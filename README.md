@@ -1,12 +1,39 @@
-# React + Vite
+Sure! Here's a well-structured **Project Details** section you can directly add to your GitHub `README.md` file for the **Banana Chat** application:
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+---
 
-Currently, two official plugins are available:
+## 📄 Project Details
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+**Project Name:** Banana Chat
+**Type:** Real-Time Anonymous Chat Web Application
+**Duration:** 1 Month
+**Team Members:**
 
-## Expanding the ESLint configuration
+* Frontend Developer: *Nilesh Sadhu*
+* Backend Developer: *Vinit Sahoo*
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### 📝 Description
+
+**Banana Chat** is a real-time chat application that connects users randomly for timed, anonymous conversations. After a fixed duration (e.g., 5 minutes), users are automatically connected with a new person. A premium version unlocks additional features such as identity reveal, priority matching, unlimited chat time, exclusive themes, emojis, and an ad-free experience.
+
+The app is designed to be lightweight, user-friendly, and engaging—offering both free and premium user journeys.
+
+### 💡 Key Highlights
+
+* 🔄 Random user pairing
+* ⏱️ Timed chat sessions for free users
+* 🧑‍💼 Identity reveal and unlimited chat for premium users
+* 🎨 Exclusive themes and emojis
+* 🚫 No ads for premium users
+* 🔒 JWT-based authentication
+* ⚡ WebSocket-powered real-time messaging
+
+### 🔧 Tech Stack
+
+| Layer      | Technologies                                 |
+| ---------- | -------------------------------------------- |
+| Frontend   | React (Vite), Tailwind CSS                   |
+| Backend    | Node.js, Express, Socket.IO                  |
+| Database   | MongoDB (via Mongoose)                       |
+| Auth       | JWT (JSON Web Tokens)                        |
+| Deployment | Netlify (Frontend), Render/Railway (Backend) |
