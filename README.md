@@ -1,7 +1,3 @@
-Sure! Here's a well-structured **Project Details** section you can directly add to your GitHub `README.md` file for the **Banana Chat** application:
-
----
-
 ## 📄 Project Details
 
 **Project Name:** Banana Chat
