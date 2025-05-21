@@ -1,4 +1,4 @@
-function CustomInput({ id, label, placeholder }) {
+function CustomInput({ id, label, placeholder, name, value, onChange, type="text" }) {
     return (
         <div className="mb-6 relative">
             <label
@@ -9,7 +9,7 @@ function CustomInput({ id, label, placeholder }) {
             </label>
             <input
                 id={id}
-                type={id === 'password' ? 'password' : id === 'email' ? 'email' : 'text'}
+                type={type}
                 autoComplete="off"
                 className="
                     rounded-md 
@@ -25,9 +25,14 @@ function CustomInput({ id, label, placeholder }) {
                     transition-shadow duration-300
                 "
                 placeholder={placeholder}
+                name={name}
+                value={value}
+                onChange={(e) => onChange && onChange(e.target.value)}
+                required 
             />
         </div>
     );
 }
+
 
 export default CustomInput;
