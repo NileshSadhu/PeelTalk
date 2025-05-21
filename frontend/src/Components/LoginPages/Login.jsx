@@ -10,7 +10,7 @@ function Login() {
 
                 {/* Left: Title Section */}
                 <div className="flex justify-center items-center w-full md:w-1/2">
-                    <Title text="Banana - because talking to strangers is more fun than talking to your plants." />
+                    <Title/>
                 </div>
 
                 {/* Right: Login Box */}

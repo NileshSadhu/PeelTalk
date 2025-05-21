@@ -10,7 +10,7 @@ function Register() {
 
                 {/* Left: Title Section */}
                 <div className="flex justify-center items-center w-full md:w-1/2">
-                    <Title text="Banana - Slip into random chats and unexpected friendships." />
+                    <Title/>
                 </div>
 
                 {/* Right: Register Form Section */}

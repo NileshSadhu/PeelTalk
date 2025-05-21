@@ -1,7 +1,7 @@
 import logo from '../assets/logo.png';
 import { Typewriter } from 'react-simple-typewriter';
 
-function Title({ text }) {
+function Title() {
     return (
         <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-6 p-4 w-full">
             <img
@@ -17,7 +17,7 @@ function Title({ text }) {
                     {/* Replace static text with typewriter */}
                     <Typewriter
                         words={[
-                            'because talking to strangers is more fun than talking to your plants.',
+                            'Why ? because talking to strangers is more fun than talking to your plants.',
                             'Slip into random chats and unexpected friendships.',
                         ]}
                         loop={5}
