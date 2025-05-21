@@ -1,14 +1,14 @@
-import { Typewriter } from 'react-simple-typewriter'
-import logo from '../assets/logo.png'
+import { Typewriter } from 'react-simple-typewriter';
+import logo from '../assets/logo.png';
 
 function Title() {
     return (
-        <div className="flex items-center space-x-6 p-4">
-            <img src={logo} alt="Logo" className="w-48 h-48 object-contain" />
-            <div className="space-y-1 text-left w-lg">
-                <h1 className="balsamiq-sans-bold text-6xl font-bold text-amber-900">Banana</h1>
-                <p className="balsamiq-sans-bold font-medium text-xl text-amber-900">
-                    Banana - 
+        <div className="flex flex-col md:flex-row items-center md:items-start space-y-4 md:space-y-0 md:space-x-6 p-4 w-full">
+            <img src={logo} alt="Logo" className="w-32 sm:w-40 md:w-48 h-auto object-contain" />
+            <div className="space-y-2 text-center md:text-left w-full">
+                <h1 className="balsamiq-sans-bold text-4xl sm:text-5xl md:text-6xl font-bold text-amber-900">Banana</h1>
+                <p className="balsamiq-sans-bold font-medium text-base sm:text-lg md:text-xl text-amber-900">
+                    Banana -{" "}
                     <Typewriter
                         words={[
                             ' because talking to strangers is more fun than talking to your plants.',
