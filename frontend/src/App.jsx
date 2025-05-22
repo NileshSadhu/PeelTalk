@@ -6,8 +6,8 @@ import Register from './Components/AuthPages/Register';
 function App() {
   return (
     <>
-      <Login />
-      {/* <Register /> */}
+      {/* <Login /> */}
+      <Register />
     </>
   )
 }

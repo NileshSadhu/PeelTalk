@@ -1,4 +1,4 @@
-function CustomButton({ label, type = "submit", onClick }) {
+function CustomButton({ label, type = "button", onClick }) {
     return (
         <button
             type={type}

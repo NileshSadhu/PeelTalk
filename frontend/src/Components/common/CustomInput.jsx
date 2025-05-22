@@ -40,6 +40,10 @@ function CustomInput({
                 onChange={(e) => onChange && onChange(e.target.value)}
                 required
             />
+            {error && (
+                <p className="text-red-500 text-xs mt-1">{error}</p>
+            )}
+
         </div>
     );
 }
