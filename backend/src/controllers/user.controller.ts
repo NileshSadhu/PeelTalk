@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { loginSchema, signupSchema } from "../validations/user.schema";
+import { loginSchema, passwordResetSchema, signupSchema } from "../validations/user.schema";
 import { User } from "../models/user.model";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
@@ -13,6 +13,10 @@ const jwt_secret = process.env.JWT_SECRET;
 
 if (!jwt_secret) {
     throw new Error("JWT_SECRET is not defined in environment variables");
+}
+
+function generateOtp(): string {
+    return Math.floor(1000 + Math.random() * 9000).toString();
 }
 
 export const signup = async(req:Request,res:Response):Promise<Response> => {
@@ -44,7 +48,7 @@ export const signup = async(req:Request,res:Response):Promise<Response> => {
 
         const hashedPassword = await bcrypt.hash(data.password,10);
 
-        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        const otp = generateOtp();
 
         const tempUserData = {
             name: data.name,
@@ -146,6 +150,86 @@ export const login = async(req:Request,res:Response):Promise<Response> => {
             msg: "User login in successfully!!!",
             token: token
         });
+    }catch(error){
+        console.error("Server Error:",error)
+        return res.status(500).json({message:"Internal server error"})
+    }
+}
+
+
+export const forgotPassword = async(req:Request,res:Response):Promise<Response> =>{
+    const result = passwordResetSchema.safeParse(req.body);
+
+    if(!result.success){
+        return res.status(400).json({
+        message: "Validation failed",
+        errors: result.error.flatten(), 
+    });
+    }
+    
+    const data = result.data;
+
+    try{
+        const isUser = await User.findOne({
+            email: data.email
+        })
+
+        if(!isUser){
+            return res.status(400).json({
+                message: "User does not exists!"
+            })
+        }
+
+        const otp = generateOtp();
+
+        const hashedPassword = await bcrypt.hash(data.Newpassword,10)
+
+        await sendOtpEmail(data.email,otp);
+
+        await redis.set(
+            `reset-otp:${data.email}`,
+            JSON.stringify({ otp, password: hashedPassword }),
+            'EX',
+            300
+        );
+
+        return res.status(200).json({
+            msg: "Otp sent to your email verify it to change password!!"
+        });
+
+    }catch(error){
+        console.error("Server Error:",error)
+        return res.status(500).json({message:"Internal server error"})
+    }
+}
+
+
+export const resetPassword = async(req:Request,res:Response):Promise<Response> => {
+    try{
+        const { otp,email } = req.body;
+
+        const data = await redis.get(`reset-otp:${email}`);
+
+        if(!data){
+            return res.status(400).json({ message: 'OTP expired or not found.' });
+        }
+
+        const parsedData = JSON.parse(data);
+
+        if(parsedData.otp !== otp){
+            return res.status(400).json({ message: 'Invalid OTP.' });
+        }
+
+        await User.updateOne({email},{
+            password: parsedData.password
+        })
+
+        await redis.del(`reset-otp:${email}`);
+
+        return res.status(200).json({
+            message: "Password reset successfully."
+        })
+
     }catch(error){
         console.error("Server Error:",error)
         return res.status(500).json({message:"Internal server error"})
