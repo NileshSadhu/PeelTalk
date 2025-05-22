@@ -6,10 +6,10 @@ function ViseVerse({ text }) {
 
     const handleClick = () => {
         if (text.includes("Login")) {
-            navigate("./Login");
+            navigate("/login");
         }
         else {
-            navigate("./Register");
+            navigate("/signup");
         }
     }
 

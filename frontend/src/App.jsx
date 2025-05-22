@@ -1,16 +1,14 @@
 import './App.css'
 import Login from './Components/AuthPages/Login';
 import Register from './Components/AuthPages/Register';
-import {BrowserRouter as Router, Routes, Route} from 'react-riuter-dom';
+import { Routes, Route } from "react-router-dom"
 
 function App() {
   return (
-    <Router>
       <Routes>
-        <Route path='./Components/AuthPage/Register' element={<Register />} />
-        <Route path='./Components/AuthPage/Login' element={<Login />} />
+        <Route path='/signup' element={<Register />} />
+        <Route path='/login' element={<Login />} />
       </Routes>
-    </Router>
   )
 }
 

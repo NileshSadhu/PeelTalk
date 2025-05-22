@@ -5,6 +5,7 @@ import Head from "../common/head";
 import Title from "../common/Title";
 import ViseVerse from "../common/ViseVerse";
 import { isPasswordValid, isEmailValid } from "./CheckList";
+import axios from "axios";
 
 
 function Login() {
@@ -14,6 +15,7 @@ function Login() {
     const [emailError, setEmailError] = useState("");
     const [passwordError, setPasswordError] = useState("");
 
+    const backend_api = import.meta.env.VITE_BACKEND_URL;
 
     async function handleSubmit(email, password) {
         const emailValidationMessage = isEmailValid(email);
@@ -34,13 +36,10 @@ function Login() {
         }
 
         try {
-            const response = await fetch("https://backend/login", {
-                method: 'POST',
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ email, password }),
-            });
+            const response = await axios.post(`${backend_api}/user/login`,{
+                email,
+                password
+            })
 
             const data = await response.json();
             if (response.ok) {

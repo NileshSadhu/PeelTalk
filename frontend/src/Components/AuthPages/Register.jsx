@@ -5,16 +5,21 @@ import Head from "../common/head";
 import Title from "../common/Title";
 import ViseVerse from "../common/ViseVerse";
 import { isEmailValid, isPasswordValid } from "./CheckList";
+import axios from "axios";
+
+
 
 function Register() {
 
     const [error, setError] = useState("");
     const [user, setUser] = useState("");
+    const [name,setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [emailError, setEmailError] = useState("");
     const [passwordError, setPasswordError] = useState("");
 
+    const backend_api = import.meta.env.VITE_BACKEND_URL;
 
     async function handleSubmit(user, email, password) {
         const emailValidationMessage = isEmailValid(email);
@@ -40,13 +45,12 @@ function Register() {
         }
 
         try {
-            const response = await fetch("https://backend/register", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ user, email, password }),
-            });
+            const response = await axios.post(`${backend_api}/user/signup`,{
+                name,
+                email,
+                username: user,
+                password
+            })
 
             const data = await response.json();
             if (response.ok) {
@@ -67,7 +71,6 @@ function Register() {
     return (
         <div className="min-h-screen bg-gradient-to-b from-yellow-300 to-yellow-100 flex items-center justify-center p-4">
             <div className="flex flex-col md:flex-row items-center md:items-stretch w-full max-w-7xl min-w-0">
-
                 {/* Left: Title Section */}
                 <div className="flex justify-center items-center w-full md:w-1/2">
                     <Title />
@@ -80,6 +83,15 @@ function Register() {
                         <Head
                             title={"Welcome Back!"}
                             tagline={"Back for more Bananas? We got you"}
+                        />
+
+                        <CustomInput 
+                        id="Name"
+                        label={"Full Name"}
+                        placeholder={"mr uzihiko"}
+                        onChange={(value) =>{
+                            setName(value)
+                        }}
                         />
 
                         {/* User field */}
