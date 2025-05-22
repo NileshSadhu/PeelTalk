@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { loginSchema, passwordResetSchema, signupSchema } from "../validations/user.schema";
+import { loginSchema, passwordResetSchema, signupSchema, updateUserSchema } from "../validations/user.schema";
 import { User } from "../models/user.model";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
@@ -102,9 +102,15 @@ export const verifySignup = async(req:Request,res:Response):Promise<Response> =>
 
         const token = jwt.sign({ id: user._id, email: user.email }, jwt_secret);
 
+        res.cookie("token",token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "lax",
+            maxAge: 7 * 24 * 60 * 60 * 1000,
+        })
+
         return res.status(201).json({
-            msg: 'Signup verified and user created successfully!',
-            token: token,
+            msg: 'Signup verified and user created successfully!'
         });
         
     }catch(error){
@@ -146,9 +152,15 @@ export const login = async(req:Request,res:Response):Promise<Response> => {
 
         const token = jwt.sign({id: user._id,email: user.email},jwt_secret)
 
+        res.cookie("token",token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "lax",
+            maxAge: 7 * 24 * 60 * 60 * 1000,
+        })
+
         return res.status(201).json({
-            msg: "User login in successfully!!!",
-            token: token
+            msg: "User login in successfully!!!"
         });
     }catch(error){
         console.error("Server Error:",error)
@@ -233,5 +245,83 @@ export const resetPassword = async(req:Request,res:Response):Promise<Response> =
     }catch(error){
         console.error("Server Error:",error)
         return res.status(500).json({message:"Internal server error"})
+    }
+}
+
+
+export const verifyUser = async(req:Request,res:Response):Promise<Response> => {
+    try{
+        const userId = req.userId;
+        const email = req.username;
+
+        return res.status(200).json({
+            message: "User verified successfully!!!",
+            userId: userId,
+            email: email
+        })
+    }catch(error){
+        console.error("Server Error:",error)
+        return res.status(500).json({message:"Internal server error"})
+    }
+}
+
+
+export const getUserDetails = async(req:Request,res:Response):Promise<Response> => {
+    try{
+        const userId = req.userId;
+
+        const user = await User.findOne({_id: userId},{
+            username: true,
+            name: true,
+            email: true,
+            profilePhoto: true
+        })
+
+        if(!user){
+            return res.status(400).json({
+                message: "User not found!!!"
+            })
+        }
+
+        return res.status(200).json({
+            message: "User Details fetched",
+            user
+        })
+
+    }catch(error){
+        console.error("Server Error:",error)
+        return res.status(500).json({message:"Internal server error"})
+    }
+}
+
+
+export const updateUserDetails = async(req:Request,res:Response):Promise<Response> => {
+    const result = updateUserSchema.safeParse(req.body);
+
+    if(!result.success){
+        return res.status(400).json({
+        message: "Validation failed",
+        errors: result.error.flatten(), 
+    });
+    }
+    
+    const data = result.data;
+
+    try{
+        const userId = req.userId;
+
+        const user = await User.findByIdAndUpdate({_id: userId},{$set: data},{new: true});
+
+        if(!user){
+            return res.status(404).json({ message: "User not found!" });
+        }
+
+        return res.status(200).json({
+            message: "User updated successfully",
+            user,
+        });
+    }catch(error){
+        console.error("Update Error:", error);
+        return res.status(500).json({ message: "Internal server error" });
     }
 }
