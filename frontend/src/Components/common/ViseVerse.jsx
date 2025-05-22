@@ -1,9 +1,25 @@
+import { useNavigate } from 'react-router-dom';
+
 function ViseVerse({ text }) {
+
+    const navigate = useNavigate();
+
+    const handleClick = () => {
+        if (text.includes("Login")) {
+            navigate("./Login");
+        }
+        else {
+            navigate("./Register");
+        }
+    }
+
     return (
         <div className="text-center mt-1.5">
-            <a href="#" className="balsamiq-sans-bold font-medium text-[12px] text-amber-900">
+            <button
+                onClick={handleClick}
+                className="balsamiq-sans-bold font-medium text-[12px] text-amber-900">
                 {text}
-            </a>
+            </button>
         </div>
     )
 }
