@@ -18,3 +18,9 @@ export const passwordResetSchema = z.object({
     email: z.string().email(),
     Newpassword: z.string().min(8)
 })
+
+export const updateUserSchema = z.object({
+    name: z.string().min(1).optional(),
+    email: z.string().email().optional(),
+    username: z.string().min(3).optional(),
+})
