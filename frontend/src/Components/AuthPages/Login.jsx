@@ -4,37 +4,36 @@ import CustomInput from "../common/CustomInput";
 import Head from "../common/head";
 import Title from "../common/Title";
 import ViseVerse from "../common/ViseVerse";
+import { isPasswordValid, isEmailValid } from "./CheckList";
+
 
 function Login() {
-
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
-
-    function isPasswordValid(password) {
-        const minLength = 8;
-        const specialCharRegex = /[!@#$%^&*(),.?":{}|<>]/;
-
-        if (password.length < minLength) {
-            return "Password must be at least 8 characters long.";
-        }
-
-        if (!specialCharRegex.test(password)) {
-            return "Password must include at least one special character.";
-        }
-
-        return null; // No error
-    }
+    const [emailError, setEmailError] = useState("");
+    const [passwordError, setPasswordError] = useState("");
 
 
     async function handleSubmit(email, password) {
-        try {
-            const passwordError = isPasswordValid(password);
-            if (passwordError) {
-                setError(passwordError);
-                return;
-            }
+        const emailValidationMessage = isEmailValid(email);
+        const passwordValidationMessage = isPasswordValid(password);
 
+        setEmailError("");
+        setPasswordError("");
+        setError("");
+
+        if (emailValidationMessage) {
+            setEmailError(emailValidationMessage);
+            return;
+        }
+
+        if (passwordValidationMessage) {
+            setPasswordError(passwordValidationMessage);
+            return;
+        }
+
+        try {
             const response = await fetch("https://backend/login", {
                 method: 'POST',
                 headers: {
@@ -84,7 +83,12 @@ function Login() {
                             label="Email:"
                             type="email"
                             placeholder="xyz@example.com"
-                            onChange={(value) => setEmail(value)}
+                            onChange={(value) => {
+                                setEmail(value)
+                                const validatinnMsg = isEmailValid(value);
+                                setEmailError(validatinnMsg || "");
+                            }}
+                            error={emailError}
                         />
 
                         {/* password Field */}
@@ -93,7 +97,12 @@ function Login() {
                             label="Password:"
                             type="password"
                             placeholder="At least 8 characters long"
-                            onChange={(value) => setPassword(value)}
+                            onChange={(value) => {
+                                setPassword(value);
+                                const validationMsg = isPasswordValid(value);
+                                setPasswordError(validationMsg || "");
+                            }}
+                            error={passwordError}
                         />
 
                         {/* Btn */}

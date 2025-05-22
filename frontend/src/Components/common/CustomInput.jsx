@@ -1,4 +1,13 @@
-function CustomInput({ id, label, placeholder, name, value, onChange, type="text" }) {
+function CustomInput({
+    id,
+    label,
+    placeholder,
+    name,
+    value,
+    onChange,
+    type = "text",
+    error, // new prop to handle error state
+}) {
     return (
         <div className="mb-6 relative">
             <label
@@ -11,7 +20,7 @@ function CustomInput({ id, label, placeholder, name, value, onChange, type="text
                 id={id}
                 type={type}
                 autoComplete="off"
-                className="
+                className={`
                     rounded-md 
                     p-3 
                     w-full 
@@ -23,16 +32,16 @@ function CustomInput({ id, label, placeholder, name, value, onChange, type="text
                     focus:outline-none 
                     focus:shadow-[0_6px_12px_rgba(253,215,85,0.8)] 
                     transition-shadow duration-300
-                "
+                    ${error ? "border-2 border-red-500" : "border-none"}
+                `}
                 placeholder={placeholder}
                 name={name}
                 value={value}
                 onChange={(e) => onChange && onChange(e.target.value)}
-                required 
+                required
             />
         </div>
     );
 }
-
 
 export default CustomInput;
