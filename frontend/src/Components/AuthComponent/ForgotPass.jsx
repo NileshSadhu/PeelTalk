@@ -5,7 +5,7 @@ import Head from "../common/head";
 import { isEmailValid, validPin } from "./CheckList";
 import Title from "../common/Title";
 
-function ForgetPass() {
+function ForgotPass() {
 
     const backend_api = import.meta.env.VITE_BACKEND_URL;
     const [error, setError] = useState("");
@@ -117,4 +117,4 @@ function ForgetPass() {
     )
 }
 
-export default ForgetPass;
+export default ForgotPass;
