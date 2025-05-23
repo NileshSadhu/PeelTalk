@@ -23,3 +23,10 @@ export function isEmailValid(email) {
     }
     return null;
 }
+
+export function validPin(pin) {
+    if (pin.length !== 4 || !/^\d{4}$/.test(pin)) {
+        return "Pin must be exactly 4 digits.";
+    }
+    return null;
+}

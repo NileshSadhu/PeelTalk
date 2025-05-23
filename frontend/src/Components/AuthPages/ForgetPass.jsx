@@ -2,55 +2,45 @@ import { useState } from "react";
 import CustomButton from "../common/CustomButton";
 import CustomInput from "../common/CustomInput";
 import Head from "../common/head";
+import { isEmailValid, validPin } from "./CheckList";
 import Title from "../common/Title";
-import ViseVerse from "../common/ViseVerse";
-import { isEmailValid, isPasswordValid } from "./CheckList";
-import axios from "axios";
 
-
-
-function Register() {
-
-    const [error, setError] = useState("");
-    const [user, setUser] = useState("");
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [emailError, setEmailError] = useState("");
-    const [passwordError, setPasswordError] = useState("");
+function ForgetPass() {
 
     const backend_api = import.meta.env.VITE_BACKEND_URL;
+    const [error, setError] = useState("");
+    const [email, setEmail] = useState("");
+    const [pin, setPin] = useState("");
+    const [emailError, setEmailError] = useState("");
+    const [pinError, setPinError] = useState("");
 
-    async function handleSubmit(user, email, password) {
+    async function handleSubmit(email, pin) {
         const emailValidationMessage = isEmailValid(email);
-        const passwordValidationMessage = isPasswordValid(password);
-
-        setEmailError("");
-        setPasswordError("");
-        setError("");
+        const pinValidationMessage = validPin(pin);
 
         if (emailValidationMessage) {
             setEmailError(emailValidationMessage);
             return;
         }
 
-        if (passwordValidationMessage) {
-            setPasswordError(passwordValidationMessage);
+        if (pinValidationMessage) {
+            setPinError(pinValidationMessage);
             return;
         }
 
-        if (!user || !email || !password) {
-            setError("All fields are required.");
+        if (!email) {
+            setError("Email is required.");
             return;
         }
 
         try {
-            const response = await axios.post(`${backend_api}/user/signup`,{
+
+            const response = await axios.post(`${backend_api}/forgetpass`, {
                 email,
-                username: user,
-                password
+                pin
             })
 
-            const data = await response.json();
+            const data = await response.data;
             if (response.ok) {
                 localStorage.setItem("token", data.token);
                 alert("Login Successful");
@@ -65,7 +55,6 @@ function Register() {
         }
     }
 
-
     return (
         <div className="min-h-screen bg-gradient-to-b from-yellow-300 to-yellow-100 flex items-center justify-center p-4">
             <div className="flex flex-col md:flex-row items-center md:items-stretch w-full max-w-7xl min-w-0">
@@ -79,17 +68,8 @@ function Register() {
                     <div className="bg-white p-6 sm:p-10 rounded-lg w-full max-w-md shadow-md">
 
                         <Head
-                            title={"Let's get you started"}
-                            tagline={"Don't worry, we don't bite. We just chat."}
-                        />
-
-                        {/* User field */}
-                        <CustomInput
-                            id="username"
-                            label="Username:"
-                            placeholder="peo"
-                            value={user}
-                            onChange={(value) => setUser(value)}
+                            title={"Forget your passowrd ?"}
+                            tagline={"Oops.. even banana slip sometimes."}
                         />
 
                         {/* email field */}
@@ -106,37 +86,35 @@ function Register() {
                             error={emailError}
                         />
 
-                        {/* password field */}
+                        {/* OTP field */}
                         <CustomInput
-                            id="password"
-                            label="Password:"
-                            placeholder="At least 8 characters long"
+                            id="otp"
+                            label="OTP:"
+                            placeholder="Enter 4 digit pin."
                             onChange={(value) => {
-                                setPassword(value);
-                                const validationMsg = isPasswordValid(value);
-                                setPasswordError(validationMsg || "");
+                                setPin(value);
+                                const validationMsg = validPin(value);
+                                setPinError(validationMsg || "");
                             }}
-                            error={passwordError}
+                            error={pinError}
                         />
 
                         {/* btn */}
                         <CustomButton
                             type="button"
                             label="Submit"
-                            onClick={() => handleSubmit(user, email, password)}
+                            onClick={() => handleSubmit(email, pin)}
                         />
 
                         {error && (
                             <p className="text-red-600 text-sm mt-2">{error}</p>
                         )}
-
-                        <ViseVerse text="Already have an account? Login" />
                     </div>
                 </div>
 
             </div>
         </div>
-    );
+    )
 }
 
-export default Register;
+export default ForgetPass;

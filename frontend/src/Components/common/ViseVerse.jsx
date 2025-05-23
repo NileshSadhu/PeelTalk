@@ -9,7 +9,7 @@ function ViseVerse({ text }) {
             navigate("/login");
         }
         else {
-            navigate("/signup");
+            navigate("/register");
         }
     }
 

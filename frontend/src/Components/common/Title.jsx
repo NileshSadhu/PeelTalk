@@ -11,7 +11,7 @@ function Title() {
             />
             <div className="space-y-2 text-left max-w-full md:max-w-xl">
                 <h1 className="balsamiq-sans-bold text-4xl sm:text-5xl md:text-6xl font-bold text-amber-900">
-                    Banana
+                    PeelTalk
                 </h1>
                 <div className="balsamiq-sans-bold font-medium text-base sm:text-lg md:text-xl text-amber-900 break-words whitespace-normal min-h-[4.5rem] md:min-h-[5rem]">
                     {/* Replace static text with typewriter */}
@@ -19,6 +19,7 @@ function Title() {
                         words={[
                             'Why ? because talking to strangers is more fun than talking to your plants.',
                             'Slip into random chats and unexpected friendships.',
+                            'Sweet chat, Zero awkward peels.'
                         ]}
                         loop={5}
                         cursor
