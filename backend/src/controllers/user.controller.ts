@@ -51,7 +51,6 @@ export const signup = async(req:Request,res:Response):Promise<Response> => {
         const otp = generateOtp();
 
         const tempUserData = {
-            name: data.name,
             email: data.email,
             username: data.username,
             password: hashedPassword
@@ -92,7 +91,6 @@ export const verifySignup = async(req:Request,res:Response):Promise<Response> =>
         }
 
         const user = await User.create({
-            name: parsedData.user.name,
             email: parsedData.user.email,
             username: parsedData.user.username,
             password: parsedData.user.password,
