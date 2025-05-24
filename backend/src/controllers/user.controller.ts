@@ -180,11 +180,11 @@ export const forgotPassword = async(req:Request,res:Response):Promise<Response> 
     const data = result.data;
 
     try{
-        const isUser = await User.findOne({
+        const user = await User.findOne({
             email: data.email
         })
 
-        if(!isUser){
+        if(!user){
             return res.status(400).json({
                 message: "User does not exists!"
             })
@@ -204,7 +204,7 @@ export const forgotPassword = async(req:Request,res:Response):Promise<Response> 
         );
 
         return res.status(200).json({
-            msg: "Otp sent to your email verify it to change password!!"
+            msg: "If this email is registered, an OTP has been sent."
         });
 
     }catch(error){
