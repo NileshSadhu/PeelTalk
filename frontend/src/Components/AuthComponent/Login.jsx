@@ -114,6 +114,14 @@ function Login() {
                             error={passwordError}
                         />
 
+                        <button
+                            className="balsamiq-sans-bold text-xs text-amber-900 mb-2 float-right"
+                            onClick={() => navigate('/ForgetPass')}
+                        >
+                            Forget password
+                        </button>
+
+
                         {/* Submit Button */}
                         <CustomButton
                             type="Submit"
