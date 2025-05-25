@@ -1,27 +1,22 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 
-function ViseVerse({ text }) {
-
+function ViseVerse({ type }) {
     const navigate = useNavigate();
 
-    const handleClick = () => {
-        if (text.includes("Login")) {
-            navigate("/login");
-        }
-        else {
-            navigate("/register");
-        }
-    }
+    const isLogin = type === "login";
 
     return (
         <div className="text-center mt-1.5">
             <button
-                onClick={handleClick}
-                className="balsamiq-sans-bold font-medium text-[12px] text-amber-900">
-                {text}
+                onClick={() => navigate(isLogin ? "/login" : "/register")}
+                className="balsamiq-sans-bold font-medium text-[12px] text-amber-900"
+            >
+                {isLogin
+                    ? "Already have an account? Login"
+                    : "Don't have an account? Register"}
             </button>
         </div>
-    )
+    );
 }
 
 export default ViseVerse;

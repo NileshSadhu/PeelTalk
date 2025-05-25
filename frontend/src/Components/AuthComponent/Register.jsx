@@ -1,33 +1,38 @@
+// Importing necessary hooks and components
 import { useState } from "react";
 import CustomButton from "../common/CustomButton";
 import CustomInput from "../common/CustomInput";
 import Head from "../common/head";
 import Title from "../common/Title";
 import ViseVerse from "../common/ViseVerse";
-import { isEmailValid, isPasswordValid } from "./CheckList";
+import { isEmailValid, isPasswordValid } from "./CheckList"; // Validation functions
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-
 function Register() {
+    // State for managing input and error messages
     const [error, setError] = useState("");
     const [user, setUser] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [emailError, setEmailError] = useState("");
     const [passwordError, setPasswordError] = useState("");
+
     const navigate = useNavigate();
+    const backend_api = import.meta.env.VITE_BACKEND_URL; // Backend base URL from env
 
-    const backend_api = import.meta.env.VITE_BACKEND_URL;
-
+    // Handles form submission logic
     async function handleSubmit(user, email, password) {
+        // Run validations
         const emailValidationMessage = isEmailValid(email);
         const passwordValidationMessage = isPasswordValid(password);
 
+        // Clear old errors
         setEmailError("");
         setPasswordError("");
         setError("");
 
+        // Set field-specific errors if any
         if (emailValidationMessage) {
             setEmailError(emailValidationMessage);
             return;
@@ -38,20 +43,23 @@ function Register() {
             return;
         }
 
+        // Check if any field is empty
         if (!user || !email || !password) {
             setError("All fields are required.");
             return;
         }
 
         try {
-            const response = await axios.post(`${backend_api}/user/signup`,{
+            // Send signup request
+            const response = await axios.post(`${backend_api}/user/signup`, {
                 email,
                 username: user,
-                password
-            })
+                password,
+            });
 
-            const data = await response.json();
-            if (response.ok) {
+            const data = await response.data;
+            // Handle successful response
+            if (response.status === 200) {
                 localStorage.setItem("token", data.token);
                 alert("Login Successful");
                 navigate('/VerifyEmail');
@@ -66,16 +74,16 @@ function Register() {
         }
     }
 
-
     return (
         <div className="min-h-screen bg-gradient-to-b from-yellow-300 to-yellow-100 flex items-center justify-center p-4">
             <div className="flex flex-col md:flex-row items-center md:items-stretch w-full max-w-7xl min-w-0">
-                {/* Left: Title Section */}
+
+                {/* Left side: Title component */}
                 <div className="flex justify-center items-center w-full md:w-1/2">
                     <Title />
                 </div>
 
-                {/* Right: Register Form Section */}
+                {/* Right side: Registration form */}
                 <div className="flex justify-center items-center w-full md:w-1/2">
                     <div className="bg-white p-6 sm:p-10 rounded-lg w-full max-w-md shadow-md">
 
@@ -84,7 +92,7 @@ function Register() {
                             tagline={"Don't worry, we don't bite. We just chat."}
                         />
 
-                        {/* User field */}
+                        {/* Username input */}
                         <CustomInput
                             id="username"
                             label="Username:"
@@ -93,7 +101,7 @@ function Register() {
                             onChange={(value) => setUser(value)}
                         />
 
-                        {/* email field */}
+                        {/* Email input with real-time validation */}
                         <CustomInput
                             id="email"
                             label="Email:"
@@ -107,7 +115,7 @@ function Register() {
                             error={emailError}
                         />
 
-                        {/* password field */}
+                        {/* Password input with real-time validation */}
                         <CustomInput
                             id="password"
                             label="Password:"
@@ -120,21 +128,23 @@ function Register() {
                             error={passwordError}
                         />
 
-                        {/* btn */}
+                        {/* Submit button */}
                         <CustomButton
                             type="button"
                             label="Submit"
                             onClick={() => handleSubmit(user, email, password)}
                         />
 
+                        {/* Display error messages */}
                         {error && (
                             <p className="text-red-600 text-sm mt-2">{error}</p>
                         )}
 
-                        <ViseVerse text="Already have an account? Login" />
+                        {/* Link to Login page */}
+                        <ViseVerse text="Already have an account? Login" type="login" />
+
                     </div>
                 </div>
-
             </div>
         </div>
     );
