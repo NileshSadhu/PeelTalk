@@ -1,4 +1,5 @@
-import Home from "../Components/HomeComponents/Home"
+import Home from "../Components/Home"
+
 
 
 

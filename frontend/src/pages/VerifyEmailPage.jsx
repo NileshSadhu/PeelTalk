@@ -1,6 +1,6 @@
 import VerifyEmail from "../Components/AuthComponent/VerifyEmail"
 
-export const LoginPage = () => {
+export const VerifyEmailPage = () => {
     return (
         <div>
             <VerifyEmail />
