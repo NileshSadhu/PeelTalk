@@ -4,6 +4,7 @@ import { LoginPage } from './pages/LoginPage';
 import { HomePage } from './pages/HomePage';
 import { ForgotPassPage } from "./pages/ForgotPassPage";
 import './App.css'
+import VerifyEmail from "./Components/AuthComponent/VerifyEmail";
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
       <Route path='/register' element={<RegistrationPage />} />
       <Route path='/login' element={<LoginPage />} />
       <Route path='/forgetpassword' element={<ForgotPassPage />} />
+      <Route path='/VerifyEmail' element={<VerifyEmail />} />
     </Routes>
   )
 }

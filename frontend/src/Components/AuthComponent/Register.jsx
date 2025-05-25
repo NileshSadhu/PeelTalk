@@ -6,17 +6,17 @@ import Title from "../common/Title";
 import ViseVerse from "../common/ViseVerse";
 import { isEmailValid, isPasswordValid } from "./CheckList";
 import axios from "axios";
-
+import { useNavigate } from "react-router-dom";
 
 
 function Register() {
-
     const [error, setError] = useState("");
     const [user, setUser] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [emailError, setEmailError] = useState("");
     const [passwordError, setPasswordError] = useState("");
+    const navigate = useNavigate();
 
     const backend_api = import.meta.env.VITE_BACKEND_URL;
 
@@ -54,6 +54,7 @@ function Register() {
             if (response.ok) {
                 localStorage.setItem("token", data.token);
                 alert("Login Successful");
+                navigate('/VerifyEmail');
                 setError("");
             } else {
                 setError(data.message || "Login Failed");

@@ -19,7 +19,8 @@ function Title() {
                         words={[
                             'Why ? because talking to strangers is more fun than talking to your plants.',
                             'Slip into random chats and unexpected friendships.',
-                            'Sweet chat, Zero awkward peels.'
+                            'Sweet chat, Zero awkward peels.',
+                            'Bananas are not a tree, but a very big herb!'
                         ]}
                         loop={5}
                         cursor
