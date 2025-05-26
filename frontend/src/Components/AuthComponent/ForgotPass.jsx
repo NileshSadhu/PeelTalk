@@ -1,6 +1,7 @@
 import { useState } from "react";
 import CustomButton from "../common/CustomButton";
 import CustomInput from "../common/CustomInput";
+import PasswordInput from '../common/PasswordInput';
 import Head from "../common/head";
 import { isEmailValid, isPasswordValid } from "./CheckList";
 import Title from "../common/Title";
@@ -48,7 +49,7 @@ function ForgotPass() {
             const response = await axios.post(`${backend_api}/user/forgot-password`, {
                 email,
                 Newpassword: password
-            },{
+            }, {
                 withCredentials: true
             });
 
@@ -116,10 +117,10 @@ function ForgotPass() {
                         />
 
                         {/* New Password field */}
-                        <CustomInput
+                        <PasswordInput
                             id="newpass"
                             label="New Password:"
-                            placeholder="add special character"
+                            placeholder="Add special character"
                             onChange={(value) => {
                                 setPassword(value);
                                 const validationMsg = isPasswordValid(value);
@@ -127,6 +128,7 @@ function ForgotPass() {
                             }}
                             error={passwordError}
                         />
+
 
                         {/* btn */}
                         <CustomButton

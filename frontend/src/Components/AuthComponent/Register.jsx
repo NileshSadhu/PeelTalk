@@ -5,10 +5,11 @@ import CustomInput from "../common/CustomInput";
 import Head from "../common/head";
 import Title from "../common/Title";
 import ViseVerse from "../common/ViseVerse";
-import { isEmailValid, isPasswordValid } from "./CheckList"; 
+import { isEmailValid, isPasswordValid } from "./CheckList";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import PasswordInput from "../common/PasswordInput";
 
 function Register() {
     const [error, setError] = useState("");
@@ -19,7 +20,7 @@ function Register() {
     const [passwordError, setPasswordError] = useState("");
 
     const navigate = useNavigate();
-    const backend_api = import.meta.env.VITE_BACKEND_URL; 
+    const backend_api = import.meta.env.VITE_BACKEND_URL;
 
 
     async function handleSubmit(user, email, password) {
@@ -51,7 +52,7 @@ function Register() {
                 email,
                 username: user,
                 password,
-            },{
+            }, {
                 withCredentials: true
             });
 
@@ -107,7 +108,7 @@ function Register() {
                         />
 
                         {/* Password input with real-time validation */}
-                        <CustomInput
+                        <PasswordInput
                             id="password"
                             label="Password:"
                             placeholder="At least 8 characters long"
@@ -118,6 +119,7 @@ function Register() {
                             }}
                             error={passwordError}
                         />
+
 
                         {/* Submit button */}
                         <CustomButton
