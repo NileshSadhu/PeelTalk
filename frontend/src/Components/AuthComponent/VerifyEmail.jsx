@@ -3,6 +3,7 @@ import CustomButton from "../common/CustomButton";
 import CustomInput from "../common/CustomInput";
 import Head from "../common/head";
 import Title from "../common/Title";
+import axios from "axios";
 
 function VerifyEmail() {
 
