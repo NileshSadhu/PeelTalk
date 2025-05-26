@@ -8,7 +8,6 @@ import Title from "../common/Title";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
-
 function VerifyEmail() {
 
     const backend_api = import.meta.env.VITE_BACKEND_URL;

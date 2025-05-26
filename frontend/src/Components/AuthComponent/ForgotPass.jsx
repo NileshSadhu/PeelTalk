@@ -4,6 +4,7 @@ import CustomInput from "../common/CustomInput";
 import Head from "../common/head";
 import { isEmailValid, validPin } from "./CheckList";
 import Title from "../common/Title";
+import axios from "axios";
 
 function ForgotPass() {
 
