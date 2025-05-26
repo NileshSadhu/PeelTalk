@@ -19,7 +19,6 @@ function CustomInput({
             <input
                 id={id}
                 type={type}
-                autoComplete="off"
                 className={`
                     rounded-md 
                     p-3 

@@ -11,6 +11,8 @@ dotenv.config();
 
 const jwt_secret = process.env.JWT_SECRET;
 
+const isProd = process.env.NODE_ENV === "production";
+
 if (!jwt_secret) {
     throw new Error("JWT_SECRET is not defined in environment variables");
 }
@@ -102,7 +104,7 @@ export const verifySignup = async(req:Request,res:Response):Promise<Response> =>
 
         res.cookie("token",token, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
+            secure: isProd,
             sameSite: "lax",
             maxAge: 7 * 24 * 60 * 60 * 1000,
         })
@@ -152,7 +154,7 @@ export const login = async(req:Request,res:Response):Promise<Response> => {
 
         res.cookie("token",token, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
+            secure: isProd,
             sameSite: "lax",
             maxAge: 7 * 24 * 60 * 60 * 1000,
         })

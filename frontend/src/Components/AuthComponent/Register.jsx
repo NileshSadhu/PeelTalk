@@ -5,7 +5,7 @@ import CustomInput from "../common/CustomInput";
 import Head from "../common/head";
 import Title from "../common/Title";
 import ViseVerse from "../common/ViseVerse";
-import { isEmailValid, isPasswordValid } from "./CheckList"; // Validation functions
+import { isEmailValid, isPasswordValid } from "./CheckList"; 
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -19,20 +19,18 @@ function Register() {
     const [passwordError, setPasswordError] = useState("");
 
     const navigate = useNavigate();
-    const backend_api = import.meta.env.VITE_BACKEND_URL; // Backend base URL from env
+    const backend_api = import.meta.env.VITE_BACKEND_URL; 
 
-    // Handles form submission logic
+
     async function handleSubmit(user, email, password) {
-        // Run validations
+
         const emailValidationMessage = isEmailValid(email);
         const passwordValidationMessage = isPasswordValid(password);
 
-        // Clear old errors
         setEmailError("");
         setPasswordError("");
         setError("");
 
-        // Set field-specific errors if any
         if (emailValidationMessage) {
             setEmailError(emailValidationMessage);
             return;
@@ -43,24 +41,21 @@ function Register() {
             return;
         }
 
-        // Check if any field is empty
         if (!user || !email || !password) {
             setError("All fields are required.");
             return;
         }
 
         try {
-            // Send signup request
             const response = await axios.post(`${backend_api}/user/signup`, {
                 email,
                 username: user,
                 password,
+            },{
+                withCredentials: true
             });
 
-            const data = await response.data;
-            // Handle successful response
             if (response.status === 200) {
-                localStorage.setItem("token", data.token);
                 toast.success("Verify Your Email To Complete registration!!!");
                 navigate(`/VerifyEmail/${email}`);
                 setError("");

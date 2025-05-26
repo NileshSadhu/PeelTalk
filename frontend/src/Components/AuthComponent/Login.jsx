@@ -11,29 +11,24 @@ import { toast } from "react-toastify";
 
 
 function Login() {
-    // Form states
+
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
-    // Error message states
     const [emailError, setEmailError] = useState("");
     const [passwordError, setPasswordError] = useState("");
 
-    // Backend URL from .env
     const backend_api = import.meta.env.VITE_BACKEND_URL;
     const navigate = useNavigate();
 
-    // Handles form submission
     async function handleSubmit(email, password) {
-        // Validate inputs
+
         const emailValidationMessage = isEmailValid(email);
         const passwordValidationMessage = isPasswordValid(password);
 
-        // Clear previous errors
         setEmailError("");
         setPasswordError("");
 
-        // Show validation errors if any
         if (emailValidationMessage) {
             setEmailError(emailValidationMessage);
             return;
@@ -48,11 +43,13 @@ function Login() {
             const response = await axios.post(`${backend_api}/user/login`, {
                 email,
                 password
+            },{
+                withCredentials: true
             });
 
             if (response.status === 201) {
                 toast.success("Login Successful");
-                navigate('/')
+                await navigate('/')
             }
         } catch (error) {
             toast.error("Something went wrong. Please try again.");
