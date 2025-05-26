@@ -14,6 +14,8 @@ function ForgotPass() {
     const [pin, setPin] = useState("");
     const [emailError, setEmailError] = useState("");
     const [pinError, setPinError] = useState("");
+    const [showEmailSuccess, setShowEmailSucccess] = useState(flase);
+    const [emailFeedback, setEmailFeedvack] = useState("");
 
     async function handleSubmit(email, pin) {
         const emailValidationMessage = isEmailValid(email);
@@ -83,8 +85,19 @@ function ForgotPass() {
                                 setEmail(value)
                                 const validationMsg = isEmailValid(value);
                                 setEmailError(validationMsg || "");
+
+                                if (!validationMsg) {
+                                    setShowEmailSucccess(true);
+                                    setEmailFeedvack("✅ OTP sent to your email.");
+                                } else {
+                                    setShowEmailSucccess(false);
+                                    setEmailFeedvack("");
+                                }
+
                             }}
                             error={emailError}
+                            showIcon={showEmailSuccess}
+                            iconMessage={emailFeedback}
                         />
 
                         {/* OTP field */}

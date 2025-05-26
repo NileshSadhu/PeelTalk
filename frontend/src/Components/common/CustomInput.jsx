@@ -6,7 +6,9 @@ function CustomInput({
     value,
     onChange,
     type = "text",
-    error, // new prop to handle error state
+    error,
+    showIcon = false,          // 👈 new optional prop
+    iconMessage = "",          // 👈 new optional prop
 }) {
     return (
         <div className="mb-6 relative">
@@ -39,10 +41,14 @@ function CustomInput({
                 onChange={(e) => onChange && onChange(e.target.value)}
                 required
             />
+
             {error && (
                 <p className="text-red-500 text-xs mt-1">{error}</p>
             )}
 
+            {showIcon && iconMessage && (
+                <p className="text-green-600 text-sm mt-1">{iconMessage}</p>
+            )}
         </div>
     );
 }
