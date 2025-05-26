@@ -1,26 +1,18 @@
-function CustomInput({
-    id,
-    label,
-    placeholder,
-    name,
-    value,
-    onChange,
-    type = "text",
-    error,
-    showIcon = false,
-    iconMessage = "",
-}) {
+import { useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
+
+function PasswordInput({ placeholder, name, value, onChange, id, error }) {
+    const [showPassword, setShowPassword] = useState(false);
+
+    const togglePasswordVisibility = () => {
+        setShowPassword(prev => !prev);
+    };
+
     return (
-        <div className="mb-6 relative">
-            <label
-                htmlFor={id}
-                className="balsamiq-sans-bold block mb-1 mt-2 font-medium text-amber-900"
-            >
-                {label}
-            </label>
+        <div className="mb-3 relative">
             <input
                 id={id}
-                type={type}
+                type={showPassword ? "text" : "password"}
                 className={`
                     rounded-md 
                     p-3 
@@ -42,15 +34,19 @@ function CustomInput({
                 required
             />
 
+            {/* Toggle visibility icon */}
+            <div
+                onClick={togglePasswordVisibility}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer"
+            >
+                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+            </div>
+
             {error && (
                 <p className="text-red-500 text-xs mt-1">{error}</p>
-            )}
-
-            {showIcon && iconMessage && (
-                <p className="text-green-600 text-sm mt-1">{iconMessage}</p>
             )}
         </div>
     );
 }
 
-export default CustomInput;
+export default PasswordInput;

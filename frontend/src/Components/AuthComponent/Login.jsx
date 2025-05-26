@@ -1,6 +1,7 @@
 import { useState } from "react";
 import CustomButton from "../common/CustomButton";
 import CustomInput from "../common/CustomInput";
+import PasswordInput from "../common/PasswordInput";
 import Head from "../common/head";
 import Title from "../common/Title";
 import ViseVerse from "../common/ViseVerse";
@@ -9,9 +10,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
-
 function Login() {
-
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
@@ -22,7 +21,6 @@ function Login() {
     const navigate = useNavigate();
 
     async function handleSubmit(email, password) {
-
         const emailValidationMessage = isEmailValid(email);
         const passwordValidationMessage = isPasswordValid(password);
 
@@ -43,13 +41,13 @@ function Login() {
             const response = await axios.post(`${backend_api}/user/login`, {
                 email,
                 password
-            },{
+            }, {
                 withCredentials: true
             });
 
             if (response.status === 201) {
                 toast.success("Login Successful");
-                await navigate('/')
+                await navigate('/');
             }
         } catch (error) {
             toast.error("Something went wrong. Please try again.");
@@ -89,11 +87,11 @@ function Login() {
                         />
 
                         {/* Password Input */}
-                        <CustomInput
+                        <PasswordInput
                             id="password"
-                            label="Password:"
-                            type="password"
                             placeholder="At least 8 characters long"
+                            name="password"
+                            value={password}
                             onChange={(value) => {
                                 setPassword(value);
                                 const validationMsg = isPasswordValid(value);
@@ -108,7 +106,6 @@ function Login() {
                         >
                             Forget password
                         </button>
-
 
                         {/* Submit Button */}
                         <CustomButton
