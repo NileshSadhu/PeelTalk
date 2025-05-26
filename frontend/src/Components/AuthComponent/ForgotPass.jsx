@@ -6,6 +6,7 @@ import { isEmailValid, isPasswordValid } from "./CheckList";
 import Title from "../common/Title";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 function ForgotPass() {
 
@@ -44,14 +45,16 @@ function ForgotPass() {
         }
 
         try {
-            const response = await axios.post(`${backend_api}/forgetpass`, {
+            const response = await axios.post(`${backend_api}/user/forgot-password`, {
                 email,
-                password
+                Newpassword: password
+            },{
+                withCredentials: true
             });
 
             const data = response.data;
             if (response.status === 200) {
-                alert("Password reset successful!");
+                toast.info("Otp sent to your email for password reset.");
                 setError("");
                 setEmail("");
                 setPassword("");
@@ -59,13 +62,13 @@ function ForgotPass() {
                 setPasswordError("");
                 setShowEmailSucccess(false);
                 setEmailFeedvack("");
-                navigate('/checkpin');
+                navigate(`/checkpin/${email}`);
             } else {
                 setError(data.message || "Password reset failed.");
             }
         } catch (error) {
             console.error(error);
-            setError("Something went wrong. Please try again.");
+            toast.error("Something went wrong. Please try again.");
         }
     }
 

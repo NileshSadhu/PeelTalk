@@ -1,16 +1,21 @@
 import { useState } from "react";
 import Title from "../common/Title";
+import { useParams,useNavigate } from "react-router-dom"
 import Head from "../common/head";
 import CustomInput from "../common/CustomInput";
 import CustomButton from "../common/CustomButton";
 import axios from "axios";
 import { validPin } from "./CheckList";
+import { toast } from "react-toastify";
 
 function CheckPin() {
     const backend_api = import.meta.env.VITE_BACKEND_URL;
+    const {email} = useParams();
     const [error, setError] = useState("");
     const [pin, setPin] = useState("");
     const [pinError, setPinError] = useState("");
+
+    const navigate = useNavigate();
 
     async function handleSubmit(pin) {
         const pinValidationMessage = validPin(pin);
@@ -21,15 +26,19 @@ function CheckPin() {
         }
 
         try {
-            const response = await axios.post(`${backend_api}/CheckPin`, {
-                pin
+            const response = await axios.put(`${backend_api}/user/reset-password`, {
+                otp:pin,
+                email
+            },{
+                withCredentials: true
             })
 
             const data = await response.data;
             if (response.status === 200) {
                 localStorage.setItem("token", data.token);
-                alert("OTP Verified!");
+                toast.success("OTP Verified password has been changed successfully!!!!");
                 setError("");
+                navigate('/login')
             } else {
                 setError(data.message || "Login Failed");
             }

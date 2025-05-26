@@ -15,13 +15,13 @@ function App() {
       <Route element={<PublicRoute/>}>
       <Route path="/login" element={<LoginPage/>} />
       <Route path="/register" element={<RegistrationPage />} />
+      <Route path='/forgetpass' element={<ForgotPassPage />} />
+      <Route path='/checkpin/:email' element={<CheckPinPage />} />
       </Route>
 
       <Route element={<PrivateRoute/>}>
       <Route path="/" element={<HomePage />} />
-      <Route path='/forgetpass' element={<ForgotPassPage />} />
       <Route path='/verifyemail/:email' element={<VerifyEmailPage />} />
-      <Route path='/checkpin' element={<CheckPinPage />} />
       </Route>
     </Routes>
   );
