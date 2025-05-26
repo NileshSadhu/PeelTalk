@@ -325,3 +325,19 @@ export const updateUserDetails = async(req:Request,res:Response):Promise<Respons
         return res.status(500).json({ message: "Internal server error" });
     }
 }
+
+
+export const userLogout = async(req:Request,res:Response):Promise<Response> => {
+    try{
+        res.clearCookie("token",{
+            httpOnly: true,
+            secure: isProd,
+            sameSite: "lax"
+        })
+
+        return res.status(200).json({ message: "Logged out successfully." });
+    }catch(error){
+        console.error("Logout Error:", error);
+        return res.status(500).json({ message: "Something went wrong while logging out." });
+    }
+}

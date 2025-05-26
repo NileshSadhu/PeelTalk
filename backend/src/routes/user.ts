@@ -1,5 +1,5 @@
 import { RequestHandler, Router } from "express";
-import {forgotPassword, getUserDetails, login, resetPassword, signup, updateUserDetails, verifySignup, verifyUser}  from "../controllers/user.controller";
+import {forgotPassword, getUserDetails, login, resetPassword, signup, updateUserDetails, userLogout, verifySignup, verifyUser}  from "../controllers/user.controller";
 import { authenticate } from "../middleware/auth.middleware";
 import { createIpRateLimiter, otpRateLimitPerEmail } from "../utils/rateLimiters";
 
@@ -28,3 +28,5 @@ userRouter.get('/verify',authenticate , verifyUser as unknown as RequestHandler)
 userRouter.get('/userDetails',authenticate, getUserDetails as unknown as RequestHandler);
 
 userRouter.put('/updateUserDetails',authenticate, updateUserDetails as unknown as RequestHandler);
+
+userRouter.post('/logout',authenticate, userLogout as unknown as RequestHandler);
