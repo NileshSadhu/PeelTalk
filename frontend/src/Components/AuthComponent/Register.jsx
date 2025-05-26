@@ -58,7 +58,7 @@ function Register() {
 
             if (response.status === 200) {
                 toast.success("Verify Your Email To Complete registration!!!");
-                navigate(`/VerifyEmail/${email}`);
+                navigate(`/verifyemail/${email}`);
                 setError("");
             }
         } catch (error) {

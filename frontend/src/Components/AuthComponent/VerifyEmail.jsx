@@ -20,6 +20,8 @@ function VerifyEmail() {
             const response = await axios.post(`${backend_api}/user/verifySignup`, {
                 otp: otp,
                 email: email
+            },{
+                withCredentials: true
             })
 
             if (response.status === 201) {

@@ -87,7 +87,7 @@ function ForgotPass() {
                     <div className="bg-white p-6 sm:p-10 rounded-lg w-full max-w-md shadow-md">
 
                         <Head
-                            title={"Forget your passowrd ?"}
+                            title={"Forgot your passowrd ?"}
                             tagline={"Oops.. even banana slip sometimes."}
                         />
 

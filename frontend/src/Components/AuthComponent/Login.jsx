@@ -91,6 +91,7 @@ function Login() {
                             id="password"
                             placeholder="At least 8 characters long"
                             name="password"
+                            label={"Password"}
                             value={password}
                             onChange={(value) => {
                                 setPassword(value);
@@ -102,9 +103,9 @@ function Login() {
 
                         <button
                             className="balsamiq-sans-bold text-xs text-amber-900 mb-2 float-right"
-                            onClick={() => navigate('/ForgetPass')}
+                            onClick={() => navigate('/forgotpass')}
                         >
-                            Forget password
+                            Forgot password
                         </button>
 
                         {/* Submit Button */}

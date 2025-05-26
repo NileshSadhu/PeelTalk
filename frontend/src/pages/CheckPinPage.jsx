@@ -1,6 +1,6 @@
 import CheckPin from '../Components/AuthComponent/CheckPin';
 
-function CheckPinPage() {
+export const CheckPinPage= ()=> {
     return (
         <div>
             <CheckPin />
@@ -8,4 +8,3 @@ function CheckPinPage() {
     )
 }
 
-export default CheckPinPage;
