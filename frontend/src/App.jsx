@@ -1,21 +1,19 @@
-import React from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
-import HomePage from './Components/HomePage';
-import Login from './Components/AuthComponent/Login';
-import Register from './Components/AuthComponent/Register';
-import ForgotPass from './Components/AuthComponent/ForgotPass';
-import VerifyEmail from './Components/AuthComponent/VerifyEmail';
+import { Routes, Route } from 'react-router-dom';
+import { LoginPage } from "./pages/LoginPage"
+import { HomePage } from "./pages/HomePage"
+import { RegistrationPage } from './pages/RegistrationPage';
+import { ForgotPassPage } from './pages/ForgotPassPage';
+import { VerifyEmailPage } from "./pages/VerifyEmailPage"
 
 function App() {
-  const token = localStorage.getItem('token');
 
   return (
     <Routes>
-      <Route path="/" element={token ? <HomePage /> : <Navigate to="/login" />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
-      <Route path='/forgetpass' element={<ForgotPass />} />
-      <Route path='/verifyemail' element={<VerifyEmail />} />
+      <Route path="/" element={<HomePage />} />
+      <Route path="/login" element={<LoginPage/>} />
+      <Route path="/register" element={<RegistrationPage />} />
+      <Route path='/forgetpass' element={<ForgotPassPage />} />
+      <Route path='/verifyemail/:email' element={<VerifyEmailPage />} />
     </Routes>
   );
 }

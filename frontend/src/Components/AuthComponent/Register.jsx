@@ -8,9 +8,9 @@ import ViseVerse from "../common/ViseVerse";
 import { isEmailValid, isPasswordValid } from "./CheckList"; // Validation functions
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 function Register() {
-    // State for managing input and error messages
     const [error, setError] = useState("");
     const [user, setUser] = useState("");
     const [email, setEmail] = useState("");
@@ -61,16 +61,12 @@ function Register() {
             // Handle successful response
             if (response.status === 200) {
                 localStorage.setItem("token", data.token);
-                alert("Login Successful");
-                navigate('/VerifyEmail');
+                toast.success("Verify Your Email To Complete registration!!!");
+                navigate(`/VerifyEmail/${email}`);
                 setError("");
-            } else {
-                setError(data.message || "Login Failed");
             }
-
         } catch (error) {
-            console.log(error);
-            setError("Something went wrong. Please try again.");
+            toast.error("Something went wrong. Please try again.");
         }
     }
 

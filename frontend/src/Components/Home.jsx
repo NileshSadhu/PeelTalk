@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
-import { FaBars, FaCrown, FaPaperPlane, FaSearch } from 'react-icons/fa';
+import { useState } from 'react';
+import { FaBars } from 'react-icons/fa';
 import PremiumButton from './common/PremiumButton';
 import UserChat from './common/UserChat';
 import MessageInput from './common/MessageInput';
 import logo from './assets/logo.png'
 
-const HomePage = () => {
+const Home = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     const toggleMenu = () => {
@@ -35,7 +35,7 @@ const HomePage = () => {
         w-80 lg:w-60 fixed h-full bg-gradient-to-b from-yellow-400 to-yellow-100 p-4
         flex flex-col justify-between z-50 transform transition-transform duration-300 ease-in-out
         ${isMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
-      `}>
+        `}>
                 <div className="flex flex-col items-center">
                     {/* Logo and Title */}
                     <div className="flex flex-col items-center gap-2">
@@ -61,4 +61,4 @@ const HomePage = () => {
     );
 };
 
-export default HomePage; 
+export default Home; 

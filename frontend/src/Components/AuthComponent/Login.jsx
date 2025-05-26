@@ -6,7 +6,8 @@ import Title from "../common/Title";
 import ViseVerse from "../common/ViseVerse";
 import { isPasswordValid, isEmailValid } from "./CheckList";
 import axios from "axios";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 
 function Login() {
@@ -15,7 +16,6 @@ function Login() {
     const [password, setPassword] = useState("");
 
     // Error message states
-    const [error, setError] = useState("");
     const [emailError, setEmailError] = useState("");
     const [passwordError, setPasswordError] = useState("");
 
@@ -32,7 +32,6 @@ function Login() {
         // Clear previous errors
         setEmailError("");
         setPasswordError("");
-        setError("");
 
         // Show validation errors if any
         if (emailValidationMessage) {
@@ -46,25 +45,17 @@ function Login() {
         }
 
         try {
-            // Make POST request to login API
             const response = await axios.post(`${backend_api}/user/login`, {
                 email,
                 password
             });
 
-            const data = response.data;
-            if (response.status === 200) {
-                localStorage.setItem("token", data.token);
-                alert("Login Successful");
-                navigate('/Home')
-                setError("");
-            } else {
-                setError(data.message || "Login Failed");
+            if (response.status === 201) {
+                toast.success("Login Successful");
+                navigate('/')
             }
-
         } catch (error) {
-            console.error(error);
-            setError("Something went wrong. Please try again.");
+            toast.error("Something went wrong. Please try again.");
         }
     }
 
@@ -128,11 +119,6 @@ function Login() {
                             label="Submit"
                             onClick={() => handleSubmit(email, password)}
                         />
-
-                        {/* Error message (if any) */}
-                        {error && (
-                            <p className="text-red-600 text-sm mt-2">{error}</p>
-                        )}
 
                         {/* Link to Register */}
                         <ViseVerse text="Don't have an account? Register" type="register" />

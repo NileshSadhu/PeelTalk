@@ -1,42 +1,33 @@
 import { useState } from "react";
+import { useParams } from "react-router-dom"
 import CustomButton from "../common/CustomButton";
+import axios from "axios";
 import CustomInput from "../common/CustomInput";
 import Head from "../common/head";
 import Title from "../common/Title";
-import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 function VerifyEmail() {
 
     const backend_api = import.meta.env.VITE_BACKEND_URL;
-    const [pin, setPin] = useState("");
-    const [error, setError] = useState("");
-    const [pinError, setPinError] = useState("");
+    const {email} = useParams();
+    const [otp, setOtp] = useState("");
+    const navigate = useNavigate();
 
-    async function handleSubmit(pin) {
-        const pinValidationMessage = validPin(pin);
-
-        if (pinValidationMessage) {
-            setPinError(pinValidationMessage);
-            return;
-        }
-
+    async function handleSubmit() {
         try {
-            const response = await axios.post(`${backend_api}/VerifyEmail`, {
-                pin
+            const response = await axios.post(`${backend_api}/user/verifySignup`, {
+                otp: otp,
+                email: email
             })
 
-            const data = await response.data;
-            if (response.ok) {
-                localStorage.setItem("token", data.token);
-                alert("Login Successful");
-                setError("");
-            } else {
-                setError(data.message || "Login Failed");
+            if (response.status === 201) {
+                toast.success("Signup Successful !!!");
+                navigate('/')
             }
-
         } catch (error) {
-            console.log(error);
-            setError("Something went wrong. Please try again.");
+            toast.error("Something went wrong. Please try again.");
         }
     }
 
@@ -65,18 +56,15 @@ function VerifyEmail() {
                             type="number"
                             placeholder="XXXX"
                             onChange={(value) => {
-                                setPin(value);
-                                const validationMsg = validPin(value);
-                                setPinError(validationMsg || "");
+                                setOtp(value);
                             }}
-                            error={pinError}
                         />
 
                         {/* Btn */}
                         <CustomButton
                             type="Submit"
                             label="Submit"
-                            onClick={() => handleSubmit(pin)}
+                            onClick={handleSubmit}
                         />
                     </div>
 
