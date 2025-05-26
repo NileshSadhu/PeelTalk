@@ -4,6 +4,7 @@ import PremiumButton from './common/PremiumButton';
 import UserChat from './common/UserChat';
 import MessageInput from './common/MessageInput';
 import logo from './assets/logo.png'
+import LogoutButton from './common/LogoutButton';
 
 const Home = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -47,6 +48,9 @@ const Home = () => {
                         <span className="balsamiq-sans-bold text-brown-900 text-base lg:text-xl">PeelTalk</span>
                     </div>
                 </div>
+
+                {/* Logout Button */}
+                <LogoutButton />
 
                 {/* Premium Button */}
                 <PremiumButton text="Premium" />
