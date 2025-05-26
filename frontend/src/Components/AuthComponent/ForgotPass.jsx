@@ -2,32 +2,39 @@ import { useState } from "react";
 import CustomButton from "../common/CustomButton";
 import CustomInput from "../common/CustomInput";
 import Head from "../common/head";
-import { isEmailValid, validPin } from "./CheckList";
+import { isEmailValid, isPasswordValid } from "./CheckList";
 import Title from "../common/Title";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 function ForgotPass() {
 
+    const navigate = useNavigate();
+
     const backend_api = import.meta.env.VITE_BACKEND_URL;
     const [error, setError] = useState("");
+
     const [email, setEmail] = useState("");
-    const [pin, setPin] = useState("");
     const [emailError, setEmailError] = useState("");
-    const [pinError, setPinError] = useState("");
-    const [showEmailSuccess, setShowEmailSucccess] = useState(flase);
+
+    const [password, setPassword] = useState("");
+    const [passwordError, setPasswordError] = useState("");
+
+    const [showEmailSuccess, setShowEmailSucccess] = useState(false);
     const [emailFeedback, setEmailFeedvack] = useState("");
 
-    async function handleSubmit(email, pin) {
+
+    async function handleSubmit(email, password) {
         const emailValidationMessage = isEmailValid(email);
-        const pinValidationMessage = validPin(pin);
+        const passwordValidationMessage = isPasswordValid(password);
 
         if (emailValidationMessage) {
             setEmailError(emailValidationMessage);
             return;
         }
 
-        if (pinValidationMessage) {
-            setPinError(pinValidationMessage);
+        if (passwordValidationMessage) {
+            setPasswordError(passwordValidationMessage);
             return;
         }
 
@@ -37,26 +44,31 @@ function ForgotPass() {
         }
 
         try {
-
             const response = await axios.post(`${backend_api}/forgetpass`, {
                 email,
-                pin
-            })
+                password
+            });
 
-            const data = await response.data;
-            if (response.ok) {
-                localStorage.setItem("token", data.token);
-                alert("Login Successful");
+            const data = response.data;
+            if (response.status === 200) {
+                alert("Password reset successful!");
                 setError("");
+                setEmail("");
+                setPassword("");
+                setEmailError("");
+                setPasswordError("");
+                setShowEmailSucccess(false);
+                setEmailFeedvack("");
+                navigate('/checkpin');
             } else {
-                setError(data.message || "Login Failed");
+                setError(data.message || "Password reset failed.");
             }
-
         } catch (error) {
-            console.log(error);
+            console.error(error);
             setError("Something went wrong. Please try again.");
         }
     }
+
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-yellow-300 to-yellow-100 flex items-center justify-center p-4">
@@ -88,7 +100,7 @@ function ForgotPass() {
 
                                 if (!validationMsg) {
                                     setShowEmailSucccess(true);
-                                    setEmailFeedvack("✅ OTP sent to your email.");
+                                    setEmailFeedvack("✅ OTP will be send to this email.");
                                 } else {
                                     setShowEmailSucccess(false);
                                     setEmailFeedvack("");
@@ -100,24 +112,24 @@ function ForgotPass() {
                             iconMessage={emailFeedback}
                         />
 
-                        {/* OTP field */}
+                        {/* New Password field */}
                         <CustomInput
-                            id="otp"
-                            label="OTP:"
-                            placeholder="Enter 4 digit pin."
+                            id="newpass"
+                            label="New Password:"
+                            placeholder="add special character"
                             onChange={(value) => {
-                                setPin(value);
-                                const validationMsg = validPin(value);
-                                setPinError(validationMsg || "");
+                                setPassword(value);
+                                const validationMsg = isPasswordValid(value);
+                                setPasswordError(validationMsg || "");
                             }}
-                            error={pinError}
+                            error={passwordError}
                         />
 
                         {/* btn */}
                         <CustomButton
                             type="button"
                             label="Submit"
-                            onClick={() => handleSubmit(email, pin)}
+                            onClick={() => handleSubmit(email, password)}
                         />
 
                         {error && (

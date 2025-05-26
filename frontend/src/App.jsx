@@ -6,6 +6,7 @@ import { ForgotPassPage } from './pages/ForgotPassPage';
 import { VerifyEmailPage } from "./pages/VerifyEmailPage"
 import { PrivateRoute } from './Components/AuthComponent/PrivateRoute';
 import { PublicRoute } from './Components/AuthComponent/PublicRoute';
+import CheckPinPage from './pages/CheckPinPage';
 
 function App() {
 
@@ -20,6 +21,7 @@ function App() {
       <Route path="/" element={<HomePage />} />
       <Route path='/forgetpass' element={<ForgotPassPage />} />
       <Route path='/verifyemail/:email' element={<VerifyEmailPage />} />
+      <Route path='/checkpin' element={<CheckPinPage />} />
       </Route>
     </Routes>
   );
