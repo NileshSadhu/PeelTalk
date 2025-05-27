@@ -3,8 +3,12 @@ import { Server } from "socket.io";
 import { setupSocket } from "./config/socket";
 import { app } from "./app";
 import { connectDB } from "./db";
+import dotenv from "dotenv";
 
-const port = process.env.PORT
+
+dotenv.config();
+
+const port = process.env.PORT || 3000;
 
 const server = createServer(app);
 
