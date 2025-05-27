@@ -7,6 +7,7 @@ import { VerifyEmailPage } from "./pages/VerifyEmailPage"
 import { PrivateRoute } from './Components/AuthComponent/PrivateRoute';
 import { PublicRoute } from './Components/AuthComponent/PublicRoute';
 import { CheckPinPage } from './pages/CheckPinPage';
+import ProfilePage from './Components/ChatsComponent/ProfilePage';
 
 function App() {
 
@@ -22,6 +23,7 @@ function App() {
       
       <Route element={<PrivateRoute/>}>
         <Route path="/" element={<HomePage />} />
+        <Route path="/profile" element={<ProfilePage />} />
       </Route>
     </Routes>
   );

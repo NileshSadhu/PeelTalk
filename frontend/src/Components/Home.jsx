@@ -5,10 +5,12 @@ import UserChat from './ChatsComponent/UserChat';
 import MessageInput from './ChatsComponent/MessageInput';
 import logo from './assets/logo.png'
 import LogoutButton from './ChatsComponent/LogoutButton';
+import { useNavigate } from 'react-router-dom';
+import profile from '../Components/assets/profile.jpg'
 
 const Home = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-
+    const navigate = useNavigate();
     const toggleMenu = () => {
         setIsMenuOpen(!isMenuOpen);
     };
@@ -59,6 +61,11 @@ const Home = () => {
 
             {/* Main Chat Area */}
             <div className="flex-1 lg:mx-20 flex flex-col h-screen">
+                <button
+                    className="balsamiq-sans-regular-italic text-browm-100"
+                    onClick={() => navigate('/profile')}>
+                    <img src={profile} alt="Profile" className="w-12 h-12 rounded-full float-right m-4" />
+                </button>
                 <UserChat />
                 <MessageInput />
             </div>
