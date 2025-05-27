@@ -58,7 +58,7 @@ const Home = () => {
             </div>
 
             {/* Main Chat Area */}
-            <div className="flex-1 lg:ml-80 flex flex-col h-screen">
+            <div className="flex-1 lg:mx-20 flex flex-col h-screen">
                 <UserChat />
                 <MessageInput />
             </div>
