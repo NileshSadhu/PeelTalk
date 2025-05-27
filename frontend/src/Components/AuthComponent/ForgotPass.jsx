@@ -75,7 +75,7 @@ function ForgotPass() {
 
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-yellow-300 to-yellow-100 flex items-center justify-center p-4">
+        <div className="min-h-screen bg-gradient-to-b from-yellow-200 to-yellow-100 flex items-center justify-center p-4">
             <div className="flex flex-col md:flex-row items-center md:items-stretch w-full max-w-7xl min-w-0">
                 {/* Left: Title Section */}
                 <div className="flex justify-center items-center w-full md:w-1/2">

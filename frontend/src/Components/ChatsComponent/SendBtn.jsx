@@ -5,7 +5,7 @@ function SendBtn({ onClick }) {
     return (
         <button
             onClick={onClick}
-            className="p-2 rounded-lg bg-yellow-400 hover:bg-yellow-500 transition-colors">
+            className="p-2 rounded-lg bg-yellow-200 hover:bg-yellow-100 transition-colors">
             <FaPaperPlane className="text-[#4B2E1E]" />
         </button>
     )

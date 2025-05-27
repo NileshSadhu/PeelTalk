@@ -13,7 +13,7 @@ function Title() {
                 <h1 className="balsamiq-sans-bold text-4xl sm:text-5xl md:text-6xl font-bold text-amber-900">
                     PeelTalk
                 </h1>
-                <div className="balsamiq-sans-bold font-medium text-base sm:text-lg md:text-xl text-amber-900 break-words whitespace-normal min-h-[4.5rem] md:min-h-[5rem]">
+                <div className="balsamiq-sans-regular-italic  font-medium text-base sm:text-lg md:text-xl text-amber-900 break-words whitespace-normal min-h-[4.5rem] md:min-h-[5rem]">
                     {/* Replace static text with typewriter */}
                     <Typewriter
                         words={[

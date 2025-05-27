@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { FaBars } from 'react-icons/fa';
-import PremiumButton from './common/PremiumButton';
-import UserChat from './common/UserChat';
-import MessageInput from './common/MessageInput';
+import PremiumButton from './ChatsComponent/PremiumButton';
+import UserChat from './ChatsComponent/UserChat';
+import MessageInput from './ChatsComponent/MessageInput';
 import logo from './assets/logo.png'
-import LogoutButton from './common/LogoutButton';
+import LogoutButton from './ChatsComponent/LogoutButton';
 
 const Home = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -33,11 +33,12 @@ const Home = () => {
 
             {/* Left Navbar */}
             <div className={`
-        w-80 lg:w-60 fixed h-full bg-gradient-to-b from-yellow-400 to-yellow-100 p-4
-        flex flex-col justify-between z-50 transform transition-transform duration-300 ease-in-out
-        ${isMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
-        `}>
-                <div className="flex flex-col items-center">
+                fixed lg:static w-64 lg:w-80 h-full bg-gradient-to-b from-yellow-200 to-yellow-100 shadow-lg
+                flex flex-col justify-between z-50 transform transition-transform duration-300 ease-in-out
+                ${isMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+            `}>
+                {/* Top Section */}
+                <div className="flex flex-col items-center p-6">
                     {/* Logo and Title */}
                     <div className="flex flex-col items-center gap-2">
                         <img
@@ -49,11 +50,11 @@ const Home = () => {
                     </div>
                 </div>
 
-                {/* Logout Button */}
-                <LogoutButton />
-
-                {/* Premium Button */}
-                <PremiumButton text="Premium" />
+                {/* Bottom Section */}
+                <div className="flex flex-col gap-4 p-6 mt-auto">
+                    <PremiumButton text="Premium" />
+                    <LogoutButton />
+                </div>
             </div>
 
             {/* Main Chat Area */}

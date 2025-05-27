@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { FaSignOutAlt } from 'react-icons/fa';
 
 function LogoutButton() {
     const navigate = useNavigate();
@@ -27,9 +28,10 @@ function LogoutButton() {
     return (
         <button
             onClick={handleLogout}
-            className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+            className="flex flex-row items-center justify-center gap-1 bg-white rounded-lg p-2 shadow-md hover:shadow-lg transition-all w-full"
         >
-            Logout
+            <FaSignOutAlt className="text-[#4B2E1E] text-xl" />
+            <span className="text-[#4B2E1E] text-xs balsamiq-sans-regular-italic hidden md:block ml-2">Logout</span>
         </button>
     );
 }
