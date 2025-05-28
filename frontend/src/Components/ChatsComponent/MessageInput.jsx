@@ -1,13 +1,19 @@
 import { useState } from 'react';
 import SendBtn from './SendBtn';
-import axios from 'axios';
 import { toast } from 'react-toastify';
+import { encryptText } from '../../utils/crypto';
 
-
-const MessageInput = () => {
+const MessageInput = ({
+  socket,
+  senderId,
+  receiverId,
+  conversationId,
+  roomId,
+  keyHex,
+  onSend,}) => {
   const [message, setMessage] = useState('');
 
-  async function handleSendMessage(e) {
+  const handleSendMessage = async(e)=> {
     e.preventDefault();
 
     if (!message.trim()) {
@@ -15,22 +21,28 @@ const MessageInput = () => {
       return;
     }
 
-    try {
-      const backend_api = import.meta.env.VITE_BACKEND_URL;
-      const response = await axios.post(`${backend_api}/message`, {
-        message,
-      });
+    if (!socket || !roomId || !keyHex) {
+      toast.error('Server Error!!!');
+      return;
+    }
+    try{
+      const { encrypted, iv } = await encryptText(message, keyHex);
 
-      if (response.status === 200) {
-        toast.success('Message sent successfully');
-        onSend(message);
-        setMessage('');
-      } else {
-        toast.error('Message not sent');
-      }
-    } catch (error) {
-      toast.error('Failed to send message');
-      console.error(error);
+      socket.emit('chat:message',{
+        roomId,
+        senderId,
+        receiverId,
+        conversationId,
+        iv,
+        message: encrypted,
+        keyHex, 
+      });
+      
+      onSend(message);
+      setMessage('');
+    }catch(error){
+        console.error(error);
+        toast.error('Failed to send message');
     }
   }
 
