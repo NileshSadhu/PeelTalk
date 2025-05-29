@@ -66,7 +66,7 @@ export const signup = async(req:Request,res:Response):Promise<Response> => {
         await sendOtpEmail(data.email,otp)
 
         return res.status(200).json({
-            msg: "OTP sent to your email. Please verify to complete signup."
+            message: "OTP sent to your email. Please verify to complete signup."
         })
 
     }catch(error){
@@ -110,7 +110,7 @@ export const verifySignup = async(req:Request,res:Response):Promise<Response> =>
         })
 
         return res.status(201).json({
-            msg: 'Signup verified and user created successfully!'
+            message: 'Signup verified and user created successfully!'
         });
         
     }catch(error){
@@ -160,7 +160,7 @@ export const login = async(req:Request,res:Response):Promise<Response> => {
         })
 
         return res.status(201).json({
-            msg: "User login in successfully!!!"
+            message: "User login in successfully!!!"
         });
     }catch(error){
         console.error("Server Error:",error)
@@ -206,7 +206,7 @@ export const forgotPassword = async(req:Request,res:Response):Promise<Response> 
         );
 
         return res.status(200).json({
-            msg: "If this email is registered, an OTP has been sent."
+            message: "If this email is registered, an OTP has been sent."
         });
 
     }catch(error){
