@@ -8,31 +8,64 @@ import socket from '../../utils/socket';
 
 const ChatWindow = ({ roomId, senderId, receiverId, conversationId, keyHex }) => {
   const [messages, setMessages] = useState([]);
-
+  
       useEffect(()=>{
-        socket.on('chat:message',async(data) => {
+        const handleNewMessage = async(data) => {
           try{
-            const decrypted = await decryptText(data.iv, data.message, keyHex);
+            const decrypted = await decryptText(data.iv, data.content, keyHex);
 
-            const newMessages = {
+            const newMessage = {
               senderId: data.senderId,
               content: decrypted,
-              timestamp: data.timeStamp
-            };
-            setMessages((prev) => [...prev, newMessages]);
-          }catch(error){
-            console.error('Failed to decrypt:', error);
-          }
-        });
+              timestamp: data.timeStamp,
+            }
 
-        return ()=> socket.off('chat:message');
+            setMessages((prev)=> [...prev, newMessage]);
+          }catch(error){
+              console.error('Failed to decrypt:', error);
+          }
+        };
+
+        socket.on('chat:message', handleNewMessage);
+
+        return ()=>{
+          socket.off('chat:message', handleNewMessage);
+        };
+      },[keyHex]);
+
+
+      useEffect(()=>{
+        const handleHistory = async ({messages}) => {
+          try{
+            const decryptedMessages = await Promise.all(
+              messages.map(async (msg) => {
+                console.log(msg)
+                const decrypted = await decryptText(msg.iv, msg.content, keyHex);
+                return {
+                  senderId: msg.senderId,
+                  content: decrypted,
+                  timestamp: msg.createdAt,
+                };
+              })
+            );
+            setMessages(decryptedMessages);
+          }catch(error){
+            console.error('Error decrypting chat history:', error);
+          }
+        };
+
+        socket.on('chat:history', handleHistory);
+
+        return () => {
+          socket.off('chat:history', handleHistory);
+        };
       },[keyHex])
 
-      useEffect(() => {
-      const chatBox = document.querySelector('.chat-scroll');
-      if (chatBox) chatBox.scrollTop = chatBox.scrollHeight;
-    }, [messages]);
 
+      useEffect(() => {
+          const chatBox = document.querySelector('.chat-scroll');
+          if (chatBox) chatBox.scrollTop = chatBox.scrollHeight;
+        }, [messages]);
 
   return (
   <div className="flex flex-col h-full">

@@ -8,41 +8,46 @@ import { Message } from "../models/message.model";
 const waitingUsers : {socket: Socket, userId: string}[] = [];
 
 export const handleFindPartner = async (io: Server, socket: Socket, userData: {userId: string}) => {
-    console.log('waitingUsers BEFORE:', waitingUsers.map(u => u.userId));
     if(waitingUsers.length > 0){
         const { socket: partnerSocket, userId: partnerId } = waitingUsers.pop()!;
-        
-        console.log('Popped partner:', partnerId);
-        console.log('waitingUsers AFTER pop:', waitingUsers.map(u => u.userId));
 
         const roomId = `room-${socket.id}-${partnerSocket.id}`;
         socket.join(roomId)
         partnerSocket.join(roomId);
 
-        console.log('Rooms for socket:', socket.id, Array.from(socket.rooms));
-        console.log('Rooms for partnerSocket:', partnerSocket.id, Array.from(partnerSocket.rooms));
+        let convo = await Conversation.findOne({
+            $or: [
+                { user1Id: userData.userId, user2Id: partnerId },
+                { user1Id: partnerId, user2Id: userData.userId },
+            ]
+        })
 
-        const keyHex = crypto.randomBytes(32).toString("hex");
+        if(!convo){
+            const keyHex = crypto.randomBytes(32).toString("hex");
+            convo = await Conversation.create({
+                user1Id: userData.userId,
+                user2Id: partnerId,
+                encryptedKeyUser1: keyHex,
+                encryptedKeyUser2: keyHex
+            });
+        }
 
-        const convo = await Conversation.create({
-            user1Id: userData.userId,
-            user2Id: partnerId,
-            encryptedKeyUser1: keyHex,
-            encryptedKeyUser2: keyHex
-        });
+        const messages = await Message.find({ conversationId: convo._id }).sort({ createdAt: 1})
 
         io.to(roomId).emit("partner:found",{
             roomId,
             conversationId: convo._id,
             partnerId
         });
+        socket.emit("chat:history", { conversationId: convo._id, messages });
+        partnerSocket.emit("chat:history", { conversationId: convo._id, messages });
     }else{
         waitingUsers.push({ socket, userId: userData.userId });
     }
 };
 
 
-export const handleMessage = async(io: Server, socket: Socket, 
+export const handleMessage = async(io: Server, 
     {roomId,message,senderId,receiverId,conversationId,iv}:
     {roomId:string,message:string,senderId:string,receiverId:string,conversationId:string,iv:string}
     ) =>{
