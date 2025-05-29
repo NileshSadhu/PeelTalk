@@ -1,13 +1,14 @@
-import { useState,useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { FaBars } from 'react-icons/fa';
 import PremiumButton from './ChatsComponent/PremiumButton';
 import logo from './assets/logo.png'
 import LogoutButton from './ChatsComponent/LogoutButton';
 import { useNavigate } from 'react-router-dom';
-import profile from '../Components/assets/profile.jpg'
+import profile from '../Components/assets/default_profile.png'
 import ChatWindow from './ChatsComponent/ChatWindow';
-import socket from '../utils/socket'; 
+import socket from '../utils/socket';
 import useUserStore from '../store/useUserStore';
+import Loading from './common/Loading';
 
 const Home = () => {
     const { user, fetchUser, loading } = useUserStore();
@@ -19,8 +20,8 @@ const Home = () => {
     const [roomId, setRoomId] = useState('');
     const [conversationId, setConversationId] = useState('');
     const [keyHex, setKeyHex] = useState('000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f');
-    const [senderId, setSenderId] = useState(''); 
-    const [receiverId, setReceiverId] = useState(''); 
+    const [senderId, setSenderId] = useState('');
+    const [receiverId, setReceiverId] = useState('');
 
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const navigate = useNavigate();
@@ -28,30 +29,30 @@ const Home = () => {
         setIsMenuOpen(!isMenuOpen);
     };
 
-    const handleFindPartner = async() => {
+    const handleFindPartner = async () => {
         const currentUserId = user._id
-        
-        if(!socket.connected){
+
+        if (!socket.connected) {
             socket.connect();
         }
 
         socket.emit("find:partner", { userId: currentUserId });
     };
 
-        useEffect(() => {
-        if (!user || !user._id) return; 
+    useEffect(() => {
+        if (!user || !user._id) return;
 
-        const handlePartnerFound = ({ roomId, conversationId, partnerId  }) => {
+        const handlePartnerFound = ({ roomId, conversationId, partnerId }) => {
             console.log("✅ Partner found!", { roomId, conversationId });
 
-            const key = keyHex; 
+            const key = keyHex;
             const userId = user._id;
 
             setRoomId(roomId);
             setConversationId(conversationId);
             setKeyHex(key || '');
             setSenderId(userId || '');
-            setReceiverId(partnerId); 
+            setReceiverId(partnerId);
         };
 
         socket.on("partner:found", handlePartnerFound);
@@ -62,7 +63,7 @@ const Home = () => {
     }, [user]);
 
 
-    if (loading) return <p>Loading user...</p>;
+    if (loading) return <Loading />;
     if (!user) return <p>Please log in.</p>;
 
 
@@ -75,7 +76,7 @@ const Home = () => {
             >
                 <FaBars className="text-[#4B2E1E] text-xl" />
             </button>
-            
+
             {isMenuOpen && (
                 <div
                     className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
@@ -114,21 +115,21 @@ const Home = () => {
                     onClick={() => navigate('/profile')}>
                     <img src={profile} alt="Profile" className="w-12 h-12 rounded-full float-right m-4" />
                 </button>
-                <ChatWindow
-                roomId={roomId}
-                conversationId={conversationId}
-                keyHex={keyHex}
-                senderId={senderId}
-                receiverId={receiverId}
-                />
                 <div>
                     <button
-                    className="bg-yellow-400 text-[#4B2E1E] px-4 py-2 rounded-lg shadow hover:bg-yellow-500 transition"
-                    onClick={handleFindPartner}
+                        className="bg-yellow-400 text-[#4B2E1E] px-4 py-2 rounded-lg shadow hover:bg-yellow-500 transition justify-center align-center"
+                        onClick={handleFindPartner}
                     >
-                    Find Partner
+                        JuiceMatch
                     </button>
                 </div>
+                <ChatWindow
+                    roomId={roomId}
+                    conversationId={conversationId}
+                    keyHex={keyHex}
+                    senderId={senderId}
+                    receiverId={receiverId}
+                />
             </div>
         </div>
     );

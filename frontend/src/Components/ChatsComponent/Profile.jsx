@@ -1,5 +1,5 @@
 import useUserStore from '../../store/useUserStore';
-import profile from '../assets/Nilesh_logo.jpeg';
+import profile from '../assets/default_profile.png';
 import { useEffect } from 'react';
 
 
