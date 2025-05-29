@@ -8,6 +8,7 @@ import { PrivateRoute } from './Components/AuthComponent/PrivateRoute';
 import { PublicRoute } from './Components/AuthComponent/PublicRoute';
 import { CheckPinPage } from './pages/CheckPinPage';
 import {ProfilePage} from './pages/ProfilePage';
+import Loading from './Components/common/Loading';
 
 function App() {
 
@@ -24,6 +25,7 @@ function App() {
       <Route element={<PrivateRoute/>}>
         <Route path="/" element={<HomePage />} />
         <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/loading" element={<Loading />} />
       </Route>
     </Routes>
   );
