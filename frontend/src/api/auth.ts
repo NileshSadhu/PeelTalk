@@ -52,7 +52,7 @@ export const verifySignup = async(otp:string,email:string) =>{
 }
 
 
-export const handleLogin = async(email: string, password: string) => {
+export const handleSignIn = async(email: string, password: string) => {
     try{
         const response = await axios.post(`${backend_api}/user/login`,{
             email,

@@ -1,31 +1,19 @@
-import { Route, Routes } from "react-router-dom"
-import { Login } from "./pages/Login"
-import { Signup } from "./pages/Signup"
-import { ForgotPass } from "./pages/ForgotPass"
-import { VerifyResetPassword } from "./pages/VerifyResetPassword"
-import { VerifySignup } from "./pages/VerifySignup"
-import { HomePage } from "./pages/HomePage"
-import { Profile } from "./pages/Profile"
-import { Toaster } from "react-hot-toast"
+import { Routes, Route } from "react-router-dom";
+import { SignIn } from "./components/AuthComponents/SignIn";
+import { PublicRoute } from "./components/AuthComponents/PublicRoute";
+import { SignUp } from "./components/AuthComponents/SignUp";
+import { Home } from "lucide-react";
 
 function App() {
-
   return (
-    <>
-      <Toaster position="top-right" />
-      <Routes>
-        <Route path="/login" element={<Login/>}/>
-        <Route path="/signup" element={<Signup/>}/>
-        <Route path="/forgotpassword" element={<ForgotPass/>}/>
-        <Route path="/resetpassword/:email" element={<VerifyResetPassword/>}/>
-        <Route path="/verifySignup/:email" element={<VerifySignup/>}/>
-
-
-        <Route path="/" element={<HomePage/>}/>
-        <Route path="/profile" element={<Profile/>  }/>
-      </Routes>
-    </>
-  )
+    <Routes>
+      <Route element={<PublicRoute />}>
+        <Route path="/" element={<Home />} />
+        <Route path="/SignIn" element={<SignIn />} />
+        <Route path="/SignUp" element={<SignUp />} />
+      </Route>
+    </Routes>
+  );
 }
 
-export default App
+export default App;
