@@ -10,7 +10,10 @@ export default {
         'brown': {
           800: '#4B2E1E',
         }
-      }
+      },
+      fontFamily: {
+        'balsamiq': ['"Balsamiq Sans"', 'cursive'],
+      },
     },
   },
   plugins: [],

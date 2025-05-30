@@ -5,16 +5,18 @@ import { SignInPage } from "./pages/SignInPage";
 import { SignUpPage } from "./pages/SignUpPage";
 import { ForgetPasswordPage } from "./pages/ForgetPasswordPage";
 import { VerificationPage } from "./pages/VerificationPage";
+import { Loading } from "./components/Common/Loading";
 
 function App() {
   return (
     <Routes>
       <Route element={<PublicRoute />}>
         <Route path="/" element={<Home />} />
-        <Route path="/SignIn" element={<SignInPage />} />
-        <Route path="/SignUp" element={<SignUpPage />} />
-        <Route path="/ForgetPassword" element={<ForgetPasswordPage />} />
-        <Route path="Verification" element={<VerificationPage />} />
+        <Route path="/signIn" element={<SignInPage />} />
+        <Route path="/signUp" element={<SignUpPage />} />
+        <Route path="/forgetpassword" element={<ForgetPasswordPage />} />
+        <Route path="verification" element={<VerificationPage />} />
+        <Route path="/loading" element={<Loading />} />
       </Route>
     </Routes>
   );
