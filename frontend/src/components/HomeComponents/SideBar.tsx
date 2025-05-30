@@ -1,5 +1,5 @@
 import { FaBars } from 'react-icons/fa';
-import logo from '../assets/logo.png';
+import logo from '../../assets/logo.png';
 import LogOutBtn from './LogOutBtn';
 
 interface SideBarProps {
