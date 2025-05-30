@@ -17,13 +17,13 @@ export const SignUp = () => {
     const [emailError, setEmailError] = useState<string>("");
     const [passwordError, setPasswordError] = useState<string>("");
 
-    const handleSubmit = async()=>{
-            const result = await handleSignup(user,email,password);
-    
-            if(result?.success){
-                navigate(result.next!);
-            }
-        };
+    const handleSubmit = async () => {
+        const result = await handleSignup(user, email, password);
+
+        if (result?.success) {
+            navigate(result.next!);
+        }
+    };
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-yellow-200 to-yellow-100 flex items-center justify-center p-4">

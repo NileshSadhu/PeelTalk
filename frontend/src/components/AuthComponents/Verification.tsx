@@ -14,30 +14,30 @@ export const Verification = () => {
     const { email } = useParams<{ email?: string }>();
 
     const handleSubmit = async () => {
-                setError("");
+        setError("");
 
-                if (!otp || otp.length !== 4) {
-                    setError("Please enter a valid 4-digit OTP.");
-                    return;
-                    }
+        if (!otp || otp.length !== 4) {
+            setError("Please enter a valid 4-digit OTP.");
+            return;
+        }
 
-                if (!email) {
-                    setError("Email is missing from the URL. Please go back and try again.");
-                    return;
-                    }
+        if (!email) {
+            setError("Email is missing from the URL. Please go back and try again.");
+            return;
+        }
 
-                try {
-                    const result = await verifySignup(otp, email);
-                    if (result?.success && result.next) {
-                            navigate(result.next);
-                        } else if (result?.error) {
-                            setError(result.error);
-                        }
-                    } catch (err: any) {
-                    console.error("Verification failed:", err);
-                    setError(err.message || "Failed to verify OTP. Please try again.");
-                    }
-                }
+        try {
+            const result = await verifySignup(otp, email);
+            if (result?.success && result.next) {
+                navigate(result.next);
+            } else if (result?.error) {
+                setError(result.error);
+            }
+        } catch (err: any) {
+            console.error("Verification failed:", err);
+            setError(err.message || "Failed to verify OTP. Please try again.");
+        }
+    }
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-yellow-200 to-yellow-100 flex items-center justify-center p-4">

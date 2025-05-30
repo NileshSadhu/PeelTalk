@@ -16,10 +16,10 @@ export const SignIn = () => {
     const [emailError, setEmailError] = useState("");
     const [passwordError, setPasswordError] = useState("");
 
-    const handleSubmit = async()=>{
-        const result = await handleSignIn(email,password);
+    const handleSubmit = async () => {
+        const result = await handleSignIn(email, password);
 
-        if(result?.success){
+        if (result?.success) {
             navigate(result.next!);
         }
     };
