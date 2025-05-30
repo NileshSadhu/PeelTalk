@@ -1,13 +1,16 @@
 import { AuthContainer } from "../Common/AuthConatiner";
 import { CustomInput } from "../Common/CustomInput";
 import { Head } from "../Common/Head";
-import { isEmailValid, isPasswordValid } from "./AuthFunctions";
+import { isEmailValid, isPasswordValid } from "../../utils/validation";
 import { useState } from "react";
 import PasswordInput from "../Common/PasswordInput";
 import { forgotPassword } from "../../api/auth";
 import { SubmitBtn } from "../Common/SubmitBtn";
+import { useNavigate } from "react-router-dom";
 
 export const ForgetPassword = () => {
+    const navigate = useNavigate();
+
     const [error, setError] = useState<string>("");
 
     const [email, setEmail] = useState<string>("");
@@ -18,6 +21,19 @@ export const ForgetPassword = () => {
 
     const [showEmailSuccess, setShowEmailSuccess] = useState<boolean>(false);
     const [emailFeedback, setEmailFeedback] = useState<string>("");
+
+    const handleSubmit = async() => {
+            if (emailError || passwordError || !email || !password) {
+                setError("Please correct the form errors and fill all fields.");
+                return;
+                }
+                const result = await forgotPassword(email, password);
+
+                if(result?.success){
+                    navigate(result.next)
+                }
+        }
+
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-yellow-200 to-yellow-100 flex items-center justify-center p-4">
@@ -75,13 +91,7 @@ export const ForgetPassword = () => {
                         <SubmitBtn
                             type="button"
                             text="Submit"
-                            onClick={() => {
-                                if (emailError || passwordError || !email || !password) {
-                                    setError("Please correct the form errors and fill all fields.");
-                                    return;
-                                }
-                                forgotPassword(email, password);
-                            }}
+                            onClick={handleSubmit}
                         />
 
                         {error && (

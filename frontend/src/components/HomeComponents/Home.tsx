@@ -1,4 +1,4 @@
-import useUserStore from "../../store/useUserStore";
+import { useUserStore } from "../../store/useUserStore";
 import { Loading } from "../Common/Loading";
 
 export const Home = () => {

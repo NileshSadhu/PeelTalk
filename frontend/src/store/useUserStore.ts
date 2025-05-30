@@ -18,7 +18,7 @@ interface UserStoreState {
 
 const backend_api = import.meta.env.VITE_BACKEND_URL;
 
-const useUserStore = create<UserStoreState>((set) => ({
+export const useUserStore = create<UserStoreState>((set) => ({
     user: null,
     loading: true,
 
@@ -38,4 +38,4 @@ const useUserStore = create<UserStoreState>((set) => ({
     }
 }));
 
-export default useUserStore;
+

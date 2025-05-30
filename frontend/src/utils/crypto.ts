@@ -1,6 +1,9 @@
-export async function encryptText(text, keyHex) {
+export async function encryptText(
+    text: string,
+    keyHex: string
+    ): Promise<{ iv: string; encrypted: string }> {
     const keyBuffer = hexToArrayBuffer(keyHex);
-    const iv = crypto.getRandomValues(new Uint8Array(12)); // AES-GCM IV must be 12 bytes
+    const iv = crypto.getRandomValues(new Uint8Array(12)); 
 
     const key = await crypto.subtle.importKey(
         "raw",
@@ -23,20 +26,11 @@ export async function encryptText(text, keyHex) {
     };
 }
 
-// Utility functions
-function hexToArrayBuffer(hex) {
-    const typedArray = new Uint8Array(hex.match(/[\da-f]{2}/gi).map(h => parseInt(h, 16)));
-    return typedArray.buffer;
-}
-
-function arrayBufferToHex(buffer) {
-    return [...new Uint8Array(buffer)]
-        .map(b => b.toString(16).padStart(2, "0"))
-        .join("");
-}
-
-
-export async function decryptText(ivHex, encryptedHex, keyHex) {
+export async function decryptText(
+    ivHex: string,
+    encryptedHex: string,
+    keyHex: string
+    ): Promise<string> {
     const keyBuffer = hexToArrayBuffer(keyHex);
     const iv = hexToArrayBuffer(ivHex);
     const encryptedData = hexToArrayBuffer(encryptedHex);
@@ -56,4 +50,18 @@ export async function decryptText(ivHex, encryptedHex, keyHex) {
     );
 
     return new TextDecoder().decode(decryptedBuffer);
+}
+
+
+function hexToArrayBuffer(hex: string): ArrayBuffer {
+    const typedArray = new Uint8Array(
+        hex.match(/[\da-f]{2}/gi)?.map(h => parseInt(h, 16)) || []
+    );
+    return typedArray.buffer;
+}
+
+function arrayBufferToHex(buffer: ArrayBuffer): string {
+    return Array.from(new Uint8Array(buffer))
+        .map(b => b.toString(16).padStart(2, "0"))
+        .join("");
 }

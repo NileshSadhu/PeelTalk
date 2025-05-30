@@ -1,16 +1,43 @@
 import { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { AuthContainer } from "../Common/AuthConatiner";
 import { CustomInput } from "../Common/CustomInput";
 import { Head } from "../Common/Head";
-import { resetPassword } from "../../api/auth";
+import { verifySignup } from "../../api/auth";
 import { SubmitBtn } from "../Common/SubmitBtn";
 
 export const Verification = () => {
+    const navigate = useNavigate();
     const [otp, setOtp] = useState<string>("");
     const [error, setError] = useState<string>("");
 
     const { email } = useParams<{ email?: string }>();
+
+    const handleSubmit = async () => {
+                setError("");
+
+                if (!otp || otp.length !== 4) {
+                    setError("Please enter a valid 4-digit OTP.");
+                    return;
+                    }
+
+                if (!email) {
+                    setError("Email is missing from the URL. Please go back and try again.");
+                    return;
+                    }
+
+                try {
+                    const result = await verifySignup(otp, email);
+                    if (result?.success && result.next) {
+                            navigate(result.next);
+                        } else if (result?.error) {
+                            setError(result.error);
+                        }
+                    } catch (err: any) {
+                    console.error("Verification failed:", err);
+                    setError(err.message || "Failed to verify OTP. Please try again.");
+                    }
+                }
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-yellow-200 to-yellow-100 flex items-center justify-center p-4">
@@ -41,27 +68,7 @@ export const Verification = () => {
                         <SubmitBtn
                             type="button"
                             text="Submit"
-                            onClick={async () => {
-                                setError("");
-
-                                if (!otp || otp.length !== 4) {
-                                    setError("Please enter a valid 4-digit OTP.");
-                                    return;
-                                }
-
-                                if (!email) {
-                                    setError("Email is missing from the URL. Please go back and try again.");
-                                    return;
-                                }
-
-                                try {
-                                    await resetPassword(email, otp);
-                                    console.log("OTP verification successful for:", email);
-                                } catch (err: any) {
-                                    console.error("Verification failed:", err);
-                                    setError(err.message || "Failed to verify OTP. Please try again.");
-                                }
-                            }}
+                            onClick={handleSubmit}
                         />
 
                         {error && (

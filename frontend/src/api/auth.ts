@@ -22,7 +22,7 @@ export const handleSignup = async (username: string, email: string, password: st
 
         if (response.status === 200) {
             toast.success(response.data.message);
-            return { success: true, next: `/verifySignup/${email}` };
+            return { success: true, next: `/verification/${email}` };
         }
     } catch (error: any) {
         if (error.response) {
@@ -47,6 +47,7 @@ export const verifySignup = async (otp: string, email: string) => {
             toast.success(response.data.message);
             return { success: true, next: `/` };
         }
+        return { success: false, error: "Unexpected response from server." };
     } catch (error: any) {
         if (error.response) {
             toast.error(error.response.data.message);
@@ -122,7 +123,7 @@ export const resetPassword = async (otp: string, email: string) => {
 
         if (response.status === 200) {
             toast.success(response.data.message);
-            return { success: true, next: `/login` };
+            return { success: true, next: `/signIn` };
         }
     } catch (error: any) {
         if (error.response) {
@@ -135,3 +136,20 @@ export const resetPassword = async (otp: string, email: string) => {
 }
 
 
+export const logoutUser = async () => {
+        try {
+            const response = await axios.post(`${backend_api}/user/logout`, {}, {
+                withCredentials: true
+            });
+
+            if (response.status === 200) {
+                toast.success("Logged out successfully.");
+                return { success: true, next: `/signIn`}
+            } else {
+                toast.error("Logout failed. Please try again.");
+            }
+        } catch (error) {
+            console.error(error);
+            toast.error("Something went wrong. Please try again.");
+        }
+    };

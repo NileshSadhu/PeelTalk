@@ -2,7 +2,7 @@ import { useState } from "react";
 import { AuthContainer } from "../Common/AuthConatiner"
 import { CustomInput } from "../Common/CustomInput"
 import { Head } from "../Common/Head"
-import { isEmailValid, isPasswordValid } from "./AuthFunctions";
+import { isEmailValid, isPasswordValid } from "../../utils/validation";
 import PasswordInput from "../Common/PasswordInput";
 import { SubmitBtn } from "../Common/SubmitBtn";
 import { handleSignIn } from "../../api/auth";
@@ -15,6 +15,14 @@ export const SignIn = () => {
     const [password, setPassword] = useState("");
     const [emailError, setEmailError] = useState("");
     const [passwordError, setPasswordError] = useState("");
+
+    const handleSubmit = async()=>{
+        const result = await handleSignIn(email,password);
+
+        if(result?.success){
+            navigate(result.next!);
+        }
+    };
 
 
     return (
@@ -67,7 +75,7 @@ export const SignIn = () => {
                         <SubmitBtn
                             type="submit"
                             text="Submit"
-                            onClick={() => handleSignIn(email, password)}
+                            onClick={handleSubmit}
                         />
 
                         {/* Link to Register */}

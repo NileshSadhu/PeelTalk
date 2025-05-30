@@ -2,18 +2,28 @@ import { useState } from "react";
 import { AuthContainer } from "../Common/AuthConatiner";
 import { CustomInput } from "../Common/CustomInput";
 import { Head } from "../Common/Head";
-import { isEmailValid, isPasswordValid } from "./AuthFunctions";
+import { isEmailValid, isPasswordValid } from "../../utils/validation";
 import PasswordInput from "../Common/PasswordInput";
 import { SubmitBtn } from "../Common/SubmitBtn";
 import { handleSignup } from "../../api/auth"; // Assumed to handle full submission logic
 import { NavigateLinks } from "../Common/NavigateLinks";
+import { useNavigate } from "react-router-dom";
 
 export const SignUp = () => {
+    const navigate = useNavigate();
     const [user, setUser] = useState<string>("");
     const [email, setEmail] = useState<string>("");
     const [password, setPassword] = useState<string>("");
     const [emailError, setEmailError] = useState<string>("");
     const [passwordError, setPasswordError] = useState<string>("");
+
+    const handleSubmit = async()=>{
+            const result = await handleSignup(user,email,password);
+    
+            if(result?.success){
+                navigate(result.next!);
+            }
+        };
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-yellow-200 to-yellow-100 flex items-center justify-center p-4">
@@ -74,7 +84,7 @@ export const SignUp = () => {
                         <SubmitBtn
                             type="submit"
                             text="Submit"
-                            onClick={() => handleSignup(user, email, password)}
+                            onClick={handleSubmit}
                         />
 
                         {/* Link to Sign In */}
