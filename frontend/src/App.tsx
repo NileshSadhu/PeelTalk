@@ -1,12 +1,12 @@
 import { Routes, Route } from "react-router-dom";
 import { PublicRoute } from "./components/AuthComponents/PublicRoute";
-import { Home } from "lucide-react";
 import { SignInPage } from "./pages/SignInPage";
 import { SignUpPage } from "./pages/SignUpPage";
 import { ForgetPasswordPage } from "./pages/ForgetPasswordPage";
 import { VerificationPage } from "./pages/VerificationPage";
 import { Loading } from "./components/Common/Loading";
 import { PrivateRoute } from "./components/AuthComponents/PrivateRoute";
+import { HomePage } from "./pages/HomePage";
 
 function App() {
   return (
@@ -20,7 +20,7 @@ function App() {
       </Route>
 
       <Route element={<PrivateRoute />}>
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<HomePage />} />
         <Route path="/loading" element={<Loading />} />
       </Route>
     </Routes>

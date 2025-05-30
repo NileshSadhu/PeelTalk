@@ -1,4 +1,4 @@
-import logo from '../../assets/logo.png'
+import logo from '../assets/logo.png'
 import { TypingEffect } from './TypingEffect'
 
 export const Head = () => {
