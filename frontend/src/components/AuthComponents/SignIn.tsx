@@ -7,8 +7,10 @@ import PasswordInput from "../Common/PasswordInput";
 import { SubmitBtn } from "../Common/SubmitBtn";
 import { handleSignIn } from "../../api/auth";
 import { NavigateLinks } from "../Common/NavigateLinks";
+import { useNavigate } from "react-router-dom";
 
 export const SignIn = () => {
+    const navigate = useNavigate();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [emailError, setEmailError] = useState("");
@@ -54,6 +56,13 @@ export const SignIn = () => {
                             }}
                             error={passwordError}
                         />
+
+                        <button
+                            onClick={() => navigate('/forgotpassword')}
+                            className="balsamiq-sans-regular text-xs text-amber-900 mb-2 float-right"
+                        >
+                            Forget Password
+                        </button>
 
                         <SubmitBtn
                             type="submit"

@@ -6,16 +6,21 @@ import { SignUpPage } from "./pages/SignUpPage";
 import { ForgetPasswordPage } from "./pages/ForgetPasswordPage";
 import { VerificationPage } from "./pages/VerificationPage";
 import { Loading } from "./components/Common/Loading";
+import { PrivateRoute } from "./components/AuthComponents/PrivateRoute";
 
 function App() {
   return (
     <Routes>
       <Route element={<PublicRoute />}>
-        <Route path="/" element={<Home />} />
         <Route path="/signIn" element={<SignInPage />} />
         <Route path="/signUp" element={<SignUpPage />} />
-        <Route path="/forgetpassword" element={<ForgetPasswordPage />} />
-        <Route path="verification" element={<VerificationPage />} />
+        <Route path='/forgotpassword' element={<ForgetPasswordPage />} />
+        {/* <Route path='/checkpin/:email' element={<CheckPinPage />} /> */}
+        <Route path='/verification/:email' element={<VerificationPage />} />
+      </Route>
+
+      <Route element={<PrivateRoute />}>
+        <Route path="/" element={<Home />} />
         <Route path="/loading" element={<Loading />} />
       </Route>
     </Routes>
