@@ -1,67 +1,68 @@
-import { useState } from "react";
 import { AuthContainer } from "../Common/AuthConatiner";
 import { CustomInput } from "../Common/CustomInput";
 import { Head } from "../Common/Head";
 import { isEmailValid, isPasswordValid } from "./AuthFunctions";
+import { useState } from "react";
 import PasswordInput from "../Common/PasswordInput";
+import { forgotPassword } from "../../api/auth";
 import { SubmitBtn } from "../Common/SubmitBtn";
-import { handleSignup } from "../../api/auth"; // Assumed to handle full submission logic
-import { NavigateLinks } from "../Common/NavigateLinks";
 
-export const SignUp = () => {
-    const [user, setUser] = useState<string>("");
+export const ForgetPassword = () => {
+    const [error, setError] = useState<string>("");
+
     const [email, setEmail] = useState<string>("");
-    const [password, setPassword] = useState<string>("");
     const [emailError, setEmailError] = useState<string>("");
+
+    const [password, setPassword] = useState<string>("");
     const [passwordError, setPasswordError] = useState<string>("");
+
+    const [showEmailSuccess, setShowEmailSuccess] = useState<boolean>(false);
+    const [emailFeedback, setEmailFeedback] = useState<string>("");
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-yellow-200 to-yellow-100 flex items-center justify-center p-4">
             <div className="flex flex-col md:flex-row items-center md:items-stretch w-full max-w-7xl min-w-0">
-                {/* Left: Title Section */}
                 <div className="flex justify-center items-center w-full md:w-1/2">
                     <Head />
                 </div>
 
                 <div className="flex justify-center items-center w-full md:w-1/2">
-                    <div className="bg-white p-6 sm:p-10 rounded-lg w-full max-w-md">
+                    <div className="bg-white p-6 sm:p-10 rounded-lg w-full max-w-md shadow-md">
                         <AuthContainer
-                            title={"Let's get you started"}
-                            tagline={"Don't worry, we don't bite. We just chat."}
+                            title={"Forgot your password?"}
+                            tagline={"Oops.. even banana slip sometimes."}
                         />
 
-                        {/* Username Input */}
-                        <CustomInput
-                            id="username"
-                            label="Username"
-                            name="username"
-                            placeholder="peo"
-                            value={user}
-                            onChange={(value: string) => setUser(value)}
-                        />
-
-                        {/* Email input with real-time validation */}
                         <CustomInput
                             id="email"
                             label="Email:"
                             type="email"
-                            name="Email"
+                            name="email"
                             placeholder="xyz@example.com"
                             value={email}
                             onChange={(value: string) => {
                                 setEmail(value);
                                 const validationMsg = isEmailValid(value);
                                 setEmailError(validationMsg || "");
+
+                                if (!validationMsg) {
+                                    setShowEmailSuccess(true);
+                                    setEmailFeedback("✅ OTP will be sent to this email.");
+                                } else {
+                                    setShowEmailSuccess(false);
+                                    setEmailFeedback("");
+                                }
                             }}
                             error={emailError}
+                            showIcon={showEmailSuccess}
+                            iconMessage={emailFeedback}
                         />
 
-                        {/* Password Input with real-time validation */}
                         <PasswordInput
-                            id="password"
-                            placeholder="At least 8 characters long"
+                            id="newpass"
                             name="password"
-                            label={"Password"}
+                            label="New Password:"
+                            placeholder="At least 8 characters long."
                             value={password}
                             onChange={(value: string) => {
                                 setPassword(value);
@@ -72,13 +73,20 @@ export const SignUp = () => {
                         />
 
                         <SubmitBtn
-                            type="submit"
+                            type="button"
                             text="Submit"
-                            onClick={() => handleSignup(user, email, password)}
+                            onClick={() => {
+                                if (emailError || passwordError || !email || !password) {
+                                    setError("Please correct the form errors and fill all fields.");
+                                    return;
+                                }
+                                forgotPassword(email, password);
+                            }}
                         />
 
-                        {/* Link to Sign In */}
-                        <NavigateLinks type="SignIn" />
+                        {error && (
+                            <p className="text-red-600 text-sm mt-2">{error}</p>
+                        )}
                     </div>
                 </div>
             </div>
