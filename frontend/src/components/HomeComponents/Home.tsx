@@ -6,7 +6,7 @@ import { useUserStore } from '../../store/useUserStore';
 import { Loading } from '../Common/Loading';
 import { SideBar } from '../HomeComponents/SideBar';
 import { Find } from '../HomeComponents/Find';
-import type { User, UserStoreState } from '../../types/user';
+import type { UserStoreState } from '../../types/user';
 
 const Home = () => {
     const { user, fetchUser, loading } = useUserStore((state: UserStoreState) => ({
