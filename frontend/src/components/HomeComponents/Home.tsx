@@ -29,7 +29,7 @@ const Home = () => {
         sendMessage,
         partnerId,
         roomId,
-        disconnect
+        // disconnect
     } = useChat({
         socket,
         userId: user?._id || '',
