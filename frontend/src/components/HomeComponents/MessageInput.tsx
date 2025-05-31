@@ -1,35 +1,23 @@
 import { useState } from 'react';
 import { SendMessageBtn } from './SendMessageBtn';
 import { toast } from 'react-toastify';
-import { encryptText } from '../../utils/crypto';
 import { TermsServices } from './TermsServices';
 import React from 'react';
-import { Socket } from 'socket.io-client';
 
 interface MessageInputProps {
-    socket: Socket;
-    senderId: string;
+    disabled: boolean,
     receiverId: string;
-    conversationId: string;
-    roomId: string;
-    keyHex: string;
-    onSend: (message: string) => void;
+    onSend: (message: string, receiverId: string) => void;
 }
 
 export const MessageInput = ({
-    socket,
-    senderId,
+    disabled,
     receiverId,
-    conversationId,
-    roomId,
-    keyHex,
     onSend,
 }: MessageInputProps) => {
     const [message, setMessage] = useState<string>('');
 
-    const isDisabled = !socket || !roomId || !keyHex;
-
-    const handleSendMessage = async (
+    const handleSend = async (
         e: React.MouseEvent<HTMLButtonElement> | React.KeyboardEvent<HTMLInputElement>
     ) => {
         e.preventDefault();
@@ -39,29 +27,13 @@ export const MessageInput = ({
             return;
         }
 
-        if (isDisabled) {
-            toast.error('Server Error! Missing socket, roomId, or keyHex.');
+        if (!receiverId) {
+            toast.error('No partner to send the message to');
             return;
         }
 
-        try {
-            const { encrypted, iv } = await encryptText(message.trim(), keyHex);
-
-            socket.emit('chat:message', {
-                roomId,
-                senderId,
-                receiverId,
-                conversationId,
-                iv,
-                message: encrypted,
-            });
-
-            onSend(message.trim());
-            setMessage('');
-        } catch (error) {
-            console.error('Error sending message:', error);
-            toast.error('Failed to send message');
-        }
+        onSend(message.trim(), receiverId);
+        setMessage('');
     };
 
     return (
@@ -73,19 +45,18 @@ export const MessageInput = ({
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => setMessage(e.target.value)}
                     type="text"
                     onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
-                        if (e.key === 'Enter' && !isDisabled) {
-                            handleSendMessage(e);
+                        if (e.key === 'Enter' && !disabled) {
+                            handleSend(e);
                         }
                     }}
                     placeholder="Write your message..."
                     className="flex-1 px-4 py-2 mr-10 outline-none text-[#4B2E1E] placeholder-[#4B2E1E]/50"
-                    disabled={isDisabled}
+                    disabled={disabled}
                 />
                 <SendMessageBtn
                     onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
-                        if (!isDisabled) handleSendMessage(e);
+                        if (!disabled) handleSend(e);
                     }}
-                    // disabled={isDisabled}
                 />
             </div>
             <TermsServices />

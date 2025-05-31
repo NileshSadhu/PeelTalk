@@ -53,12 +53,24 @@ export async function decryptText(
 }
 
 
-function hexToArrayBuffer(hex: string): ArrayBuffer {
-    const typedArray = new Uint8Array(
-        hex.match(/[\da-f]{2}/gi)?.map(h => parseInt(h, 16)) || []
-    );
-    return typedArray.buffer;
+export function hexToArrayBuffer(hex: string): ArrayBuffer {
+    if (!hex || typeof hex !== 'string') {
+        throw new Error('Invalid hex string');
+    }
+
+    if (hex.length % 2 !== 0) {
+        throw new Error('Hex string must have an even length');
+    }
+
+    const match = hex.match(/[\da-f]{2}/gi);
+    if (!match) {
+        throw new Error('Hex string contains invalid characters');
+    }
+
+    const byteArray = new Uint8Array(match.map(h => parseInt(h, 16)));
+    return byteArray.buffer;
 }
+
 
 function arrayBufferToHex(buffer: ArrayBuffer): string {
     return Array.from(new Uint8Array(buffer))

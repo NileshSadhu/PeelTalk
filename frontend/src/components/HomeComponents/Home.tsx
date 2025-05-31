@@ -7,77 +7,50 @@ import { Loading } from '../Common/Loading';
 import { SideBar } from './SideBar';
 import { ChatWindow } from './ChatWindow';
 import { MessageInput } from './MessageInput';
+import { useChat } from '../../hooks/useChat';
 
-interface Message {
-    senderId: string;
-    content: string;
-    timestamp: string;
-}
 
 const Home = () => {
     const { user, fetchUser, loading } = useUserStore();
     const [partnerProfileImageUrl, setPartnerProfileImageUrl] = useState(profile);
-
-
+    
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const toggleMenu = () => setIsMenuOpen((prev) => !prev);
 
-    const [keyHex, setKeyHex] = useState(
-        '000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f'
-    );
-    const [roomId, setRoomId] = useState('');
-    const [conversationId, setConversationId] = useState('');
-    const [senderId, setSenderId] = useState('');
-    const [receiverId, setReceiverId] = useState('');
-
-    const [messages, setMessages] = useState<Message[]>([]);
-
+    const keyHex = '000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f';
     const navigate = useNavigate();
 
     useEffect(() => {
         fetchUser();
     }, []);
 
+    const {
+        messages,
+        sendMessage,
+        partnerId,
+        roomId,
+        disconnect
+    } = useChat({
+        socket,
+        userId: user?._id || '',
+        keyHex
+    });
+
     const handleFindPartner = async () => {
         if (!user || !user._id) return;
-        const currentUserId = user._id;
-        if (!socket.connected) {
-            socket.connect();
-        }
-        socket.emit('find:partner', { userId: currentUserId });
+        if (!socket.connected) socket.connect();
+        socket.emit('find:partner', { userId: user._id });
     };
 
     useEffect(() => {
-        if (!user || !user._id) return;
-
-        const handlePartnerFound = (data: {
-            roomId: string;
-            conversationId: string;
-            partnerId: string;
-            partnerImageUrl?: string;
-        }) => {
-            const { roomId, conversationId, partnerId, partnerImageUrl } = data;
-            setRoomId(roomId);
-            setConversationId(conversationId);
-            setSenderId(user._id);
-            setReceiverId(partnerId);
-            setPartnerProfileImageUrl(partnerImageUrl || profile);
-            setMessages([]);
-        };
-
-
-        const handleReceiveMessage = (message: Message) => {
-            setMessages((prev) => [...prev, message]);
-        };
-
-        socket.on('partner:found', handlePartnerFound);
-        socket.on('message:receive', handleReceiveMessage);
+        socket.on('partner:image', (url: string) => {
+            setPartnerProfileImageUrl(url || profile);
+        });
 
         return () => {
-            socket.off('partner:found', handlePartnerFound);
-            socket.off('message:receive', handleReceiveMessage);
+            socket.off('partner:image');
         };
-    }, [user]);
+    }, []);
 
     if (loading) return <Loading />;
     if (!user) return <p>Please log in.</p>;
@@ -103,23 +76,14 @@ const Home = () => {
                     partnerImage={partnerProfileImageUrl}
                     onFindPartner={handleFindPartner}
                 />
-
-
+                {/* <button className='mt-6 bg-yellow-400 text-[#4B2E1E] px-6 py-3 rounded-lg shadow hover:bg-yellow-500 transition' onClick={disconnect}>
+                    Disconnect
+                </button> */}
 
                 <MessageInput
-                    socket={socket}
-                    senderId={senderId}
-                    receiverId={receiverId}
-                    conversationId={conversationId}
-                    roomId={roomId}
-                    keyHex={keyHex}
-                    onSend={(newMessage) => {
-                        setMessages(prev => [...prev, {
-                            senderId: senderId,
-                            content: newMessage,
-                            timestamp: new Date().toISOString()
-                        }]);
-                    }}
+                    receiverId={partnerId!}
+                    onSend={sendMessage}
+                    disabled = {!roomId || !partnerId}
                 />
 
             </div>
