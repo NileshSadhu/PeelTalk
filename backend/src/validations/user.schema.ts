@@ -20,7 +20,10 @@ export const passwordResetSchema = z.object({
 })
 
 export const updateUserSchema = z.object({
-    name: z.string().min(1).optional(),
+    firstname: z.string().min(1).optional(),
+    lastname: z.string().min(1).optional(),
     email: z.string().email().optional(),
     username: z.string().min(3).optional(),
+    age: z.string().min(1).optional(),
+    gender: z.enum(["Male", "Female", "Other"]).optional()
 })

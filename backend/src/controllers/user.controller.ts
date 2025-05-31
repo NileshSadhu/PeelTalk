@@ -6,6 +6,7 @@ import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import redis from "../redis";
 import { sendOtpEmail } from "../utils/mailer";
+import { uploadToCloudinary } from "../services/uploadServices";
 
 dotenv.config();
 
@@ -272,9 +273,12 @@ export const getUserDetails = async(req:Request,res:Response):Promise<Response> 
 
         const user = await User.findOne({_id: userId},{
             username: true,
-            name: true,
+            firstname: true,
+            lastname: true,
             email: true,
-            profilePhoto: true
+            profilePhoto: true,
+            age: true,
+            gender: true
         })
 
         if(!user){
@@ -339,5 +343,33 @@ export const userLogout = async(req:Request,res:Response):Promise<Response> => {
     }catch(error){
         console.error("Logout Error:", error);
         return res.status(500).json({ message: "Something went wrong while logging out." });
+    }
+}
+
+
+export const updateProfilePhoto = async(req:Request,res:Response):Promise<Response> => {
+    try{
+        if(!req.file){
+            return res.status(400).json({ error: "No file uploaded" });
+        }
+
+        const userId = req.userId;
+        const user = await User.findById(userId);
+        if(!user){
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        const result: any = await uploadToCloudinary(req.file.buffer);
+
+        user.profilePhoto = result.secure_url;
+        await user.save();
+
+        return res.status(200).json({
+            message: "Profile photo updated successfully",
+            imageUrl: result.secure_url,
+        });
+    }catch(error){
+        console.error("Upload Error:", error);
+        return res.status(500).json({ message: "Internal server error" });
     }
 }

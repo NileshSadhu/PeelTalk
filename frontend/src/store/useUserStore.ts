@@ -3,11 +3,15 @@ import axios from 'axios';
 
 const backend_api = import.meta.env.VITE_BACKEND_URL;
 
-interface User {
+export interface User {
     _id: string;
-    name: string;
+    firstname: string;
+    lastname: string;
+    username: string;
+    age: string;
+    gender: string;
     email: string;
-    profileImageUrl: string | null;
+    profilePhoto: string | null;
 }
 
 interface UserStore {

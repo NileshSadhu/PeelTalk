@@ -1,5 +1,6 @@
 import axios from "axios"
 import toast from "react-hot-toast";
+import type { ProfileInputs } from "../components/ProfileComponents/Profile";
 
 const backend_api = import.meta.env.VITE_BACKEND_URL;
 
@@ -153,3 +154,47 @@ export const logoutUser = async () => {
             toast.error("Something went wrong. Please try again.");
         }
     };
+
+
+export const updateUser = async (formData:ProfileInputs) => {
+    try{
+        const response = await axios.put(`${backend_api}/user/updateUserDetails`,formData,{
+            withCredentials: true
+        })
+
+        if (response.status === 200) {
+            toast.success("Profile updated successfully.");
+            return { success: true }
+        } else {
+            toast.error("Profile update failed. Please try again.");
+        }
+    }catch(error){
+        console.error(error);
+        toast.error("Something went wrong. Please try again.");
+    }
+}
+
+
+export const updateProfilePhoto = async (image: File) => {
+    try{
+        const formData = new FormData();
+        formData.append("image", image);
+
+        const response = await axios.put(`${backend_api}/user/updateProfilePhoto`,formData,{
+            withCredentials: true,
+            headers: {
+                "Content-Type": "multipart/form-data",
+            }
+        })
+
+        if (response.status === 200) {
+            toast.success("Profile Photo updated successfully.");
+            return { success: true, imageUrl: response.data.imageUrl };
+        } else {
+            throw new Error("Upload failed");
+        }
+    }catch(error){
+        console.error("Upload Error:", error);
+        toast.error("Something went wrong. Please try again.");
+    }
+}

@@ -72,7 +72,7 @@ const Home = () => {
                 <ChatWindow
                     messages={messages}
                     currentUserId={user._id}
-                    currentUserImage={user.profileImageUrl || profile}
+                    currentUserImage={user.profilePhoto || profile}
                     partnerImage={partnerProfileImageUrl}
                     onFindPartner={handleFindPartner}
                 />
