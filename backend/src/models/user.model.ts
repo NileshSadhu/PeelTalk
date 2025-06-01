@@ -19,7 +19,7 @@ const userSchema = new Schema<IUser>({
     email:        { type: String, required: true, unique: true },
     username:     { type: String, required: true, unique: true },
     age:          { type: String, default: null},
-    gender:       {type: String, enum: ["Male","Female","Other"], default: null},
+    gender:       { type: String, enum: ["Male","Female","Other"], default: null},
     password:     { type: String, required: true},
     isPremium:    { type: Boolean, default: false},
     profilePhoto: { type: String, default: null}

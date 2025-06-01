@@ -20,22 +20,39 @@ export default function registerChatHandlers(io: Server, socket: Socket) {
     });
 
     socket.on("disconnect", async () => {
-    const userId = await redis.get(`socket:${socket.id}:user`);
-    if (userId) {
-        await redis.srem("waitingUsers:set", userId);
-        await redis.del(`user:${userId}:socket`);
-        await redis.del(`socket:${socket.id}:user`);
-    }
+        const userId = await redis.get(`socket:${socket.id}:user`);
 
-    const partnerId = await redis.get(`partner:${socket.id}`);
-    if (partnerId) {
-        const partnerSocket = io.sockets.sockets.get(partnerId);
-        if (partnerSocket) {
-            partnerSocket.emit("partner:disconnected");
+        if(userId){
+            await redis.srem("waitingUsers:set", userId);
+
+            const waitingList = await redis.lrange("waitingUsers", 0, -1);
+            const updatedList = waitingList.filter(item => {
+                try {
+                    const parsed = JSON.parse(item);
+                    return parsed.userId !== userId;
+                } catch {
+                    return true;
+                }
+            });
+
+            await redis.del("waitingUsers");
+            if (updatedList.length > 0) {
+                await redis.rpush("waitingUsers", ...updatedList);
+            }
+
+            await redis.del(`user:${userId}:socket`);
+            await redis.del(`socket:${socket.id}:user`);
         }
 
-        await redis.del(`partner:${socket.id}`);
-        await redis.del(`partner:${partnerId}`);
-    }
-    });
+        const partnerSocketId = await redis.get(`partner:${socket.id}`);
+        if (partnerSocketId) {
+            const partnerSocket = io.sockets.sockets.get(partnerSocketId);
+            if (partnerSocket) {
+                partnerSocket.emit("partner:disconnected");
+            }
+
+            await redis.del(`partner:${socket.id}`);
+            await redis.del(`partner:${partnerSocketId}`);
+        }
+    })
 }

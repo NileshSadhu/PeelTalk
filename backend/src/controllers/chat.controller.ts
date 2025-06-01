@@ -4,20 +4,27 @@ import crypto from "crypto";
 import { Conversation } from "../models/conversation.model";
 import { Message } from "../models/message.model";
 import redis from "../redis";
+import { User } from "../models/user.model";
 
 
 
 export const handleFindPartner = async (io: Server, socket: Socket, userData: { userId: string }) => {
-    const data = await redis.rpop("waitingUsers");
+    await redis.set(`socket:${socket.id}:user`, userData.userId);
 
-    if (data) {
+    let data: string | null;
+
+    while((data = await redis.rpop("waitingUsers")) !== null){
         const { socketId: partnerSocketId, userId: partnerId } = JSON.parse(data);
+        console.log(data)
+        if(partnerId === userData.userId){
+            continue;
+        }
+
         const partnerSocket = io.sockets.sockets.get(partnerSocketId);
 
-        if (!partnerSocket) {
+        if(!partnerSocket){
             await redis.srem("waitingUsers:set", partnerId);
-            await handleFindPartner(io, socket, userData); 
-            return;
+            continue;
         }
 
         const roomId = `room-${socket.id}-${partnerSocket.id}`;
@@ -28,9 +35,10 @@ export const handleFindPartner = async (io: Server, socket: Socket, userData: { 
         await redis.set(`user:${partnerId}:socket`, partnerSocket.id);
         await redis.set(`partner:${socket.id}`, partnerSocket.id);
         await redis.set(`partner:${partnerSocket.id}`, socket.id);
-
+        
         await redis.srem("waitingUsers:set", userData.userId);
         await redis.srem("waitingUsers:set", partnerId);
+
 
         let convo = await Conversation.findOne({
             $or: [
@@ -39,7 +47,7 @@ export const handleFindPartner = async (io: Server, socket: Socket, userData: { 
             ]
         });
 
-        if (!convo) {
+        if(!convo){
             const keyHex = crypto.randomBytes(32).toString("hex");
             convo = await Conversation.create({
                 user1Id: userData.userId,
@@ -51,26 +59,46 @@ export const handleFindPartner = async (io: Server, socket: Socket, userData: { 
 
         const messages = await Message.find({ conversationId: convo._id }).sort({ createdAt: 1 });
 
-        io.to(roomId).emit("partner:found", {
+        const currentUser = await User.findById(userData.userId).select("username profilePhoto");
+        const partnerUser = await User.findById(partnerId).select("username profilePhoto");
+
+        // Send to current user
+        socket.emit("partner:found", {
             roomId,
             conversationId: convo._id,
             partnerId,
+            partnerProfile: {
+                username: partnerUser?.username,
+                profilePhoto: partnerUser?.profilePhoto,
+            },
+        });
+
+        // sending to partner
+        partnerSocket.emit("partner:found", {
+            roomId,
+            conversationId: convo._id,
+            partnerId: userData.userId,
+            partnerProfile: {
+                username: currentUser?.username,
+                profilePhoto: currentUser?.profilePhoto
+            }, 
         });
 
         socket.emit("chat:history", { conversationId: convo._id, messages });
         partnerSocket.emit("chat:history", { conversationId: convo._id, messages });
 
-    } else {
-        const isAlreadyWaiting = await redis.sismember("waitingUsers:set", userData.userId);
-        if (!isAlreadyWaiting) {
-            await redis.lpush("waitingUsers", JSON.stringify({ socketId: socket.id, userId: userData.userId }));
-            await redis.sadd("waitingUsers:set", userData.userId);
+        return;
+    }
+
+    const isAlreadyWaiting = await redis.sismember("waitingUsers:set", userData.userId);
+    if(!isAlreadyWaiting){
+        await redis.lpush("waitingUsers", JSON.stringify({ socketId: socket.id, userId: userData.userId }));
+        await redis.sadd("waitingUsers:set", userData.userId);
+        await redis.set(`user:${userData.userId}:socket`, socket.id);
+    } else{
+        const current = await redis.get(`user:${userData.userId}:socket`);
+        if (current !== socket.id) {
             await redis.set(`user:${userData.userId}:socket`, socket.id);
-        } else {
-            const current = await redis.get(`user:${userData.userId}:socket`);
-            if (current !== socket.id) {
-                await redis.set(`user:${userData.userId}:socket`, socket.id);
-            }
         }
     }
 };

@@ -29,7 +29,8 @@ const Home = () => {
         sendMessage,
         partnerId,
         roomId,
-        // disconnect
+        disconnect,
+        partnerProfile
     } = useChat({
         socket,
         userId: user?._id || '',
@@ -43,14 +44,8 @@ const Home = () => {
     };
 
     useEffect(() => {
-        socket.on('partner:image', (url: string) => {
-            setPartnerProfileImageUrl(url || profile);
-        });
-
-        return () => {
-            socket.off('partner:image');
-        };
-    }, []);
+        setPartnerProfileImageUrl(partnerProfile?.profilePhoto || profile)
+    }, [partnerProfile]);
 
     if (loading) return <Loading />;
     if (!user) return <p>Please log in.</p>;
@@ -75,10 +70,12 @@ const Home = () => {
                     currentUserImage={user.profilePhoto || profile}
                     partnerImage={partnerProfileImageUrl}
                     onFindPartner={handleFindPartner}
+                    currentUsername={user.username}
+                    partnerUsername={partnerProfile?.username!}
                 />
-                {/* <button className='mt-6 bg-yellow-400 text-[#4B2E1E] px-6 py-3 rounded-lg shadow hover:bg-yellow-500 transition' onClick={disconnect}>
+                <button className='mt-6 bg-yellow-400 text-[#4B2E1E] px-6 py-3 rounded-lg shadow hover:bg-yellow-500 transition' onClick={disconnect}>
                     Disconnect
-                </button> */}
+                </button>
 
                 <MessageInput
                     receiverId={partnerId!}

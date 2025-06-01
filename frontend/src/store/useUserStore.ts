@@ -25,7 +25,7 @@ interface UserStore {
 export const useUserStore = create<UserStore>((set) => ({
     user: null,
     loading: true,
-
+    
     setUser: (user) => set({ user, loading: false }),
     clearUser: () => set({ user: null, loading: false }),
 

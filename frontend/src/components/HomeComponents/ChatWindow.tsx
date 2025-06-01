@@ -12,8 +12,11 @@ interface ChatWindowProps {
     currentUserId: string;
     currentUserImage: string;
     partnerImage: string;
+    currentUsername: string;
+    partnerUsername: string;
     onFindPartner?: () => void;
 }
+
 
 export const ChatWindow = ({
     messages,
@@ -21,6 +24,8 @@ export const ChatWindow = ({
     currentUserImage,
     partnerImage,
     onFindPartner,
+    currentUsername,
+    partnerUsername
 }: ChatWindowProps) => {
 
     const messagesEndRef = useRef<HTMLDivElement | null>(null);
@@ -49,7 +54,7 @@ export const ChatWindow = ({
                     {messages.map((msg, idx) => {
                         const isCurrentUser = msg.senderId === currentUserId;
                         const avatar = isCurrentUser ? currentUserImage : partnerImage;
-                        const username = isCurrentUser ? "You" : "Partner";
+                        const username = isCurrentUser ? currentUsername : partnerUsername;
 
                         return (
                             <div
@@ -78,7 +83,8 @@ export const ChatWindow = ({
                                 </div>
                             </div>
                         );
-                    })}
+})}
+
                     <div ref={messagesEndRef} />
                 </div>
             )}

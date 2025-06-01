@@ -5,11 +5,11 @@ import { Loading } from "../Common/Loading";
 import { updateProfilePhoto, updateUser } from "../../api/auth";
 
 export interface ProfileInputs {
-    username: string;
-    firstname: string;
-    lastname: string;
-    age: string;
-    gender: string;
+    username?: string;
+    firstname?: string;
+    lastname?: string;
+    age?: string;
+    gender?: string;
 }
 
 export const Profile = () => {
@@ -63,7 +63,11 @@ export const Profile = () => {
             return;
         }
 
-        await updateUser(formData);
+        const cleanedData = Object.fromEntries(
+            Object.entries(formData).filter(([_, value]) => value !== "")
+        );
+
+        await updateUser(cleanedData);
         setOriginalData(formData);
     };
 
@@ -143,10 +147,11 @@ export const Profile = () => {
                             {isEditing ? (
                                 key === "gender" ? (
                                     <select
-                                        value={formData.gender}
+                                        value={formData.gender || ""}
                                         onChange={(e) => handleChange("gender", e.target.value)}
                                         className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-                                    >
+                                    >   
+                                        <option value="" disabled>Select Gender</option>
                                         <option value="Male">Male</option>
                                         <option value="Female">Female</option>
                                         <option value="Other">Other</option>

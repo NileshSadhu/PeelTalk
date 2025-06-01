@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { toast } from 'react-hot-toast';
 import { Socket } from 'socket.io-client';
 import { decryptText, encryptText } from '../utils/crypto';
@@ -23,7 +23,12 @@ export const useChat = ({ socket, userId, keyHex }: UseChatProps) => {
     const [roomId, setRoomId] = useState<string | null>(null);
     const [conversationId, setConversationId] = useState<string | null>(null);
     const [partnerId, setPartnerId] = useState<string | null>(null);
+    const [partnerProfile, setPartnerProfile] = useState<{ username: string; profilePhoto: string } | null>(null);
+    const partnerProfileRef = useRef<{ username: string; profilePhoto: string } | null>(null);
 
+    useEffect(() => {
+        partnerProfileRef.current = partnerProfile;
+    }, [partnerProfile]);
 
         const sendMessage = useCallback(async (msg: string, receiverId: string) => {
         if (!msg.trim()) {
@@ -116,22 +121,35 @@ export const useChat = ({ socket, userId, keyHex }: UseChatProps) => {
         roomId: string;
         conversationId: string;
         partnerId: string;
+        partnerProfile: {
+            username: string,
+            profilePhoto: string
+        }
     }) => {
         setRoomId(data.roomId);
         setConversationId(data.conversationId);
         setPartnerId(data.partnerId);
-    },[])
+        setPartnerProfile({
+            username: data.partnerProfile.username,
+            profilePhoto: data.partnerProfile.profilePhoto,
+        });
+        toast.success(`User ${data.partnerProfile?.username} has connected!!`)
+    },[]);
 
     useEffect(() => {
     const handlePartnerDisconnected = () => {
-        toast('❌ Your chat partner has disconnected.', {
+        const username = partnerProfileRef.current?.username || "someone";
+
+        toast(`❌ Your chat partner ${username} has disconnected.`, {
             icon: '👤',
             duration: 5000,
         });
-        setPartnerId(null);
-        setRoomId(null);
-        setConversationId(null);
-        setMessages([]);
+        setTimeout(() => {
+            setPartnerId(null);
+            setRoomId(null);
+            setConversationId(null);
+            setMessages([]);
+        }, 600); 
     };
 
     socket.on('partner:disconnected', handlePartnerDisconnected);
@@ -149,6 +167,7 @@ export const useChat = ({ socket, userId, keyHex }: UseChatProps) => {
         setRoomId(null);
         setConversationId(null);
         setMessages([]);
+        setPartnerProfile(null)
     }
     };
 
@@ -170,6 +189,7 @@ export const useChat = ({ socket, userId, keyHex }: UseChatProps) => {
         partnerId,
         roomId,
         conversationId,
-        disconnect
+        disconnect,
+        partnerProfile
     };
 }
