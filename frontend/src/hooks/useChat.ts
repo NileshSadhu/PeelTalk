@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { toast } from 'react-hot-toast';
 import { Socket } from 'socket.io-client';
-import { decryptText, encryptText } from '../utils/crypto';
+import { decryptText, encryptText } from '../utils/aesUtils.ts';
 
 
 interface Message {

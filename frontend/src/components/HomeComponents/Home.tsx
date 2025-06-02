@@ -59,7 +59,7 @@ const Home = () => {
                         className="balsamiq-sans-regular-italic text-brown-100"
                         onClick={() => navigate('/profile')}
                     >
-                        <img src={profile} alt="Profile" className="w-12 h-12 rounded-full" />
+                        <img src={user.profilePhoto || profile} alt="Profile" className="w-12 h-12 rounded-full" />
                     </button>
                 </div>
 
