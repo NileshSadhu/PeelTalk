@@ -41,9 +41,10 @@ export const ChatWindow = ({
         <div className="flex-1 overflow-y-auto p-4 flex flex-col items-center justify-center relative">
             {/* ✅ Show Disconnect button only if user is matched */}
             {partnerId && onDisconnect && (
-                <div className="absolute top-0 left-1/2 transform -translate-x-1/2 z-20 mt-2">
+                <div className="sticky top-0 z-20 mt-2 bg-white flex justify-center shadow-md">
                     <Disconnect onDisconnect={onDisconnect} />
                 </div>
+
             )}
 
             {messages.length === 0 ? (
