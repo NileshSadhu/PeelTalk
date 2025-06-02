@@ -190,6 +190,6 @@ export const useChat = ({ socket, userId, keyHex }: UseChatProps) => {
         roomId,
         conversationId,
         disconnect,
-        partnerProfile
+        partnerProfile,
     };
 }

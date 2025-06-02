@@ -1,5 +1,6 @@
-import { Taglines } from "./Taglines";
 import { useEffect, useRef } from "react";
+import { Taglines } from "./Taglines";
+import { Disconnect } from "./Disconnect";
 
 interface Message {
     senderId: string;
@@ -14,29 +15,37 @@ interface ChatWindowProps {
     partnerImage: string;
     currentUsername: string;
     partnerUsername: string;
+    partnerId?: string;             // ✅ Add this
     onFindPartner?: () => void;
+    onDisconnect?: () => void;      // ✅ Add this
 }
-
 
 export const ChatWindow = ({
     messages,
     currentUserId,
     currentUserImage,
     partnerImage,
-    onFindPartner,
     currentUsername,
-    partnerUsername
+    partnerUsername,
+    partnerId,
+    onFindPartner,
+    onDisconnect
 }: ChatWindowProps) => {
-
     const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [messages]);
 
-
     return (
-        <div className="flex-1 overflow-y-auto p-4 flex flex-col items-center justify-center">
+        <div className="flex-1 overflow-y-auto p-4 flex flex-col items-center justify-center relative">
+            {/* ✅ Show Disconnect button only if user is matched */}
+            {partnerId && onDisconnect && (
+                <div className="absolute top-0 left-1/2 transform -translate-x-1/2 z-20 mt-2">
+                    <Disconnect onDisconnect={onDisconnect} />
+                </div>
+            )}
+
             {messages.length === 0 ? (
                 <div className="flex flex-col items-center justify-center text-center">
                     <Taglines />
@@ -50,7 +59,7 @@ export const ChatWindow = ({
                     )}
                 </div>
             ) : (
-                <div className="w-full">
+                <div className="w-full pt-16"> {/* Padding for disconnect button */}
                     {messages.map((msg, idx) => {
                         const isCurrentUser = msg.senderId === currentUserId;
                         const avatar = isCurrentUser ? currentUserImage : partnerImage;
@@ -83,8 +92,7 @@ export const ChatWindow = ({
                                 </div>
                             </div>
                         );
-})}
-
+                    })}
                     <div ref={messagesEndRef} />
                 </div>
             )}

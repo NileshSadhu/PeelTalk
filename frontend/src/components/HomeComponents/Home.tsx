@@ -9,11 +9,10 @@ import { ChatWindow } from './ChatWindow';
 import { MessageInput } from './MessageInput';
 import { useChat } from '../../hooks/useChat';
 
-
 const Home = () => {
     const { user, fetchUser, loading } = useUserStore();
     const [partnerProfileImageUrl, setPartnerProfileImageUrl] = useState(profile);
-    
+
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const toggleMenu = () => setIsMenuOpen((prev) => !prev);
 
@@ -27,9 +26,9 @@ const Home = () => {
     const {
         messages,
         sendMessage,
+        disconnect,
         partnerId,
         roomId,
-        disconnect,
         partnerProfile
     } = useChat({
         socket,
@@ -72,15 +71,14 @@ const Home = () => {
                     onFindPartner={handleFindPartner}
                     currentUsername={user.username}
                     partnerUsername={partnerProfile?.username!}
+                    partnerId={partnerId ?? undefined}
+                    onDisconnect={disconnect}
                 />
-                <button className='mt-6 bg-yellow-400 text-[#4B2E1E] px-6 py-3 rounded-lg shadow hover:bg-yellow-500 transition' onClick={disconnect}>
-                    Disconnect
-                </button>
 
                 <MessageInput
                     receiverId={partnerId!}
                     onSend={sendMessage}
-                    disabled = {!roomId || !partnerId}
+                    disabled={!roomId || !partnerId}
                 />
 
             </div>
