@@ -24,10 +24,10 @@ export function isEmailValid(email: string) {
     return null;
 }
 
-export function validPin(pin: number) {
-    const pinString = pin.toString();
+export function validPin(pin: string) {
+    
 
-    if (pinString.length !== 4 || !/^\d{4}$/.test(pinString)) {
+    if (pin.length !== 4 || !/^\d{4}$/.test(pin)) {
         return "Pin must be exactly 4 digits.";
     }
     return null;

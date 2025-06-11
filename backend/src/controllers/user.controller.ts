@@ -56,8 +56,16 @@ export const signup = async(req:Request,res:Response):Promise<Response> => {
         const tempUserData = {
             email: data.email,
             username: data.username,
-            password: hashedPassword
+            password: hashedPassword,
+            publicKey: data.publicKey,
+            encryptedPrivateKey: {
+                cipher: data.encryptedPrivateKey.cipher,
+                iv: data.encryptedPrivateKey.iv,
+                salt: data.encryptedPrivateKey.salt
+            }
         }
+
+
 
         await redis.set(`otp:${data.email}`,JSON.stringify({
             otp: otp,
@@ -97,6 +105,12 @@ export const verifySignup = async(req:Request,res:Response):Promise<Response> =>
             email: parsedData.user.email,
             username: parsedData.user.username,
             password: parsedData.user.password,
+            publicKey: parsedData.user.publicKey,
+            encryptedPrivateKey: {
+                cipher: parsedData.user.encryptedPrivateKey.cipher,
+                iv: parsedData.user.encryptedPrivateKey.iv,
+                salt: parsedData.user.encryptedPrivateKey.salt
+            }
         });
 
         await redis.del(`otp:${email}`);
@@ -111,7 +125,10 @@ export const verifySignup = async(req:Request,res:Response):Promise<Response> =>
         })
 
         return res.status(201).json({
-            message: 'Signup verified and user created successfully!'
+            message: 'Signup verified successfully!',
+            userId: user._id,
+            publicKey: user.publicKey,
+            encryptedPrivateKey: user.encryptedPrivateKey
         });
         
     }catch(error){
@@ -134,9 +151,7 @@ export const login = async(req:Request,res:Response):Promise<Response> => {
     const data = result.data;
 
     try{
-        const user = await User.findOne({
-            $or: [{email: data.email}, {username: data.username}]
-        })
+        const user = await User.findOne({email: data.email})
 
         if(!user){
             return res.status(400).json({
@@ -151,7 +166,7 @@ export const login = async(req:Request,res:Response):Promise<Response> => {
             });
         }
 
-        const token = jwt.sign({id: user._id,email: user.email},jwt_secret)
+        const token = jwt.sign({ id: user._id, email: user.email }, jwt_secret);
 
         res.cookie("token",token, {
             httpOnly: true,
@@ -161,8 +176,12 @@ export const login = async(req:Request,res:Response):Promise<Response> => {
         })
 
         return res.status(201).json({
-            message: "User login in successfully!!!"
+            message: "Login in successful!!!",
+            userId: user._id,
+            publicKey: user.publicKey,
+            encryptedPrivateKey: user.encryptedPrivateKey
         });
+        
     }catch(error){
         console.error("Server Error:",error)
         return res.status(500).json({message:"Internal server error"})
@@ -201,7 +220,16 @@ export const forgotPassword = async(req:Request,res:Response):Promise<Response> 
 
         await redis.set(
             `reset-otp:${data.email}`,
-            JSON.stringify({ otp, password: hashedPassword }),
+            JSON.stringify({
+                otp,
+                password: hashedPassword,
+                publicKey: data.publicKey,
+                encryptedPrivateKey: {
+                    cipher: data.encryptedPrivateKey.cipher,
+                    iv: data.encryptedPrivateKey.iv,
+                    salt: data.encryptedPrivateKey.salt
+            }
+            }),
             'EX',
             300
         );
@@ -232,15 +260,32 @@ export const resetPassword = async(req:Request,res:Response):Promise<Response> =
         if(parsedData.otp !== otp){
             return res.status(400).json({ message: 'Invalid OTP.' });
         }
+        
+        const user = await User.findOneAndUpdate({email},{
+            password: parsedData.password,
+            publicKey: parsedData.publicKey,
+            encryptedPrivateKey: {
+                cipher: parsedData.encryptedPrivateKey.cipher,
+                iv: parsedData.encryptedPrivateKey.iv,
+                salt: parsedData.encryptedPrivateKey.salt
+            }
+        },{
+            new: true
+        });
 
-        await User.updateOne({email},{
-            password: parsedData.password
-        })
+        if(!user){
+            return res.status(400).json({
+                message: "Error updating user password!!!"
+            })
+        }
 
         await redis.del(`reset-otp:${email}`);
 
         return res.status(200).json({
-            message: "Password reset successfully."
+            message: "Password reset successfully.",
+            userId: user._id,
+            publicKey: user.publicKey,
+            encryptedPrivateKey: user.encryptedPrivateKey
         })
 
     }catch(error){

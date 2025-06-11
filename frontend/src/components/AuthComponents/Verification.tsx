@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { AuthContainer } from "../Common/AuthConatiner";
 import { CustomInput } from "../Common/CustomInput";
@@ -13,6 +13,12 @@ export const Verification = () => {
 
     const { email } = useParams<{ email?: string }>();
 
+    useEffect(() => {
+        return () => {
+        sessionStorage.removeItem("cachedPassword");
+        };
+    }, []);
+
     const handleSubmit = async () => {
         setError("");
 
@@ -26,9 +32,17 @@ export const Verification = () => {
             return;
         }
 
+        const cachedPassword = sessionStorage.getItem("cachedPassword");
+
+        if (!cachedPassword) {
+        setError("Verification expired or invalid. Please sign up again.");
+        return;
+        }
+
         try {
-            const result = await verifySignup(otp, email);
+            const result = await verifySignup(otp, email, cachedPassword);
             if (result?.success && result.next) {
+                sessionStorage.removeItem("cachedPassword");
                 navigate(result.next);
             } else if (result?.error) {
                 setError(result.error);

@@ -16,7 +16,6 @@ const Home = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const toggleMenu = () => setIsMenuOpen((prev) => !prev);
 
-    const keyHex = '000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f';
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -32,8 +31,7 @@ const Home = () => {
         partnerProfile
     } = useChat({
         socket,
-        userId: user?._id || '',
-        keyHex
+        userId: user?._id || ''
     });
 
     const handleFindPartner = async () => {

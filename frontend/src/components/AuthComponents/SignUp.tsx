@@ -5,7 +5,7 @@ import { Head } from "../Common/Head";
 import { isEmailValid, isPasswordValid } from "../../utils/validation";
 import PasswordInput from "../Common/PasswordInput";
 import { SubmitBtn } from "../Common/SubmitBtn";
-import { handleSignup } from "../../api/auth"; // Assumed to handle full submission logic
+import { handleSignup } from "../../api/auth";
 import { NavigateLinks } from "../Common/NavigateLinks";
 import { useNavigate } from "react-router-dom";
 
@@ -21,6 +21,7 @@ export const SignUp = () => {
         const result = await handleSignup(user, email, password);
 
         if (result?.success) {
+            sessionStorage.setItem("cachedPassword", password);
             navigate(result.next!);
         }
     };

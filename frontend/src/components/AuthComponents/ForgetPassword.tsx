@@ -27,11 +27,13 @@ export const ForgetPassword = () => {
                 setError("Please correct the form errors and fill all fields.");
                 return;
                 }
-                const result = await forgotPassword(email, password);
 
-                if(result?.success){
-                    navigate(result.next)
-                }
+            const result = await forgotPassword(email, password);
+
+            if(result?.success){
+                sessionStorage.setItem("newCachedPassword", password);
+                navigate(result.next)
+            }
         }
 
 

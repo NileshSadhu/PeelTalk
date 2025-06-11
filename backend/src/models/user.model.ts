@@ -11,6 +11,12 @@ export interface IUser extends Document {
     password: string;
     isPremium: boolean;
     profilePhoto: string;
+    publicKey: string;
+    encryptedPrivateKey: {
+        cipher: string;
+        iv: string;
+        salt: string;
+    };
 }
 
 const userSchema = new Schema<IUser>({
@@ -22,7 +28,13 @@ const userSchema = new Schema<IUser>({
     gender:       { type: String, enum: ["Male","Female","Other"], default: null},
     password:     { type: String, required: true},
     isPremium:    { type: Boolean, default: false},
-    profilePhoto: { type: String, default: null}
+    profilePhoto: { type: String, default: null},
+    publicKey:    { type: String, required: true},
+    encryptedPrivateKey: {
+        cipher: { type: String, required: true },
+        iv: { type: String, required: true },
+        salt: { type: String, required: true }
+    }
 })
 
 

@@ -1,6 +1,5 @@
 import { Request,Response } from "express";
 import { Server, Socket } from "socket.io";
-import crypto from "crypto";
 import { Conversation } from "../models/conversation.model";
 import { Message } from "../models/message.model";
 import redis from "../redis";
@@ -46,23 +45,20 @@ export const handleFindPartner = async (io: Server, socket: Socket, userData: { 
                 { user1Id: partnerId, user2Id: userData.userId },
             ]
         });
-
-        if(!convo){
-            const keyHex = crypto.randomBytes(32).toString("hex");
+        
+        const currentUser = await User.findById(userData.userId).select("username profilePhoto publicKey");
+        const partnerUser = await User.findById(partnerId).select("username profilePhoto publicKey");
+        
+        if(convo){
+            await Message.deleteMany({ conversationId: convo._id });
+        }
+        else{
             convo = await Conversation.create({
                 user1Id: userData.userId,
-                user2Id: partnerId,
-                encryptedKeyUser1: keyHex,
-                encryptedKeyUser2: keyHex,
+                user2Id: partnerId
             });
         }
 
-        const messages = await Message.find({ conversationId: convo._id }).sort({ createdAt: 1 });
-
-        const currentUser = await User.findById(userData.userId).select("username profilePhoto");
-        const partnerUser = await User.findById(partnerId).select("username profilePhoto");
-
-        // Send to current user
         socket.emit("partner:found", {
             roomId,
             conversationId: convo._id,
@@ -71,9 +67,9 @@ export const handleFindPartner = async (io: Server, socket: Socket, userData: { 
                 username: partnerUser?.username,
                 profilePhoto: partnerUser?.profilePhoto,
             },
+            publicKey: partnerUser?.publicKey
         });
-
-        // sending to partner
+        
         partnerSocket.emit("partner:found", {
             roomId,
             conversationId: convo._id,
@@ -82,10 +78,11 @@ export const handleFindPartner = async (io: Server, socket: Socket, userData: { 
                 username: currentUser?.username,
                 profilePhoto: currentUser?.profilePhoto
             }, 
+            publicKey: currentUser?.publicKey
         });
 
-        socket.emit("chat:history", { conversationId: convo._id, messages });
-        partnerSocket.emit("chat:history", { conversationId: convo._id, messages });
+        socket.emit("chat:history", { conversationId: convo._id });
+        partnerSocket.emit("chat:history", { conversationId: convo._id });
 
         return;
     }
@@ -106,22 +103,20 @@ export const handleFindPartner = async (io: Server, socket: Socket, userData: { 
 
 
 export const handleMessage = async(io: Server, 
-    {roomId,message,senderId,receiverId,conversationId,iv}:
-    {roomId:string,message:string,senderId:string,receiverId:string,conversationId:string,iv:string}
+    {roomId,content,senderId,receiverId,conversationId}:
+    {roomId:string,content:string,senderId:string,receiverId:string,conversationId:string}
     ) =>{
 
         const saved = await Message.create({
             senderId,
             receiverId,
-            content: message,
-            iv,
+            content,
             conversationId,
         });
 
         io.to(roomId).emit("chat:message",{
             senderId,
-            content: message,
-            iv,
+            content,
             timeStamp: saved.createdAt
         })
 };

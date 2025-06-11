@@ -83,12 +83,12 @@ export const ChatWindow = ({
                                     <div className="flex flex-col">
                                         <span className="text-xs text-gray-500 mb-1">{username}</span>
                                         <div className={`relative bg-[#F9F4F2] text-[#4B2E1E] p-3 rounded-lg shadow
-    ${isCurrentUser ? 'rounded-tr-none' : 'rounded-tl-none'}
-    before:absolute before:bottom-0 before:w-0 before:h-0
-    ${isCurrentUser
+                                                ${isCurrentUser ? 'rounded-tr-none' : 'rounded-tl-none'}
+                                                before:absolute before:bottom-0 before:w-0 before:h-0
+                                                ${isCurrentUser
                                                 ? 'before:right-0 before:border-l-[12px] before:border-l-[#F9F4F2] before:border-b-[12px] before:border-b-transparent'
                                                 : 'before:left-0 before:border-r-[12px] before:border-r-[#F9F4F2] before:border-b-[12px] before:border-b-transparent'}
-`}>
+                                                `}>
                                             <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
                                             <p className="text-[10px] text-right mt-1 text-gray-500">
                                                 {new Date(msg.timestamp).toLocaleTimeString([], {

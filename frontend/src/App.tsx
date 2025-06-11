@@ -8,6 +8,7 @@ import { Loading } from "./components/Common/Loading";
 import { PrivateRoute } from "./components/AuthComponents/PrivateRoute";
 import { HomePage } from "./pages/HomePage";
 import { ProfilePage } from "./pages/ProfilePage";
+import { ResetPasswordPage } from "./pages/ResetPasswordPage";
 
 function App() {
   return (
@@ -16,7 +17,7 @@ function App() {
         <Route path="/signIn" element={<SignInPage />} />
         <Route path="/signUp" element={<SignUpPage />} />
         <Route path='/forgotpassword' element={<ForgetPasswordPage />} />
-        {/* <Route path='/checkpin/:email' element={<CheckPinPage />} /> */}
+        <Route path='/resetpassword/:email' element={ <ResetPasswordPage/> } />
         <Route path='/verification/:email' element={<VerificationPage />} />
       </Route>
 

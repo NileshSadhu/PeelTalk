@@ -1,6 +1,10 @@
 import axios from "axios"
 import toast from "react-hot-toast";
 import type { ProfileInputs } from "../components/ProfileComponents/Profile";
+import { exportPublicKey, generateKeyPair } from "../utils/keyUtils";
+import { decryptPrivateKeyWithPassword, encryptPrivateKeyWithPassword } from "../utils/aesUtils.ts";
+import { KeyStorageService } from "../utils/keyStorage.ts";
+import { clearUserKeysFromIndexedDB, storeUserKeysInIndexedDB } from "../utils/indexedDbUtils.ts";
 
 const backend_api = import.meta.env.VITE_BACKEND_URL;
 
@@ -12,17 +16,26 @@ export const handleSignup = async (username: string, email: string, password: st
         return { success: false, message: "Missing input fields" };
     }
 
+    const { publicKey, privateKey } = await generateKeyPair();
+    const exportedPublicKey = await exportPublicKey(publicKey);
+
+    const encryptedPrivateKey = await encryptPrivateKeyWithPassword(privateKey, password);
     try {
         const response = await axios.post(`${backend_api}/user/signup`, {
             username,
             email,
-            password
+            password,
+            publicKey: exportedPublicKey,
+            encryptedPrivateKey
         }, {
             withCredentials: true
         })
 
         if (response.status === 200) {
             toast.success(response.data.message);
+
+            console.log(response.data)
+
             return { success: true, next: `/verification/${email}` };
         }
     } catch (error: any) {
@@ -35,7 +48,7 @@ export const handleSignup = async (username: string, email: string, password: st
 }
 
 
-export const verifySignup = async (otp: string, email: string) => {
+export const verifySignup = async (otp: string, email: string, password: string) => {
     try {
         const response = await axios.post(`${backend_api}/user/verifySignup`, {
             otp,
@@ -46,6 +59,19 @@ export const verifySignup = async (otp: string, email: string) => {
 
         if (response.status === 201) {
             toast.success(response.data.message);
+            
+            const { encryptedPrivateKey, publicKey } = response.data;
+
+            const decryptedPrivateKey = await decryptPrivateKeyWithPassword(encryptedPrivateKey.cipher, password,  encryptedPrivateKey.iv, encryptedPrivateKey.salt)
+
+            KeyStorageService.setInMemoryKey(decryptedPrivateKey);
+            await KeyStorageService.setPrivateKeyToLocalStorage(decryptedPrivateKey);
+
+            await storeUserKeysInIndexedDB({
+                publicKey,
+                encryptedPrivateKey
+            })
+
             return { success: true, next: `/` };
         }
         return { success: false, error: "Unexpected response from server." };
@@ -76,6 +102,18 @@ export const handleSignIn = async (email: string, password: string) => {
 
         if (response.status === 201) {
             toast.success(response.data.message);
+
+            const {encryptedPrivateKey, publicKey } = response.data;
+
+            const decryptedPrivateKey = await decryptPrivateKeyWithPassword(encryptedPrivateKey.cipher, password, encryptedPrivateKey.iv, encryptedPrivateKey.salt)
+
+            await KeyStorageService.setPrivateKeyToLocalStorage(decryptedPrivateKey)
+
+            await storeUserKeysInIndexedDB({
+                publicKey,
+                encryptedPrivateKey
+            })
+
             return { success: true, next: `/` };
         }
     } catch (error: any) {
@@ -91,9 +129,16 @@ export const handleSignIn = async (email: string, password: string) => {
 
 export const forgotPassword = async (email: string, password: string) => {
     try {
+        const { publicKey, privateKey } = await generateKeyPair();
+        const exportedPublicKey = await exportPublicKey(publicKey);
+        
+        const encryptedPrivateKey = await encryptPrivateKeyWithPassword(privateKey, password);
+
         const response = await axios.post(`${backend_api}/user/forgot-password`, {
             email,
-            Newpassword: password
+            Newpassword: password,
+            publicKey: exportedPublicKey,
+            encryptedPrivateKey
         }, {
             withCredentials: true
         });
@@ -113,7 +158,7 @@ export const forgotPassword = async (email: string, password: string) => {
 }
 
 
-export const resetPassword = async (otp: string, email: string) => {
+export const resetPassword = async (otp: string, email: string, password: string) => {
     try {
         const response = await axios.put(`${backend_api}/user/reset-password`, {
             otp,
@@ -124,6 +169,19 @@ export const resetPassword = async (otp: string, email: string) => {
 
         if (response.status === 200) {
             toast.success(response.data.message);
+
+            const { encryptedPrivateKey, publicKey } = response.data;
+
+            const decryptedPrivateKey = await decryptPrivateKeyWithPassword(encryptedPrivateKey.cipher, password, encryptedPrivateKey.iv, encryptedPrivateKey.salt)
+
+            KeyStorageService.setInMemoryKey(decryptedPrivateKey)
+            await KeyStorageService.setPrivateKeyToLocalStorage(decryptedPrivateKey)
+
+            await storeUserKeysInIndexedDB({
+                publicKey,
+                encryptedPrivateKey
+            })
+
             return { success: true, next: `/signIn` };
         }
     } catch (error: any) {
@@ -144,6 +202,12 @@ export const logoutUser = async () => {
             });
 
             if (response.status === 200) {
+                localStorage.removeItem("aesKey");
+                localStorage.removeItem("aesKeyExpiry");
+                sessionStorage.clear();
+                KeyStorageService.clearAll();
+                await clearUserKeysFromIndexedDB();
+
                 toast.success("Logged out successfully.");
                 return { success: true, next: `/signIn`}
             } else {

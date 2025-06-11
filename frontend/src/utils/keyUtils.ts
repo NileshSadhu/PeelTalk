@@ -23,12 +23,6 @@ export const exportPublicKey = async(key: CryptoKey):Promise<string> => {
 }
 
 
-export const exportPrivateKey = async(key: CryptoKey):Promise<string> => {
-    const exported = await window.crypto.subtle.exportKey("pkcs8", key);
-    return btoa(String.fromCharCode(...new Uint8Array(exported)));
-}
-
-
 export const importPublicKey = async(spkiBase64: string): Promise<CryptoKey> => {
     const binary = Uint8Array.from(atob(spkiBase64), c => c.charCodeAt(0));
     return await crypto.subtle.importKey(
