@@ -8,6 +8,7 @@ import { SideBar } from './SideBar';
 import { ChatWindow } from './ChatWindow';
 import { MessageInput } from './MessageInput';
 import { useChat } from '../../hooks/useChat';
+import { useBeforeUnloadWarning } from '../../hooks/useBeforeUnloadWarning';
 
 const Home = () => {
     const { user, fetchUser, loading } = useUserStore();
@@ -33,6 +34,8 @@ const Home = () => {
         socket,
         userId: user?._id || ''
     });
+
+    useBeforeUnloadWarning(!!partnerId)
 
     const handleFindPartner = async () => {
         if (!user || !user._id) return;
