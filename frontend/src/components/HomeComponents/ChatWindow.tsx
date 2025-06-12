@@ -1,6 +1,7 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Taglines } from "./Taglines";
 import { Disconnect } from "./Disconnect";
+import { SearchSpinner } from "./SearchSpinner";
 
 interface Message {
     senderId: string;
@@ -32,10 +33,20 @@ export const ChatWindow = ({
     onDisconnect
 }: ChatWindowProps) => {
     const messagesEndRef = useRef<HTMLDivElement | null>(null);
+    const [isSearching, setIsSearching] = useState(false);
 
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [messages]);
+
+    useEffect(() => {
+        if (partnerId) setIsSearching(false);
+    }, [partnerId]);
+
+    const handleJuiceMatch = () => {
+        setIsSearching(true);
+        onFindPartner?.();
+    }
 
     return (
         <div className="flex-1 overflow-y-auto p-4 flex flex-col items-center justify-center relative">
@@ -49,15 +60,16 @@ export const ChatWindow = ({
 
             {messages.length === 0 ? (
                 <div className="flex flex-col items-center justify-center text-center">
-                    <Taglines />
-                    {onFindPartner && (
+                    {!isSearching && !partnerId && <Taglines />}
+                    {!isSearching && !partnerId && (
                         <button
                             className="mt-6 bg-yellow-400 text-[#4B2E1E] px-6 py-3 rounded-lg shadow hover:bg-yellow-500 transition"
-                            onClick={onFindPartner}
+                            onClick={handleJuiceMatch}
                         >
                             JuiceMatch
                         </button>
                     )}
+                    {isSearching && <SearchSpinner />}
                 </div>
             ) : (
                 <div className="w-full pt-16"> {/* Padding for disconnect button */}
@@ -98,7 +110,6 @@ export const ChatWindow = ({
                                                 })}
                                             </p>
                                         </div>
-
                                     </div>
                                 </div>
                             </div>
