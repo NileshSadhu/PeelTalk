@@ -19,6 +19,16 @@ export default function registerChatHandlers(io: Server, socket: Socket) {
         }
     });
 
+    socket.on("partner:cancel", async () => {
+        const userId = await redis.get(`socket:${socket.id}:user`);
+        if (userId) {
+            await redis.lrem("waitingUsers", 0, JSON.stringify({ socketId: socket.id, userId }));
+            await redis.srem("waitingUsers:set", userId);
+            await redis.del(`socket:${socket.id}:user`);
+            console.log(`🛑 User ${userId} cancelled partner search.`);
+        }
+    });
+
     socket.on("disconnect", async () => {
         const userId = await redis.get(`socket:${socket.id}:user`);
 

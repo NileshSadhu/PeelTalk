@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Taglines } from "./Taglines";
 import { Disconnect } from "./Disconnect";
 import { SearchSpinner } from "./SearchSpinner";
+import { socket } from "../../utils/socket";
 
 interface Message {
     senderId: string;
@@ -71,7 +72,20 @@ export const ChatWindow = ({
                             JuiceMatch
                         </button>
                     )}
-                    {isSearching && <SearchSpinner />}
+                    {isSearching && (
+                        <>
+                            <SearchSpinner />
+                            <button
+                                className="mt-4 bg-yellow-200 text-gray-800 px-4 py-2 rounded-lg shadow hover:bg-yellow-100 transition"
+                                onClick={() => {
+                                    setIsSearching(false);
+                                    socket.emit("partner:cancel");
+                                }}
+                            >
+                                Cancel Search
+                            </button>
+                        </>
+                        )}
                 </div>
             ) : (
                 <div className="w-full pt-16"> {/* Padding for disconnect button */}
