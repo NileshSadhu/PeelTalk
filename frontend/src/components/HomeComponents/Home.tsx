@@ -51,9 +51,7 @@ const Home = () => {
     return (
         <div className="flex h-screen w-full bg-white overflow-hidden">
             <SideBar isMenuOpen={isMenuOpen} toggleMenu={toggleMenu} />
-
             <div className="flex-1 lg:mx-20 flex flex-col h-screen">
-
                 <ChatWindow
                     messages={messages}
                     currentUserId={user._id}
@@ -74,8 +72,6 @@ const Home = () => {
                     userId={user._id}
                     onSend={sendMessage}
                 />
-
-
             </div>
         </div>
     );
