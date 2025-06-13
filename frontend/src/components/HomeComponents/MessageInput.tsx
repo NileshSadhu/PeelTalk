@@ -3,32 +3,28 @@ import { SendMessageBtn } from './SendMessageBtn';
 import { toast } from 'react-toastify';
 import { TermsServices } from './TermsServices';
 import React from 'react';
-import { useChat } from '../../hooks/useChat';
-import type { Socket } from 'socket.io-client';
+import { socket } from '../../utils/socket';
 
 interface MessageInputProps {
     disabled: boolean;
     receiverId: string;
     onSend: (message: string, receiverId: string) => void;
-    socket: Socket;
-    userId: string;
+    roomId: string; 
+    partnerTyping?: boolean; 
+    partnerUsername?: string;
 }
 
 export const MessageInput = ({
     disabled,
     receiverId,
     onSend,
-    socket,
-    userId,
+    roomId,
+    partnerTyping,
+    partnerUsername
 }: MessageInputProps) => {
     const [message, setMessage] = useState<string>('');
     const textareaRef = useRef<HTMLTextAreaElement | null>(null);
     const typingTimeoutRef = useRef<number | null>(null);
-
-    const { socket: chatSocket, roomId, partnerTyping, partnerProfile } = useChat({
-        socket,
-        userId
-    });
 
     const handleSend = (
         e: React.MouseEvent<HTMLButtonElement> | React.KeyboardEvent<HTMLTextAreaElement>
@@ -50,10 +46,11 @@ export const MessageInput = ({
     };
 
     const emitTypingEvent = () => {
-        if (chatSocket && roomId) {
-            chatSocket.emit('partner:typing', { roomId });
+        if (socket && roomId) {
+            socket.emit('partner:typing', { roomId });
         }
     };
+
 
     const handleTyping = (value: string) => {
         setMessage(value);
@@ -64,9 +61,12 @@ export const MessageInput = ({
         }
 
         typingTimeoutRef.current = window.setTimeout(() => {
-            // Optional: emit stopped typing event here
+            if (socket && roomId) {
+                socket.emit('partner:stopTyping', { roomId });
+            }
         }, 1000);
     };
+
 
     useEffect(() => {
         if (textareaRef.current) {
@@ -111,7 +111,7 @@ export const MessageInput = ({
 
             {partnerTyping && (
                 <div className="text-sm text-gray-500 italic mt-2 ml-2">
-                    {partnerProfile?.username || "Partner"} is typing...
+                    {partnerUsername || "Partner"} is typing...
                 </div>
             )}
 

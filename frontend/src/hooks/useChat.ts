@@ -25,6 +25,8 @@ export const useChat = ({ socket, userId }: UseChatProps) => {
     const [partnerProfile, setPartnerProfile] = useState<{ username: string; profilePhoto: string } | null>(null);
     const partnerProfileRef = useRef<{ username: string; profilePhoto: string } | null>(null);
     const [partnerTyping, setPartnerTyping] = useState(false);
+    const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
 
     useEffect(() => {
         partnerProfileRef.current = partnerProfile;
@@ -98,20 +100,49 @@ export const useChat = ({ socket, userId }: UseChatProps) => {
         }
     }, []);
 
+
     useEffect(() => {
         const handlePartnerTyping = () => {
             setPartnerTyping(true);
-            setTimeout(() => setPartnerTyping(false), 1000); // Clear after 1s of inactivity
+
+            if (typingTimeoutRef.current) {
+                clearTimeout(typingTimeoutRef.current);
+            }
+
+            typingTimeoutRef.current = setTimeout(() => {
+                setPartnerTyping(false);
+                typingTimeoutRef.current = null;
+            }, 1000);
         };
+
+        socket.on('partner:typing', handlePartnerTyping);
+
+        return () => {
+            socket.off('partner:typing', handlePartnerTyping);
+            if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+        };
+    }, [socket]);
+
+
+    useEffect(() => {
+        const handlePartnerStopTyping = () => setPartnerTyping(false);
+
+        socket.on('partner:stopTyping', handlePartnerStopTyping);
+
+        return () => {
+            socket.off('partner:stopTyping', handlePartnerStopTyping);
+        };
+    }, [socket]);
+
+
+    useEffect(() => {
 
         socket.on('chat:message', handleIncomingMessage);
         socket.on('partner:found', handlePartnerFound);
-        socket.on('partner:typing', handlePartnerTyping); // ✅ Add typing handler
 
         return () => {
             socket.off('chat:message', handleIncomingMessage);
             socket.off('partner:found', handlePartnerFound);
-            socket.off('partner:typing', handlePartnerTyping); // ✅ Clean up
         };
     }, [socket, handleIncomingMessage, handlePartnerFound]);
 
