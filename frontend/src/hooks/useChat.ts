@@ -24,6 +24,7 @@ export const useChat = ({ socket, userId }: UseChatProps) => {
     const [partnerPublicKey, setPartnerPublicKey] = useState<CryptoKey | null>(null);
     const [partnerProfile, setPartnerProfile] = useState<{ username: string; profilePhoto: string } | null>(null);
     const partnerProfileRef = useRef<{ username: string; profilePhoto: string } | null>(null);
+    const [partnerTyping, setPartnerTyping] = useState(false);
 
     useEffect(() => {
         partnerProfileRef.current = partnerProfile;
@@ -34,19 +35,19 @@ export const useChat = ({ socket, userId }: UseChatProps) => {
         if (!socket || !roomId || !partnerPublicKey) return toast.error('Missing socket, roomId, or partner public key');
 
         try {
-        const encrypted = await encryptWithPublicKey(new TextEncoder().encode(msg), partnerPublicKey);
+            const encrypted = await encryptWithPublicKey(new TextEncoder().encode(msg), partnerPublicKey);
 
-        socket.emit('chat:message', {
-            roomId,
-            senderId: userId,
-            receiverId,
-            content: arrayBufferToBase64(encrypted),
-            conversationId
-        });
-        setMessages(prev => [...prev, { senderId: userId, content: msg, timestamp: new Date().toISOString() }]);
+            socket.emit('chat:message', {
+                roomId,
+                senderId: userId,
+                receiverId,
+                content: arrayBufferToBase64(encrypted),
+                conversationId
+            });
+            setMessages(prev => [...prev, { senderId: userId, content: msg, timestamp: new Date().toISOString() }]);
         } catch (err) {
-        console.error(err);
-        toast.error('Failed to send message');
+            console.error(err);
+            toast.error('Failed to send message');
         }
     }, [socket, roomId, userId, partnerPublicKey]);
 
@@ -56,16 +57,16 @@ export const useChat = ({ socket, userId }: UseChatProps) => {
         timestamp?: string;
     }) => {
         if (msg.senderId === userId) return;
-            try {
-                const privateKey = await KeyStorageService.getPrivateKeyFromLocalStorage();
-                if (!privateKey) return toast.error('Private key not found');
-                const decrypted = await decryptWithPrivateKey(strToArrayBuffer(msg.content), privateKey);
-                const decodedMsg = new TextDecoder().decode(decrypted);
-                setMessages(prev => [...prev, { senderId: msg.senderId, content: decodedMsg, timestamp: msg.timestamp || new Date().toISOString() }]);
-            } catch (err) {
-                console.error('Decryption failed', err);
-                toast.error('Failed to decrypt message');
-            }
+        try {
+            const privateKey = await KeyStorageService.getPrivateKeyFromLocalStorage();
+            if (!privateKey) return toast.error('Private key not found');
+            const decrypted = await decryptWithPrivateKey(strToArrayBuffer(msg.content), privateKey);
+            const decodedMsg = new TextDecoder().decode(decrypted);
+            setMessages(prev => [...prev, { senderId: msg.senderId, content: decodedMsg, timestamp: msg.timestamp || new Date().toISOString() }]);
+        } catch (err) {
+            console.error('Decryption failed', err);
+            toast.error('Failed to decrypt message');
+        }
     }, [userId]);
 
 
@@ -81,30 +82,39 @@ export const useChat = ({ socket, userId }: UseChatProps) => {
             setConversationId(data.conversationId);
             setPartnerId(data.partnerId);
             setPartnerProfile(data.partnerProfile);
-        const importedKey = await window.crypto.subtle.importKey(
-            'spki',
-            strToArrayBuffer(data.publicKey),
-            { name: 'RSA-OAEP', hash: 'SHA-256' },
-            true,
-            ['encrypt']
-        );
-        setPartnerPublicKey(importedKey);
-        KeyStorageService.setPartnerPublicKey(data.publicKey);
-        toast.success(`User ${data.partnerProfile.username} has connected!`);
+            const importedKey = await window.crypto.subtle.importKey(
+                'spki',
+                strToArrayBuffer(data.publicKey),
+                { name: 'RSA-OAEP', hash: 'SHA-256' },
+                true,
+                ['encrypt']
+            );
+            setPartnerPublicKey(importedKey);
+            KeyStorageService.setPartnerPublicKey(data.publicKey);
+            toast.success(`User ${data.partnerProfile.username} has connected!`);
         } catch (err) {
-        console.error('Error setting up partner key:', err);
-        toast.error('Failed to set up secure chat');
+            console.error('Error setting up partner key:', err);
+            toast.error('Failed to set up secure chat');
         }
     }, []);
 
     useEffect(() => {
+        const handlePartnerTyping = () => {
+            setPartnerTyping(true);
+            setTimeout(() => setPartnerTyping(false), 1000); // Clear after 1s of inactivity
+        };
+
         socket.on('chat:message', handleIncomingMessage);
         socket.on('partner:found', handlePartnerFound);
-    return () => {
-        socket.off('chat:message', handleIncomingMessage);
-        socket.off('partner:found', handlePartnerFound);
+        socket.on('partner:typing', handlePartnerTyping); // ✅ Add typing handler
+
+        return () => {
+            socket.off('chat:message', handleIncomingMessage);
+            socket.off('partner:found', handlePartnerFound);
+            socket.off('partner:typing', handlePartnerTyping); // ✅ Clean up
         };
     }, [socket, handleIncomingMessage, handlePartnerFound]);
+
 
     const disconnect = () => {
         if (socket && socket.connected) {
@@ -122,29 +132,30 @@ export const useChat = ({ socket, userId }: UseChatProps) => {
 
     useEffect(() => {
         const handlePartnerDisconnected = () => {
-        const username = partnerProfileRef.current?.username || "someone";
+            const username = partnerProfileRef.current?.username || "someone";
 
-        toast(`❌ Your chat partner ${username} has disconnected.`, {
-            icon: '👤',
-            duration: 5000,
-        });
-        setTimeout(() => {
-            setPartnerId(null);
-            setRoomId(null);
-            setConversationId(null);
-            setMessages([]);
-            KeyStorageService.clearPartnerPublicKey();
-        }, 600); 
-    };
+            toast(`❌ Your chat partner ${username} has disconnected.`, {
+                icon: '👤',
+                duration: 5000,
+            });
+            setTimeout(() => {
+                setPartnerId(null);
+                setRoomId(null);
+                setConversationId(null);
+                setMessages([]);
+                KeyStorageService.clearPartnerPublicKey();
+            }, 600);
+        };
 
-    socket.on('partner:disconnected', handlePartnerDisconnected);
+        socket.on('partner:disconnected', handlePartnerDisconnected);
 
-    return () => {
-        socket.off('partner:disconnected', handlePartnerDisconnected);
-    };
+        return () => {
+            socket.off('partner:disconnected', handlePartnerDisconnected);
+        };
     }, [socket]);
 
     return {
+        socket,
         messages,
         sendMessage,
         partnerId,
@@ -152,5 +163,6 @@ export const useChat = ({ socket, userId }: UseChatProps) => {
         conversationId,
         disconnect,
         partnerProfile,
+        partnerTyping,
     };
 };

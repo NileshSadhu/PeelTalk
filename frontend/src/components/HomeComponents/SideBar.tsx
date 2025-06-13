@@ -1,6 +1,7 @@
 import { FaBars } from 'react-icons/fa';
 import logo from '../../assets/logo.png';
 import LogOutBtn from './LogOutBtn';
+import { ProfileBtn } from './ProfileBtn';
 
 interface SideBarProps {
     isMenuOpen: boolean;
@@ -8,6 +9,7 @@ interface SideBarProps {
 }
 
 export const SideBar = ({ isMenuOpen, toggleMenu }: SideBarProps) => {
+
     return (
         <>
             {/* Hamburger Menu Button for Mobile */}
@@ -45,7 +47,10 @@ export const SideBar = ({ isMenuOpen, toggleMenu }: SideBarProps) => {
                 </div>
 
                 {/* Buttons Section */}
-                <div className="flex flex-col gap-4 p-6 mt-auto">
+                <div className="flex flex-col gap-4 p-6 items-center">
+                    {/* Profile Button */}
+                    <ProfileBtn />
+                    {/* Logout Button */}
                     <LogOutBtn />
                 </div>
             </div>

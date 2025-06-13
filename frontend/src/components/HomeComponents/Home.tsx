@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import profile from '../../assets/default_profile.png';
 import { useUserStore } from '../../store/useUserStore';
 import { socket } from '../../utils/socket';
@@ -16,8 +15,6 @@ const Home = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const toggleMenu = () => setIsMenuOpen((prev) => !prev);
 
-    const navigate = useNavigate();
-
     useEffect(() => {
         fetchUser();
     }, []);
@@ -28,7 +25,8 @@ const Home = () => {
         disconnect,
         partnerId,
         roomId,
-        partnerProfile
+        partnerProfile,
+        partnerTyping
     } = useChat({
         socket,
         userId: user?._id || ''
@@ -52,14 +50,6 @@ const Home = () => {
             <SideBar isMenuOpen={isMenuOpen} toggleMenu={toggleMenu} />
 
             <div className="flex-1 lg:mx-20 flex flex-col h-screen">
-                <div className="flex justify-end p-4">
-                    <button
-                        className="balsamiq-sans-regular-italic text-brown-100"
-                        onClick={() => navigate('/profile')}
-                    >
-                        <img src={user.profilePhoto || profile} alt="Profile" className="w-12 h-12 rounded-full" />
-                    </button>
-                </div>
 
                 <ChatWindow
                     messages={messages}
@@ -68,16 +58,20 @@ const Home = () => {
                     partnerImage={partnerProfileImageUrl}
                     onFindPartner={handleFindPartner}
                     currentUsername={user.username}
-                    partnerUsername={partnerProfile?.username!}
+                    partnerUsername={partnerProfile?.username! || 'Stranger'}
                     partnerId={partnerId ?? undefined}
                     onDisconnect={disconnect}
+                    isPartnerTyping={partnerTyping}
                 />
 
                 <MessageInput
-                    receiverId={partnerId!}
+                    disabled={!partnerId || !roomId}
+                    receiverId={partnerId ?? ""}
+                    socket={socket}
+                    userId={user._id}
                     onSend={sendMessage}
-                    disabled={!roomId || !partnerId}
                 />
+
 
             </div>
         </div>

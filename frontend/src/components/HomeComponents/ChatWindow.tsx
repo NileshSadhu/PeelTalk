@@ -16,9 +16,10 @@ interface ChatWindowProps {
     partnerImage: string;
     currentUsername: string;
     partnerUsername: string;
-    partnerId?: string;             // ✅ Add this
+    partnerId?: string;
+    isPartnerTyping?: boolean;
     onFindPartner?: () => void;
-    onDisconnect?: () => void;      // ✅ Add this
+    onDisconnect?: () => void;
 }
 
 export const ChatWindow = ({
@@ -29,6 +30,7 @@ export const ChatWindow = ({
     currentUsername,
     partnerUsername,
     partnerId,
+    isPartnerTyping,
     onFindPartner,
     onDisconnect
 }: ChatWindowProps) => {
@@ -115,6 +117,21 @@ export const ChatWindow = ({
                             </div>
                         );
                     })}
+                    {isPartnerTyping && (
+                        <div className="flex items-center gap-2 mt-2">
+                            <img
+                                src={partnerImage}
+                                alt="Partner avatar"
+                                className="w-8 h-8 rounded-full border border-gray-300"
+                            />
+                            <div className="flex gap-1">
+                                <span className="w-2 h-2 bg-yellow-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
+                                <span className="w-2 h-2 bg-yellow-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
+                                <span className="w-2 h-2 bg-yellow-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
+                            </div>
+                        </div>
+                    )}
+
                     <div ref={messagesEndRef} />
                 </div>
             )}
