@@ -9,8 +9,8 @@ interface MessageInputProps {
     disabled: boolean;
     receiverId: string;
     onSend: (message: string, receiverId: string) => void;
-    roomId: string; 
-    partnerTyping?: boolean; 
+    roomId: string;
+    partnerTyping?: boolean;
     partnerUsername?: string;
 }
 
@@ -55,7 +55,7 @@ export const MessageInput = ({
         setMessage(value);
 
         if (roomId && value.trim()) {
-            socket.emit("partner:typing"); 
+            socket.emit("partner:typing");
 
             if (typingTimeoutRef.current) {
                 clearTimeout(typingTimeoutRef.current);
@@ -65,7 +65,7 @@ export const MessageInput = ({
                 socket.emit("partner:stopTyping");
             }, 1000);
         } else {
-            socket.emit("partner:stopTyping"); 
+            socket.emit("partner:stopTyping");
         }
     };
 

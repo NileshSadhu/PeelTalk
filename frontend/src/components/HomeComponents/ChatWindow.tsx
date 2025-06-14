@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { Taglines } from "./Taglines";
-import { Disconnect } from "./Disconnect";
+import { Disconnect } from "../ChatComponents/Disconnect";
 import { SearchSpinner } from "./SearchSpinner";
+import { MessageBubble } from "../ChatComponents/MessageBubble";
+import { TypingIndicator } from "../ChatComponents/TypingIndicator";
 import { socket } from "../../utils/socket";
 
 interface Message {
@@ -35,13 +37,30 @@ export const ChatWindow = ({
     onFindPartner,
     onDisconnect
 }: ChatWindowProps) => {
-    const messagesEndRef = useRef<HTMLDivElement | null>(null);
     const [isSearching, setIsSearching] = useState(false);
+    const [isUserAtBottom, setIsUserAtBottom] = useState(true);
 
+    const scrollContainerRef = useRef<HTMLDivElement | null>(null);
+    const messagesEndRef = useRef<HTMLDivElement | null>(null);
+
+    // Track scroll position
+    const handleScroll = () => {
+        const el = scrollContainerRef.current;
+        if (!el) return;
+
+        const distanceFromBottom = el.scrollHeight - el.scrollTop - el.clientHeight;
+        const isNearBottom = distanceFromBottom < 100;
+        setIsUserAtBottom(isNearBottom); // user is near bottom
+    };
+
+    // Scroll to bottom when new message or typing
     useEffect(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    }, [messages]);
+        if (isUserAtBottom) {
+            messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+        }
+    }, [messages, isPartnerTyping]);
 
+    // Stop searching if partner is found
     useEffect(() => {
         if (partnerId) setIsSearching(false);
     }, [partnerId]);
@@ -49,18 +68,22 @@ export const ChatWindow = ({
     const handleJuiceMatch = () => {
         setIsSearching(true);
         onFindPartner?.();
-    }
+    };
 
     return (
-        <div className="flex-1 overflow-y-auto p-4 flex flex-col items-center justify-center relative">
-            {/* ✅ Show Disconnect button only if user is matched */}
+        <div
+            ref={scrollContainerRef}
+            onScroll={handleScroll}
+            className="flex-1 overflow-y-auto p-4 flex flex-col items-center justify-center relative"
+        >
+            {/* 🔌 Disconnect button (if matched) */}
             {partnerId && onDisconnect && (
                 <div className="sticky top-0 z-20 mt-2 flex justify-center shadow-md">
                     <Disconnect onDisconnect={onDisconnect} />
                 </div>
-
             )}
 
+            {/* 🕵️‍♂️ Before match or during search */}
             {messages.length === 0 ? (
                 <div className="flex flex-col items-center justify-center text-center">
                     {!isSearching && !partnerId && <Taglines />}
@@ -88,66 +111,27 @@ export const ChatWindow = ({
                     )}
                 </div>
             ) : (
-                <div className="w-full pt-16 mt-5 mb-2.5"> {/* Padding for disconnect button */}
-                    {messages.map((msg, idx) => {
-                        const isCurrentUser = msg.senderId === currentUserId;
-                        const avatar = isCurrentUser ? currentUserImage : partnerImage;
-                        const username = isCurrentUser ? currentUsername : partnerUsername;
+                // 💬 Message bubbles and typing indicator
+                <div className="w-full pt-16 mt-5 mb-2.5"> {/* Padding for sticky disconnect */}
+                    {messages.map((msg, idx) => (
+                        <MessageBubble
+                            key={idx}
+                            isCurrentUser={msg.senderId === currentUserId}
+                            avatar={msg.senderId === currentUserId ? currentUserImage : partnerImage}
+                            username={msg.senderId === currentUserId ? currentUsername : partnerUsername}
+                            content={msg.content}
+                            timestamp={msg.timestamp}
+                        />
+                    ))}
 
-                        return (
-                            <div
-                                key={idx}
-                                className={`my-2 flex ${isCurrentUser ? "justify-end" : "justify-start"} w-full`}
-                            >
-                                <div className={`flex ${isCurrentUser ? "flex-row-reverse" : "flex-row"} gap-2 items-start max-w-[80%]`}>
-                                    {/* Avatar */}
-                                    <img
-                                        src={avatar}
-                                        alt={`${username}'s avatar`}
-                                        className="w-10 h-10 rounded-full border border-gray-300"
-                                    />
-
-                                    {/* Message bubble */}
-                                    <div className="flex flex-col">
-                                        <span className="text-xs text-gray-500 mb-1">{username}</span>
-                                        <div className={`relative bg-[#F9F4F2] text-[#4B2E1E] p-3 rounded-lg shadow
-                                                ${isCurrentUser ? 'rounded-tr-none' : 'rounded-tl-none'}
-                                                before:absolute before:bottom-0 before:w-0 before:h-0
-                                                ${isCurrentUser
-                                                ? 'before:right-0 before:border-l-[12px] before:border-l-[#F9F4F2] before:border-b-[12px] before:border-b-transparent'
-                                                : 'before:left-0 before:border-r-[12px] before:border-r-[#F9F4F2] before:border-b-[12px] before:border-b-transparent'}
-                                                `}>
-                                            <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
-                                            <p className="text-[10px] text-right mt-1 text-gray-500">
-                                                {new Date(msg.timestamp).toLocaleTimeString([], {
-                                                    hour: "2-digit",
-                                                    minute: "2-digit",
-                                                    hour12: true,
-                                                })}
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        );
-                    })}
                     {isPartnerTyping && (
-                        <div className="items-center gap-2 mt-2">
-                            <div className="flex gap-2">
-                                <img
-                                    src={partnerImage}
-                                    alt="Partner avatar"
-                                    className="w-8 h-8 rounded-full border border-gray-300"
-                                />
-                                <span>{partnerUsername}</span>
-                            </div>
-                            <div className="flex items-center gap-1 mt-2 ml-8">
-                                <span className="w-2 h-2 bg-yellow-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
-                                <span className="w-2 h-2 bg-yellow-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
-                                <span className="w-2 h-2 bg-yellow-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
-                            </div>
-                        </div>
+                        <TypingIndicator
+                            partnerImage={partnerImage}
+                            partnerUsername={partnerUsername}
+                        />
                     )}
+
+                    {/* 🔽 Scroll target */}
                     <div ref={messagesEndRef} />
                 </div>
             )}

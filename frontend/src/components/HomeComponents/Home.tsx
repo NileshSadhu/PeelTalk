@@ -5,7 +5,7 @@ import { socket } from '../../utils/socket';
 import { Loading } from '../Common/Loading';
 import { SideBar } from './SideBar';
 import { ChatWindow } from './ChatWindow';
-import { MessageInput } from './MessageInput';
+import { MessageInput } from '../ChatComponents/MessageInput';
 import { useChat } from '../../hooks/useChat';
 import { useBeforeUnloadWarning } from '../../hooks/useBeforeUnloadWarning';
 
@@ -69,8 +69,8 @@ const Home = () => {
                     disabled={!roomId}
                     receiverId={partnerId ?? ""}
                     onSend={sendMessage}
-                    roomId={roomId!}                
-                    />
+                    roomId={roomId!}
+                />
             </div>
         </div>
     );
