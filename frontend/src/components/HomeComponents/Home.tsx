@@ -51,7 +51,7 @@ const Home = () => {
     return (
         <div className="flex h-screen w-full bg-white overflow-hidden">
             <SideBar isMenuOpen={isMenuOpen} toggleMenu={toggleMenu} />
-            <div className="flex-1 lg:mx-20 flex flex-col h-screen">
+            <div className="flex-1 lg:mx-20 flex flex-col h-screen pt-5">
                 <ChatWindow
                     messages={messages}
                     currentUserId={user._id}
