@@ -42,29 +42,31 @@ export const MessageInput = ({
         }
 
         onSend(message.trim(), receiverId);
-        setMessage('');
-    };
 
-    const emitTypingEvent = () => {
         if (socket && roomId) {
-            socket.emit('partner:typing', { roomId });
+            socket.emit("partner:stopTyping");
         }
+
+        setMessage('');
     };
 
 
     const handleTyping = (value: string) => {
         setMessage(value);
-        emitTypingEvent();
 
-        if (typingTimeoutRef.current) {
-            clearTimeout(typingTimeoutRef.current);
-        }
+        if (roomId && value.trim()) {
+            socket.emit("partner:typing"); 
 
-        typingTimeoutRef.current = window.setTimeout(() => {
-            if (socket && roomId) {
-                socket.emit('partner:stopTyping', { roomId });
+            if (typingTimeoutRef.current) {
+                clearTimeout(typingTimeoutRef.current);
             }
-        }, 1000);
+
+            typingTimeoutRef.current = window.setTimeout(() => {
+                socket.emit("partner:stopTyping");
+            }, 1000);
+        } else {
+            socket.emit("partner:stopTyping"); 
+        }
     };
 
 

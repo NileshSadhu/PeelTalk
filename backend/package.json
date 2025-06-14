@@ -8,7 +8,7 @@
   "main": "server.js",
   "scripts": {
     "build": "tsc -b",
-    "start": "tsc -b && node dist/server.js"
+    "start": "tsc -b && node --max-old-space-size=1024 dist/server.js"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",

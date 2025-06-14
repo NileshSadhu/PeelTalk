@@ -106,12 +106,12 @@ export const useChat = ({ socket, userId }: UseChatProps) => {
             setPartnerTyping(true);
 
             if (typingTimeoutRef.current) {
-                clearTimeout(typingTimeoutRef.current);
+            clearTimeout(typingTimeoutRef.current);
             }
 
             typingTimeoutRef.current = setTimeout(() => {
-                setPartnerTyping(false);
-                typingTimeoutRef.current = null;
+            setPartnerTyping(false);
+            typingTimeoutRef.current = null;
             }, 1000);
         };
 
@@ -121,7 +121,8 @@ export const useChat = ({ socket, userId }: UseChatProps) => {
             socket.off('partner:typing', handlePartnerTyping);
             if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
         };
-    }, [socket]);
+        }, []); 
+
 
 
     useEffect(() => {
@@ -132,7 +133,7 @@ export const useChat = ({ socket, userId }: UseChatProps) => {
         return () => {
             socket.off('partner:stopTyping', handlePartnerStopTyping);
         };
-    }, [socket]);
+    }, []);
 
 
     useEffect(() => {

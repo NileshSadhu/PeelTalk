@@ -66,7 +66,7 @@ const Home = () => {
                 />
 
                 <MessageInput
-                    disabled={!partnerId || !roomId}
+                    disabled={!roomId}
                     receiverId={partnerId ?? ""}
                     onSend={sendMessage}
                     roomId={roomId!}                
