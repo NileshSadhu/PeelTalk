@@ -132,7 +132,7 @@ export const ChatWindow = ({
                         );
                     })}
                     {isPartnerTyping && (
-                        <div className="flex items-center gap-2 mt-2">
+                        <div className="items-center gap-2 mt-2">
                             <img
                                 src={partnerImage}
                                 alt="Partner avatar"
