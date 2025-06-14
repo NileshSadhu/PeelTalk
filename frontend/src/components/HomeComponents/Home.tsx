@@ -66,12 +66,11 @@ const Home = () => {
                 />
 
                 <MessageInput
-                    disabled={!partnerId || !roomId}
+                    disabled={!roomId}
                     receiverId={partnerId ?? ""}
-                    socket={socket}
-                    userId={user._id}
                     onSend={sendMessage}
-                />
+                    roomId={roomId!}                
+                    />
             </div>
         </div>
     );

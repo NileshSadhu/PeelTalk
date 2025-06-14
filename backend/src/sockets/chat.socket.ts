@@ -19,6 +19,7 @@ export default function registerChatHandlers(io: Server, socket: Socket) {
         }
     });
 
+
     socket.on("partner:cancel", async () => {
         const userId = await redis.get(`socket:${socket.id}:user`);
         if (userId) {
@@ -28,6 +29,28 @@ export default function registerChatHandlers(io: Server, socket: Socket) {
             console.log(`🛑 User ${userId} cancelled partner search.`);
         }
     });
+
+
+    socket.on("partner:typing", async () => {
+    const partnerSocketId = await redis.get(`partner:${socket.id}`);
+    if (partnerSocketId) {
+        const partnerSocket = io.sockets.sockets.get(partnerSocketId);
+        if (partnerSocket) {
+            partnerSocket.emit("partner:typing");
+        }
+    }
+    });
+
+    socket.on("partner:stopTyping", async () => {
+        const partnerSocketId = await redis.get(`partner:${socket.id}`);
+        if (partnerSocketId) {
+            const partnerSocket = io.sockets.sockets.get(partnerSocketId);
+            if (partnerSocket) {
+                partnerSocket.emit("partner:stopTyping");
+            }
+        }
+    });
+
 
     socket.on("disconnect", async () => {
         const userId = await redis.get(`socket:${socket.id}:user`);

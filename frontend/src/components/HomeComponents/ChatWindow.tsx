@@ -138,6 +138,7 @@ export const ChatWindow = ({
                                 alt="Partner avatar"
                                 className="w-8 h-8 rounded-full border border-gray-300"
                             />
+                            <span>{partnerUsername}</span>
                             <div className="flex gap-1">
                                 <span className="w-2 h-2 bg-yellow-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
                                 <span className="w-2 h-2 bg-yellow-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
