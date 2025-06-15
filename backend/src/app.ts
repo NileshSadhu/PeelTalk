@@ -9,13 +9,20 @@ dotenv.config();
 
 export const app = express();
 
-app.use(cors({
+const corsOptions = {
     origin: process.env.FRONTEND_URL,
-    credentials: true
-}))
+    credentials: true,
+    optionsSuccessStatus: 200
+};
+
+app.use(cors(corsOptions));
+
+
+app.options('*', cors(corsOptions));
 
 app.use(express.json());
 app.use(cookieParser());
+
 
 app.use('/api/v1',mainRouter);
 
