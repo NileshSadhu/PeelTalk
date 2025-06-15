@@ -1,9 +1,9 @@
 import { useState, useRef, useEffect } from 'react';
 import { SendMessageBtn } from './SendMessageBtn';
 import { toast } from 'react-toastify';
-import { TermsServices } from './TermsServices';
 import React from 'react';
 import { socket } from '../../utils/socket';
+import { TermsServices } from './TermsServices';
 
 interface MessageInputProps {
     disabled: boolean;
@@ -98,7 +98,7 @@ export const MessageInput = ({
                         }
                     }}
                     placeholder="Write your message..."
-                    className="flex-1 resize-none px-3 py-2 text-sm sm:text-base outline-none text-[#4B2E1E] placeholder-[#4B2E1E]/50 bg-transparent max-h-48 overflow-y-auto"
+                    className="flex-1 resize-none px-3 py-2 text-sm sm:text-base outline-none text-[#4B2E1E] placeholder-[#4B2E1E]/50 bg-transparent max-h-48 border border-gray-200 rounded-lg scrollbar-hide"
                     rows={1}
                     disabled={disabled}
                 />
@@ -115,7 +115,9 @@ export const MessageInput = ({
                 </div>
             )}
 
-            <TermsServices />
+            <div className='mt-6 md:mt-0'>
+                <TermsServices/>
+            </div>
         </div>
     );
 };

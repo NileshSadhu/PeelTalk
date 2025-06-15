@@ -28,8 +28,13 @@ export const MessageBubble = ({
             />
 
             <div className="flex flex-col">
-                <span className="text-[10px] sm:text-xs text-gray-500 mb-1 truncate max-w-[180px] sm:max-w-none">
-                    {username}
+                <span
+                className={`
+                    text-[10px] sm:text-xs text-gray-500 mb-1 truncate max-w-[180px] sm:max-w-none
+                    ${isCurrentUser ? 'self-end text-right' : 'self-start text-left'}
+                `}
+                >
+                {username}
                 </span>
 
                 <div

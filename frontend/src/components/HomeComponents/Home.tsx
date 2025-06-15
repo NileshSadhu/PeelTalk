@@ -10,6 +10,7 @@ import { useChat } from '../../hooks/useChat';
 import { useBeforeUnloadWarning } from '../../hooks/useBeforeUnloadWarning';
 import { Disconnect } from '../ChatComponents/Disconnect';
 
+
 const Home = () => {
     const { user, fetchUser, loading } = useUserStore();
     const [partnerProfileImageUrl, setPartnerProfileImageUrl] = useState(profile);
@@ -50,12 +51,12 @@ const Home = () => {
 
     return (
         <div className="flex flex-col sm:flex-row h-screen w-full bg-white overflow-hidden">
-            <SideBar isMenuOpen={isMenuOpen} toggleMenu={toggleMenu} />
+            <SideBar isMenuOpen={isMenuOpen} toggleMenu={toggleMenu} partnerId={partnerId!}/>
 
-            <div className="flex-1 flex flex-col h-full pt-4 px-4 sm:px-6 lg:px-10 xl:mx-20 max-w-screen-lg mx-auto w-full">
+            <div className="flex-1 flex flex-col min-h-0 pt-4 px-4 sm:px-6 lg:px-10 xl:mx-20 max-w-screen-lg mx-auto w-full">
                 
                 {/* Let ChatWindow expand to fill space */}
-                <div className="flex-1 overflow-hidden">
+                <div className="flex flex-col flex-1 min-h-0 overflow-hidden">
                     <ChatWindow
                         messages={messages}
                         currentUserId={user._id}
@@ -71,21 +72,19 @@ const Home = () => {
                 </div>
 
                 {/* Input Area */}
-                <div className="w-full px-3 sm:px-4 py-2 sm:py-3 border-t border-gray-200 bg-white flex items-center gap-2 flex-nowrap">
-                    {partnerId && (
-                        <div className="shrink-0">
-                            <Disconnect onDisconnect={disconnect} />
-                        </div>
-                    )}
-
-                    <div className="flex-1">
-                        <MessageInput
-                            disabled={!roomId}
-                            receiverId={partnerId ?? ""}
-                            onSend={sendMessage}
-                            roomId={roomId!}
-                        />
+                <div className="w-full md:px-4 py-2 sm:py-3 border-t border-gray-200 bg-white flex items-center gap-2">
+                {partnerId && (
+                    <div className="shrink-0 mb-4">
+                    <Disconnect onDisconnect={disconnect} />
                     </div>
+                )}
+                
+                <MessageInput
+                    disabled={!roomId}
+                    receiverId={partnerId ?? ""}
+                    onSend={sendMessage}
+                    roomId={roomId!}
+                />
                 </div>
             </div>
         </div>

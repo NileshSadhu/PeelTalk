@@ -6,19 +6,22 @@ import { ProfileBtn } from './ProfileBtn';
 interface SideBarProps {
     isMenuOpen: boolean;
     toggleMenu: () => void;
+    partnerId : string;
 }
 
-export const SideBar = ({ isMenuOpen, toggleMenu }: SideBarProps) => {
+export const SideBar = ({ isMenuOpen, toggleMenu, partnerId }: SideBarProps) => {
 
     return (
         <>
             {/* Hamburger Menu Button for Mobile */}
-            <button
+            {partnerId ? <div></div>
+                :<button
                 onClick={toggleMenu}
                 className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-lg bg-yellow-400 hover:bg-yellow-500 transition-colors"
-            >
+                >
                 <FaBars className="text-[#4B2E1E] text-xl" />
             </button>
+            }
 
             {/* Overlay for Mobile Menu */}
             {isMenuOpen && (

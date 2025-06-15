@@ -77,7 +77,7 @@ export const ChatWindow = ({
     };
 
     return (
-        <div className="flex-1 flex flex-col relative overflow-hidden">
+        <div className="flex-1 flex flex-col overflow-hidden">
             <div
                 ref={scrollContainerRef}
                 onScroll={handleScroll}
@@ -85,6 +85,11 @@ export const ChatWindow = ({
             >
                 {messages.length === 0 ? (
                     <div className="flex flex-col items-center justify-center text-center h-full px-4">
+                        {partnerId && (
+                            <div className="text-base sm:text-lg md:text-xl font-semibold text-center max-w-[90vw] break-words">
+                                <span className="font-medium ">{partnerUsername}</span> has connected. Start chatting!
+                            </div>
+                            )}
                         {!isSearching && !partnerId && <Taglines />}
                         {!isSearching && !partnerId && (
                             <button
@@ -110,7 +115,7 @@ export const ChatWindow = ({
                         )}
                     </div>
                 ) : (
-                    <div className="w-full space-y-4 px-2 sm:px-4">
+                    <div className="flex flex-col gap-4 pb-4">
                         {messages.map((msg, idx) => (
                             <MessageBubble
                                 key={idx}
