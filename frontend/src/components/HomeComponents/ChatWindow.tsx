@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import { Taglines } from "./Taglines";
-import { Disconnect } from "../ChatComponents/Disconnect";
 import { SearchSpinner } from "./SearchSpinner";
 import { MessageBubble } from "../ChatComponents/MessageBubble";
 import { TypingIndicator } from "../ChatComponents/TypingIndicator";
@@ -35,7 +34,6 @@ export const ChatWindow = ({
     partnerId,
     isPartnerTyping,
     onFindPartner,
-    onDisconnect
 }: ChatWindowProps) => {
     const [isSearching, setIsSearching] = useState(false);
     const isUserAtBottomRef = useRef(true);
@@ -43,6 +41,8 @@ export const ChatWindow = ({
     const scrollContainerRef = useRef<HTMLDivElement | null>(null);
     const messagesEndRef = useRef<HTMLDivElement | null>(null);
     const lastMessageSenderIdRef = useRef<string | null>(null);
+
+    const [showPartnerProfile, setShowPartnerProfile] = useState(false);
 
     // Track scroll position
     const handleScroll = () => {
@@ -86,14 +86,6 @@ export const ChatWindow = ({
 
     return (
         <div className="flex-1 flex flex-col relative overflow-hidden"> {/* Main chat container */}
-    
-            {/* 🔌 Sticky Disconnect stays outside of scroll area */}
-            {partnerId && onDisconnect && (
-                <div className="sticky top-0 z-20 mt-0 flex justify-center bg-white py-3 border-gray-200">
-                    <Disconnect onDisconnect={onDisconnect} />
-                </div>
-            )}
-
             {/* 📜 Scrollable Chat Area */}
             <div
                 ref={scrollContainerRef}
@@ -136,6 +128,11 @@ export const ChatWindow = ({
                                 username={msg.senderId === currentUserId ? currentUsername : partnerUsername}
                                 content={msg.content}
                                 timestamp={msg.timestamp}
+                                onAvatarClick={
+                                    msg.senderId === currentUserId
+                                        ? undefined
+                                        : () => setShowPartnerProfile(true)
+                                }
                             />
                         ))}
 
@@ -151,6 +148,31 @@ export const ChatWindow = ({
                     </div>
                 )}
             </div>
+            {showPartnerProfile && (
+                <>
+                    {/* Background Blur Overlay */}
+                    <div
+                        className="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-40"
+                        onClick={() => setShowPartnerProfile(false)}
+                    />
+
+                    {/* Profile Card */}
+                    <div className="absolute top-1/2 left-1/2 z-50 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-2xl shadow-xl p-6 w-[280px] text-center">
+                        <img
+                            src={partnerImage}
+                            alt={`${partnerUsername}'s profile`}
+                            className="w-20 h-20 rounded-full mx-auto border border-gray-300"
+                        />
+                        <h2 className="mt-4 text-lg font-semibold text-[#4B2E1E]">{partnerUsername}</h2>
+                        <button
+                            onClick={() => setShowPartnerProfile(false)}
+                            className="mt-4 px-4 py-2 bg-yellow-400 hover:bg-yellow-500 text-[#4B2E1E] rounded-lg transition"
+                        >
+                            Close
+                        </button>
+                    </div>
+                </>
+            )}
         </div>
     );
 };

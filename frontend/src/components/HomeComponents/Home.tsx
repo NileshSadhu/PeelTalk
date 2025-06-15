@@ -8,6 +8,7 @@ import { ChatWindow } from './ChatWindow';
 import { MessageInput } from '../ChatComponents/MessageInput';
 import { useChat } from '../../hooks/useChat';
 import { useBeforeUnloadWarning } from '../../hooks/useBeforeUnloadWarning';
+import { Disconnect } from '../ChatComponents/Disconnect';
 
 const Home = () => {
     const { user, fetchUser, loading } = useUserStore();
@@ -52,6 +53,8 @@ const Home = () => {
         <div className="flex h-screen w-full bg-white overflow-hidden">
             <SideBar isMenuOpen={isMenuOpen} toggleMenu={toggleMenu} />
             <div className="flex-1 lg:mx-20 flex flex-col h-screen pt-5">
+
+
                 <ChatWindow
                     messages={messages}
                     currentUserId={user._id}
@@ -65,12 +68,23 @@ const Home = () => {
                     isPartnerTyping={partnerTyping}
                 />
 
-                <MessageInput
-                    disabled={!roomId}
-                    receiverId={partnerId ?? ""}
-                    onSend={sendMessage}
-                    roomId={roomId!}
-                />
+                <div className="w-full px-4 py-3 border-t border-gray-200 bg-white flex items-center gap-3 flex-nowrap">
+                    {partnerId && (
+                        <div className="shrink-0">
+                            <Disconnect onDisconnect={disconnect} />
+                        </div>
+                    )}
+
+                    <div className="flex-1">
+                        <MessageInput
+                            disabled={!roomId}
+                            receiverId={partnerId ?? ""}
+                            onSend={sendMessage}
+                            roomId={roomId!}
+                        />
+                    </div>
+                </div>
+
             </div>
         </div>
     );

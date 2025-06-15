@@ -4,6 +4,7 @@ interface MessageBubbleProps {
     username: string;
     content: string;
     timestamp: string;
+    onAvatarClick?: () => void;
 }
 
 export const MessageBubble = ({
@@ -11,11 +12,19 @@ export const MessageBubble = ({
     avatar,
     username,
     content,
-    timestamp
+    timestamp,
+    onAvatarClick
 }: MessageBubbleProps) => (
     <div className={`my-2 scroll-mt-20 flex ${isCurrentUser ? "justify-end" : "justify-start"} w-full`}>
         <div className={`flex ${isCurrentUser ? "flex-row-reverse" : "flex-row"} gap-2 items-start max-w-[80%]`}>
-            <img src={avatar} alt={`${username}'s avatar`} className="w-10 h-10 rounded-full border border-gray-300" />
+            <img
+                src={avatar}
+                alt={`${username}'s avatar`}
+                // className="w-10 h-10 rounded-full border border-gray-300"
+                className={`w-10 h-10 rounded-full border border-gray-300 ${onAvatarClick ? 'cursor-pointer hover:scale-105 transition' : ''
+                    }`}
+                onClick={onAvatarClick}
+            />
             <div className="flex flex-col">
                 <span className="text-xs text-gray-500 mb-1">{username}</span>
                 <div className={`relative bg-[#F9F4F2] text-[#4B2E1E] p-3 rounded-lg shadow
