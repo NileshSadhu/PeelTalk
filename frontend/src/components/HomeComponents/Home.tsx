@@ -51,20 +51,26 @@ const Home = () => {
     return (
         <div className="flex flex-col sm:flex-row h-screen w-full bg-white overflow-hidden">
             <SideBar isMenuOpen={isMenuOpen} toggleMenu={toggleMenu} />
-            <div className="flex-1 flex flex-col h-full pt-4 px-4 sm:px-6 lg:px-10 xl:mx-20 max-w-screen-lg mx-auto w-full">
-                <ChatWindow
-                    messages={messages}
-                    currentUserId={user._id}
-                    currentUserImage={user.profilePhoto || profile}
-                    partnerImage={partnerProfileImageUrl}
-                    onFindPartner={handleFindPartner}
-                    currentUsername={user.username}
-                    partnerUsername={partnerProfile?.username || 'Stranger'}
-                    partnerId={partnerId ?? undefined}
-                    onDisconnect={disconnect}
-                    isPartnerTyping={partnerTyping}
-                />
 
+            <div className="flex-1 flex flex-col h-full pt-4 px-4 sm:px-6 lg:px-10 xl:mx-20 max-w-screen-lg mx-auto w-full">
+                
+                {/* Let ChatWindow expand to fill space */}
+                <div className="flex-1 overflow-hidden">
+                    <ChatWindow
+                        messages={messages}
+                        currentUserId={user._id}
+                        currentUserImage={user.profilePhoto || profile}
+                        partnerImage={partnerProfileImageUrl}
+                        onFindPartner={handleFindPartner}
+                        currentUsername={user.username}
+                        partnerUsername={partnerProfile?.username || 'Stranger'}
+                        partnerId={partnerId ?? undefined}
+                        onDisconnect={disconnect}
+                        isPartnerTyping={partnerTyping}
+                    />
+                </div>
+
+                {/* Input Area */}
                 <div className="w-full px-3 sm:px-4 py-2 sm:py-3 border-t border-gray-200 bg-white flex items-center gap-2 flex-nowrap">
                     {partnerId && (
                         <div className="shrink-0">

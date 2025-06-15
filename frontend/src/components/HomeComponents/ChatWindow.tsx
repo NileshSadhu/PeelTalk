@@ -4,6 +4,7 @@ import { SearchSpinner } from "./SearchSpinner";
 import { MessageBubble } from "../ChatComponents/MessageBubble";
 import { TypingIndicator } from "../ChatComponents/TypingIndicator";
 import { socket } from "../../utils/socket";
+import { PartnerProfileOverlay } from "../ProfileComponents/PartnerProfileOverlay";
 
 interface Message {
     senderId: string;
@@ -44,7 +45,6 @@ export const ChatWindow = ({
 
     const [showPartnerProfile, setShowPartnerProfile] = useState(false);
 
-    // Track scroll position
     const handleScroll = () => {
         const el = scrollContainerRef.current;
         if (!el) return;
@@ -54,27 +54,19 @@ export const ChatWindow = ({
         isUserAtBottomRef.current = isNearBottom;
     };
 
-
-    // Scroll to bottom when new message or typing
     useEffect(() => {
         if (messages.length === 0) return;
 
         const lastMessage = messages[messages.length - 1];
-
-        // Always scroll if partner sent the message
         const isFromPartner = lastMessage.senderId !== currentUserId;
 
         if (isFromPartner || isUserAtBottomRef.current) {
             messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
         }
 
-        // Save for comparison next time (optional)
         lastMessageSenderIdRef.current = lastMessage.senderId;
     }, [messages, isPartnerTyping]);
 
-
-
-    // Stop searching if partner is found
     useEffect(() => {
         if (partnerId) setIsSearching(false);
     }, [partnerId]);
@@ -145,28 +137,12 @@ export const ChatWindow = ({
                 )}
             </div>
 
-            {/* Partner Profile Overlay */}
             {showPartnerProfile && (
-                <>
-                    <div
-                        className="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-40"
-                        onClick={() => setShowPartnerProfile(false)}
-                    />
-                    <div className="absolute top-1/2 left-1/2 z-50 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-2xl shadow-xl p-6 w-[90vw] max-w-sm text-center">
-                        <img
-                            src={partnerImage}
-                            alt={`${partnerUsername}'s profile`}
-                            className="w-20 h-20 rounded-full mx-auto border border-gray-300"
-                        />
-                        <h2 className="mt-4 text-lg font-semibold text-[#4B2E1E] break-words">{partnerUsername}</h2>
-                        <button
-                            onClick={() => setShowPartnerProfile(false)}
-                            className="mt-4 px-4 py-2 bg-yellow-400 hover:bg-yellow-500 text-[#4B2E1E] rounded-lg transition w-full max-w-xs"
-                        >
-                            Close
-                        </button>
-                    </div>
-                </>
+                <PartnerProfileOverlay
+                    partnerImage={partnerImage}
+                    partnerUsername={partnerUsername}
+                    onClose={() => setShowPartnerProfile(false)}
+                />
             )}
         </div>
     );

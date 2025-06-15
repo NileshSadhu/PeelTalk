@@ -6,7 +6,7 @@ export const TermsServices = () => {
 
     return (
         <>
-            <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2 z-10">
+            <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2 z-10 sm:mt-3">
                 <button
                     onClick={handleToggle}
                     className="text-[11px] sm:text-xs text-[#4B2E1E]/70 hover:text-[#4B2E1E] transition-colors"
