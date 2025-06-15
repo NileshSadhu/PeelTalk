@@ -13,7 +13,6 @@ import { Disconnect } from '../ChatComponents/Disconnect';
 const Home = () => {
     const { user, fetchUser, loading } = useUserStore();
     const [partnerProfileImageUrl, setPartnerProfileImageUrl] = useState(profile);
-
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const toggleMenu = () => setIsMenuOpen((prev) => !prev);
 
@@ -34,7 +33,7 @@ const Home = () => {
         userId: user?._id || ''
     });
 
-    useBeforeUnloadWarning(!!partnerId)
+    useBeforeUnloadWarning(!!partnerId);
 
     const handleFindPartner = async () => {
         if (!user || !user._id) return;
@@ -43,32 +42,36 @@ const Home = () => {
     };
 
     useEffect(() => {
-        setPartnerProfileImageUrl(partnerProfile?.profilePhoto || profile)
+        setPartnerProfileImageUrl(partnerProfile?.profilePhoto || profile);
     }, [partnerProfile]);
 
     if (loading) return <Loading />;
     if (!user) return <p>Please log in.</p>;
 
     return (
-        <div className="flex h-screen w-full bg-white overflow-hidden">
+        <div className="flex flex-col sm:flex-row h-screen w-full bg-white overflow-hidden">
             <SideBar isMenuOpen={isMenuOpen} toggleMenu={toggleMenu} />
-            <div className="flex-1 lg:mx-20 flex flex-col h-screen pt-5">
 
+            <div className="flex-1 flex flex-col h-full pt-4 px-4 sm:px-6 lg:px-10 xl:mx-20 max-w-screen-lg mx-auto w-full">
+                
+                {/* Let ChatWindow expand to fill space */}
+                <div className="flex-1 overflow-hidden">
+                    <ChatWindow
+                        messages={messages}
+                        currentUserId={user._id}
+                        currentUserImage={user.profilePhoto || profile}
+                        partnerImage={partnerProfileImageUrl}
+                        onFindPartner={handleFindPartner}
+                        currentUsername={user.username}
+                        partnerUsername={partnerProfile?.username || 'Stranger'}
+                        partnerId={partnerId ?? undefined}
+                        onDisconnect={disconnect}
+                        isPartnerTyping={partnerTyping}
+                    />
+                </div>
 
-                <ChatWindow
-                    messages={messages}
-                    currentUserId={user._id}
-                    currentUserImage={user.profilePhoto || profile}
-                    partnerImage={partnerProfileImageUrl}
-                    onFindPartner={handleFindPartner}
-                    currentUsername={user.username}
-                    partnerUsername={partnerProfile?.username! || 'Stranger'}
-                    partnerId={partnerId ?? undefined}
-                    onDisconnect={disconnect}
-                    isPartnerTyping={partnerTyping}
-                />
-
-                <div className="w-full px-4 py-3 border-t border-gray-200 bg-white flex items-center gap-3 flex-nowrap">
+                {/* Input Area */}
+                <div className="w-full px-3 sm:px-4 py-2 sm:py-3 border-t border-gray-200 bg-white flex items-center gap-2 flex-nowrap">
                     {partnerId && (
                         <div className="shrink-0">
                             <Disconnect onDisconnect={disconnect} />
@@ -84,7 +87,6 @@ const Home = () => {
                         />
                     </div>
                 </div>
-
             </div>
         </div>
     );
