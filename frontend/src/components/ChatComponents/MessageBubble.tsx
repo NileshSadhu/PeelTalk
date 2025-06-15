@@ -16,7 +16,7 @@ export const MessageBubble = ({
     onAvatarClick
 }: MessageBubbleProps) => (
     <div className={`my-2 scroll-mt-20 flex ${isCurrentUser ? "justify-end" : "justify-start"} w-full`}>
-        <div className={`flex ${isCurrentUser ? "flex-row-reverse" : "flex-row"} gap-2 items-start max-w-[80%]`}>
+        <div className={`flex ${isCurrentUser ? "flex-row-reverse" : "flex-row"} gap-2 items-start max-w-[80%] sm:max-w-[70%]`}>
             <img
                 src={avatar}
                 alt={`${username}'s avatar`}

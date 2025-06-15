@@ -90,10 +90,10 @@ export const ChatWindow = ({
             <div
                 ref={scrollContainerRef}
                 onScroll={handleScroll}
-                className="flex-1 overflow-y-auto px-4 py-6 scrollbar-thin scrollbar-thumb-yellow-300 scrollbar-track-transparent"
+                className="flex-1 overflow-y-auto px-3 py-4 sm:px-4 sm:py-6 scrollbar-thin scrollbar-thumb-yellow-300 scrollbar-track-transparent"
             >
                 {messages.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center text-center h-full">
+                    <div className="flex flex-col items-center justify-center text-center h-full px-4">
                         {!isSearching && !partnerId && <Taglines />}
                         {!isSearching && !partnerId && (
                             <button
