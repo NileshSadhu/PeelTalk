@@ -64,7 +64,7 @@ export const ChatWindow = ({
         // Always scroll if partner sent the message
         const isFromPartner = lastMessage.senderId !== currentUserId;
 
-        if (isFromPartner || isUserAtBottomRef.current || isPartnerTyping) {
+        if (isFromPartner || isUserAtBottomRef.current) {
             messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
         }
 
@@ -90,7 +90,7 @@ export const ChatWindow = ({
             <div
                 ref={scrollContainerRef}
                 onScroll={handleScroll}
-                className="flex-1 overflow-y-auto px-3 pt-4 pb-1 sm:px-4 sm:pt-6 sm:pb-2 scrollbar-thin scrollbar-thumb-yellow-300 scrollbar-track-transparent"
+                className="flex-1 overflow-y-auto px-3 py-4 sm:px-4 sm:py-6 scrollbar-thin scrollbar-thumb-yellow-300 scrollbar-track-transparent"
             >
                 {messages.length === 0 ? (
                     <div className="flex flex-col items-center justify-center text-center h-full px-4">
@@ -119,7 +119,7 @@ export const ChatWindow = ({
                         )}
                     </div>
                 ) : (
-                    <div className="flex flex-col gap-4 pb-4">
+                    <div className="w-full space-y-4">
                         {messages.map((msg, idx) => (
                             <MessageBubble
                                 key={idx}
@@ -142,6 +142,8 @@ export const ChatWindow = ({
                                 partnerUsername={partnerUsername}
                             />
                         )}
+
+                        {/* 🔽 Scroll target */}
                         <div ref={messagesEndRef} />
                     </div>
                 )}
