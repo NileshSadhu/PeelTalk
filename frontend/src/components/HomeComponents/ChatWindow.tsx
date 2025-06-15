@@ -85,8 +85,7 @@ export const ChatWindow = ({
     };
 
     return (
-        <div className="flex-1 flex flex-col relative overflow-hidden"> {/* Main chat container */}
-            {/* 📜 Scrollable Chat Area */}
+        <div className="flex-1 flex flex-col relative overflow-hidden">
             <div
                 ref={scrollContainerRef}
                 onScroll={handleScroll}
@@ -97,7 +96,7 @@ export const ChatWindow = ({
                         {!isSearching && !partnerId && <Taglines />}
                         {!isSearching && !partnerId && (
                             <button
-                                className="mt-6 bg-yellow-400 text-[#4B2E1E] px-6 py-3 rounded-lg shadow hover:bg-yellow-500 transition"
+                                className="mt-6 bg-yellow-400 text-[#4B2E1E] px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base rounded-lg shadow hover:bg-yellow-500 transition w-[90vw] max-w-xs"
                                 onClick={handleJuiceMatch}
                             >
                                 JuiceMatch
@@ -107,7 +106,7 @@ export const ChatWindow = ({
                             <>
                                 <SearchSpinner />
                                 <button
-                                    className="mt-4 bg-yellow-200 text-gray-800 px-4 py-2 rounded-lg shadow hover:bg-yellow-100 transition"
+                                    className="mt-4 bg-yellow-200 text-gray-800 px-4 py-2 rounded-lg shadow hover:bg-yellow-100 transition text-sm sm:text-base w-[90vw] max-w-xs"
                                     onClick={() => {
                                         setIsSearching(false);
                                         socket.emit("partner:cancel");
@@ -119,7 +118,7 @@ export const ChatWindow = ({
                         )}
                     </div>
                 ) : (
-                    <div className="w-full space-y-4">
+                    <div className="w-full space-y-4 px-2 sm:px-4">
                         {messages.map((msg, idx) => (
                             <MessageBubble
                                 key={idx}
@@ -135,38 +134,34 @@ export const ChatWindow = ({
                                 }
                             />
                         ))}
-
                         {isPartnerTyping && (
                             <TypingIndicator
                                 partnerImage={partnerImage}
                                 partnerUsername={partnerUsername}
                             />
                         )}
-
-                        {/* 🔽 Scroll target */}
                         <div ref={messagesEndRef} />
                     </div>
                 )}
             </div>
+
+            {/* Partner Profile Overlay */}
             {showPartnerProfile && (
                 <>
-                    {/* Background Blur Overlay */}
                     <div
                         className="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-40"
                         onClick={() => setShowPartnerProfile(false)}
                     />
-
-                    {/* Profile Card */}
-                    <div className="absolute top-1/2 left-1/2 z-50 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-2xl shadow-xl p-6 w-[280px] text-center">
+                    <div className="absolute top-1/2 left-1/2 z-50 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-2xl shadow-xl p-6 w-[90vw] max-w-sm text-center">
                         <img
                             src={partnerImage}
                             alt={`${partnerUsername}'s profile`}
                             className="w-20 h-20 rounded-full mx-auto border border-gray-300"
                         />
-                        <h2 className="mt-4 text-lg font-semibold text-[#4B2E1E]">{partnerUsername}</h2>
+                        <h2 className="mt-4 text-lg font-semibold text-[#4B2E1E] break-words">{partnerUsername}</h2>
                         <button
                             onClick={() => setShowPartnerProfile(false)}
-                            className="mt-4 px-4 py-2 bg-yellow-400 hover:bg-yellow-500 text-[#4B2E1E] rounded-lg transition"
+                            className="mt-4 px-4 py-2 bg-yellow-400 hover:bg-yellow-500 text-[#4B2E1E] rounded-lg transition w-full max-w-xs"
                         >
                             Close
                         </button>

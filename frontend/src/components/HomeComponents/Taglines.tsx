@@ -16,9 +16,9 @@ const taglines = [
 export const Taglines = () => {
     const randomTagline = taglines[Math.floor(Math.random() * taglines.length)];
     return (
-        <div className="flex flex-col items-center gap-4 text-[#4B2E1E] mt-10">
-            <FaSearch className="text-4xl" />
-            <p className="text-xl font-semibold text-center">
+        <div className="flex flex-col items-center gap-4 text-[#4B2E1E] mt-10 px-4">
+            <FaSearch className="text-3xl sm:text-4xl md:text-5xl" />
+            <p className="text-base sm:text-lg md:text-xl font-semibold text-center max-w-[90vw] break-words">
                 {randomTagline}
             </p>
         </div>

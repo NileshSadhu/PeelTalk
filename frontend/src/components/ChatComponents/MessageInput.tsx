@@ -50,7 +50,6 @@ export const MessageInput = ({
         setMessage('');
     };
 
-
     const handleTyping = (value: string) => {
         setMessage(value);
 
@@ -69,7 +68,6 @@ export const MessageInput = ({
         }
     };
 
-
     useEffect(() => {
         if (textareaRef.current) {
             textareaRef.current.style.height = 'auto';
@@ -86,33 +84,33 @@ export const MessageInput = ({
     }, []);
 
     return (
-        <div className="p-4 pb-8 relative mr-5">
-            <div className="flex items-end gap-2 bg-white rounded-lg shadow-md p-2 w-full">
+        <div className="px-3 py-2 sm:px-4 sm:pb-6 relative w-full">
+            <div className="flex items-end gap-2 bg-white rounded-xl shadow-sm p-2 sm:p-3 w-full">
                 <textarea
                     ref={textareaRef}
                     aria-label="Type your message"
                     value={message}
-                    onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => handleTyping(e.target.value)}
-                    onKeyDown={(e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+                    onChange={(e) => handleTyping(e.target.value)}
+                    onKeyDown={(e) => {
                         if (e.key === 'Enter' && !e.shiftKey && !disabled) {
                             e.preventDefault();
                             handleSend(e);
                         }
                     }}
                     placeholder="Write your message..."
-                    className="flex-1 resize-none px-4 py-2 mr-10 outline-none text-[#4B2E1E] placeholder-[#4B2E1E]/50 bg-transparent max-h-48 overflow-y-auto"
+                    className="flex-1 resize-none px-3 py-2 text-sm sm:text-base outline-none text-[#4B2E1E] placeholder-[#4B2E1E]/50 bg-transparent max-h-48 overflow-y-auto"
                     rows={1}
                     disabled={disabled}
                 />
                 <SendMessageBtn
-                    onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                    onClick={(e) => {
                         if (!disabled) handleSend(e);
                     }}
                 />
             </div>
 
             {partnerTyping && (
-                <div className="text-sm text-gray-500 italic mt-2 ml-2">
+                <div className="text-xs sm:text-sm text-gray-500 italic mt-2 ml-1">
                     {partnerUsername || "Partner"} is typing...
                 </div>
             )}

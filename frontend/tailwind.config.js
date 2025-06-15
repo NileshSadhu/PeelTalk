@@ -8,6 +8,7 @@ export default {
     extend: {
       screens: {
         xs: "450px",
+        // sm: "50px",
       },
       colors: {
         'brown': {

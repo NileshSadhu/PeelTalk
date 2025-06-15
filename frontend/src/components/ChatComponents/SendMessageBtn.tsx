@@ -9,8 +9,9 @@ export const SendMessageBtn = ({ onClick }: SendBtnProps) => {
     return (
         <button
             onClick={onClick}
-            className="p-2 rounded-lg bg-yellow-200 hover:bg-yellow-100 transition-colors">
-            <FaPaperPlane className="text-[#4B2E1E]" />
+            className="p-2 sm:p-2.5 rounded-full bg-yellow-300 hover:bg-yellow-200 transition-colors"
+        >
+            <FaPaperPlane className="text-[#4B2E1E] text-base sm:text-lg" />
         </button>
     );
 };

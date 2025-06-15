@@ -6,20 +6,23 @@ export const TermsServices = () => {
 
     return (
         <>
-            <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 z-10">
+            <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2 z-10">
                 <button
                     onClick={handleToggle}
-                    className="text-xs text-[#4B2E1E]/70 hover:text-[#4B2E1E] transition-colors"
+                    className="text-[11px] sm:text-xs text-[#4B2E1E]/70 hover:text-[#4B2E1E] transition-colors"
                 >
                     Terms & Services
                 </button>
             </div>
 
             {showTerms && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-4">
-                    <div className="bg-white rounded-lg shadow-lg max-w-2xl w-full p-6 overflow-y-auto max-h-[80vh]">
-                        <h2 className="text-xl font-bold mb-4 text-[#4B2E1E]">Terms and Conditions</h2>
-                        <div className="text-sm text-gray-700 space-y-4">
+                <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 px-3 sm:px-4">
+                    <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg sm:max-w-2xl p-4 sm:p-6 overflow-y-auto max-h-[85vh]">
+                        <h2 className="text-lg sm:text-xl font-semibold mb-4 text-[#4B2E1E] text-center">
+                            Terms and Conditions
+                        </h2>
+
+                        <div className="text-xs sm:text-sm text-gray-700 space-y-3 leading-relaxed">
                             <p><strong>1. Service Description:</strong> PeelTalk is an anonymous chat platform that randomly connects users for one-on-one conversations.</p>
                             <p><strong>2. Account Requirement:</strong> Users must create an account using details such as username, first name, last name, age, gender, and a profile photo.</p>
                             <p><strong>3. Data Storage:</strong> PeelTalk does not store chat data for more than one week. All messages are automatically deleted after 7 days.</p>
@@ -31,10 +34,10 @@ export const TermsServices = () => {
                             <p><strong>9. Free Usage:</strong> PeelTalk is a free service. There are no hidden charges.</p>
                         </div>
 
-                        <div className="mt-6 text-right">
+                        <div className="mt-6 text-center">
                             <button
                                 onClick={handleToggle}
-                                className="bg-yellow-400 text-[#4B2E1E] px-4 py-2 rounded hover:bg-yellow-500 transition"
+                                className="bg-yellow-400 hover:bg-yellow-500 text-[#4B2E1E] text-sm font-medium px-4 py-2 rounded-lg transition-colors"
                             >
                                 OK
                             </button>
