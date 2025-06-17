@@ -7,7 +7,7 @@ export const Disconnect = ({ onDisconnect }: DisconnectProps) => {
         <div className="flex justify-center mb-2 md:mb-0 md:mt-0">
             <button
                 onClick={onDisconnect}
-                className="flex items-center justify-center bg-yellow-300 hover:bg-yellow-400 text-[#4B2E1E] 
+                className="flex items-center justify-center bg-yellow-400 hover:bg-yellow-500 text-[#4B2E1E] 
                 px-4 sm:px-4 py-1.5 sm:py-2 rounded-lg shadow transition-all 
                 text-sm sm:text-base font-medium whitespace-nowrap"
             >

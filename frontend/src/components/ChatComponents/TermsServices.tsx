@@ -30,7 +30,7 @@ export const TermsServices = () => {
                             <p><strong>5. Public Information:</strong> Users can only see the username and profile photo of the person they are chatting with.</p>
                             <p><strong>6. Age Restriction:</strong> PeelTalk is intended for users aged 13 and above. By using the app, you confirm you meet this requirement.</p>
                             <p><strong>7. Personal Safety:</strong> Users are advised not to share personal details. PeelTalk is not responsible for any personal information disclosed during chats.</p>
-                            <p><strong>8. Reporting & Blocking:</strong> A feature to report or block users is coming in future updates. In the meantime, contact support at <a href="mailto:banana.chat.app@gmail.com" className="text-blue-600 underline">banana.chat.app@gmail.com</a>.</p>
+                            <p><strong>8. Reporting & Blocking:</strong> A feature to report or block users is coming in future updates. In the meantime, contact support at <a href="mailto:banana.chat.app@gmail.com" className="text-blue-600 underline">peeltalkchat@gmail.com</a>.</p>
                             <p><strong>9. Free Usage:</strong> PeelTalk is a free service. There are no hidden charges.</p>
                         </div>
 
