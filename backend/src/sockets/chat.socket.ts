@@ -1,12 +1,15 @@
 import { Server, Socket } from "socket.io";
 import { handleFindPartner, handleMessage } from "../controllers/chat.controller";
 import redis from "../redis";
+import { sendSlackMessage } from "../utils/webhookSlack";
 
 
 export default function registerChatHandlers(io: Server, socket: Socket) {
     console.log("📥 Chat socket ready for:",socket.id);
 
-    socket.on("find:partner", (data) => {
+    socket.on("find:partner", async(data) => {
+        await sendSlackMessage(`🔍 A user is looking for a chat partner (socket ID: ${data.userId})`);
+
         handleFindPartner(io, socket, data);
     });
 

@@ -7,6 +7,8 @@ import dotenv from "dotenv";
 import redis from "../redis";
 import { sendOtpEmail } from "../utils/mailer";
 import { uploadToCloudinary } from "../services/uploadServices";
+import axios from "axios";
+import { sendSlackMessage } from "../utils/webhookSlack";
 
 dotenv.config();
 
@@ -122,6 +124,8 @@ export const verifySignup = async(req:Request,res:Response):Promise<Response> =>
             sameSite: "none",
             maxAge: 7 * 24 * 60 * 60 * 1000,
         })
+
+        await sendSlackMessage(`🎉 New user signup: *${email}*`);
 
         return res.status(201).json({
             message: 'Signup verified successfully!',
