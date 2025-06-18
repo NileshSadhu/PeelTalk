@@ -39,25 +39,29 @@ export const handleFindPartner = async (io: Server, socket: Socket, userData: { 
         await redis.srem("waitingUsers:set", partnerId);
 
 
-        let convo = await Conversation.findOne({
-            $or: [
+        let convo = await Conversation.findOneAndUpdate(
+            {
+                $or: [
                 { user1Id: userData.userId, user2Id: partnerId },
                 { user1Id: partnerId, user2Id: userData.userId },
-            ]
-        });
+                ],
+            },
+            {
+                $setOnInsert: {
+                user1Id: userData.userId,
+                user2Id: partnerId,
+                },
+            },
+            {
+                new: true,        
+                upsert: true,   
+            }
+            );
+
         
         const currentUser = await User.findById(userData.userId).select("username profilePhoto publicKey");
         const partnerUser = await User.findById(partnerId).select("username profilePhoto publicKey");
         
-        if(convo){
-            await Message.deleteMany({ conversationId: convo._id });
-        }
-        else{
-            convo = await Conversation.create({
-                user1Id: userData.userId,
-                user2Id: partnerId
-            });
-        }
 
         socket.emit("partner:found", {
             roomId,
@@ -157,3 +161,57 @@ export const getMessages = async (req:Request, res:Response): Promise<Response> 
         return res.status(500).json({ message: "Internal server error." });
     }
 }
+
+
+
+export const handleDisconnect = async (io: Server, socket: Socket) => {
+    const userId = await redis.get(`socket:${socket.id}:user`);
+
+    if (userId) {
+        await redis.srem("waitingUsers:set", userId);
+
+        const waitingList = await redis.lrange("waitingUsers", 0, -1);
+        const updatedList = waitingList.filter(item => {
+        try {
+            const parsed = JSON.parse(item);
+            return parsed.userId !== userId;
+        } catch {
+            return true;
+        }
+        });
+
+        await redis.del("waitingUsers");
+        if (updatedList.length > 0) {
+        await redis.rpush("waitingUsers", ...updatedList);
+        }
+
+        await redis.del(`user:${userId}:socket`);
+        await redis.del(`socket:${socket.id}:user`);
+    }
+
+    const partnerSocketId = await redis.get(`partner:${socket.id}`);
+    if (partnerSocketId) {
+        const partnerUserId = await redis.get(`socket:${partnerSocketId}:user`);
+
+        const partnerSocket = io.sockets.sockets.get(partnerSocketId);
+        if (partnerSocket) {
+        partnerSocket.emit("partner:disconnected");
+        }
+
+        await redis.del(`partner:${socket.id}`);
+        await redis.del(`partner:${partnerSocketId}`);
+
+        if (userId && partnerUserId) {
+        const conversation = await Conversation.findOne({
+            $or: [
+            { user1Id: userId, user2Id: partnerUserId },
+            { user1Id: partnerUserId, user2Id: userId },
+            ],
+        });
+
+        if (conversation) {
+            await Message.deleteMany({ conversationId: conversation._id });
+        }
+        }
+    }
+};
