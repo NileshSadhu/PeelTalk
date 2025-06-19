@@ -4,7 +4,6 @@ import { SignInPage } from "./pages/SignInPage";
 import { SignUpPage } from "./pages/SignUpPage";
 import { ForgetPasswordPage } from "./pages/ForgetPasswordPage";
 import { VerificationPage } from "./pages/VerificationPage";
-import { Loading } from "./components/Common/Loading";
 import { PrivateRoute } from "./components/AuthComponents/PrivateRoute";
 import { HomePage } from "./pages/HomePage";
 import { ProfilePage } from "./pages/ProfilePage";
@@ -23,7 +22,6 @@ function App() {
 
       <Route element={<PrivateRoute />}>
         <Route path="/" element={<HomePage />} />
-        <Route path="/loading" element={<Loading />} />
         <Route path="/profile" element={<ProfilePage />} />
       </Route>
     </Routes>

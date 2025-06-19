@@ -1,0 +1,9 @@
+User-agent: *
+Disallow: /profile
+Disallow: /resetpassword
+Disallow: /verification
+Disallow: /loading
+
+Allow: /
+
+Sitemap: https://www.peeltalk.live/sitemap.xml
