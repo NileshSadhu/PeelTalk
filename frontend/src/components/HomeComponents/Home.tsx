@@ -12,14 +12,11 @@ import { Disconnect } from '../ChatComponents/Disconnect';
 
 
 const Home = () => {
-    const { user, fetchUser, loading } = useUserStore();
+    const { user, loading } = useUserStore();
     const [partnerProfileImageUrl, setPartnerProfileImageUrl] = useState(profile);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const toggleMenu = () => setIsMenuOpen((prev) => !prev);
 
-    useEffect(() => {
-        fetchUser();
-    }, []);
 
     const {
         messages,
@@ -39,7 +36,7 @@ const Home = () => {
     const handleFindPartner = async () => {
         if (!user || !user._id) return;
         if (!socket.connected) socket.connect();
-        socket.emit('find:partner', { userId: user._id });
+        socket.emit('find:partner', { userId: user._id, username: user.username });
     };
 
     useEffect(() => {
@@ -47,11 +44,17 @@ const Home = () => {
     }, [partnerProfile]);
 
     if (loading) return <Loading />;
-    if (!user) return <p>Please log in.</p>;
+
+    if (!user || !user._id) {
+        return <p>Something went wrong. Please refresh the page.</p>;
+    }
+
+    const isGuest = user._id.startsWith("guest-");
+
 
     return (
         <div className="flex flex-col sm:flex-row h-screen w-full bg-white overflow-hidden">
-            <SideBar isMenuOpen={isMenuOpen} toggleMenu={toggleMenu} partnerId={partnerId!}/>
+            <SideBar isMenuOpen={isMenuOpen} toggleMenu={toggleMenu} partnerId={partnerId!} isGuest={isGuest}/>
 
             <div className="flex-1 flex flex-col min-h-0 pt-4 px-4 sm:px-6 lg:px-10 xl:mx-20 max-w-screen-lg mx-auto w-full">
                 

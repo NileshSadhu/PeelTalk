@@ -34,18 +34,29 @@ export const useChat = ({ socket, userId }: UseChatProps) => {
 
     const sendMessage = useCallback(async (msg: string, receiverId: string) => {
         if (!msg.trim()) return toast.error('Message cannot be empty');
-        if (!socket || !roomId || !partnerPublicKey) return toast.error('Missing socket, roomId, or partner public key');
+        if (!socket || !roomId) return toast.error('Missing socket, roomId, or partner public key');
 
         try {
-            const encrypted = await encryptWithPublicKey(new TextEncoder().encode(msg), partnerPublicKey);
+            if (partnerPublicKey) {
+                const encrypted = await encryptWithPublicKey(new TextEncoder().encode(msg), partnerPublicKey);
+                socket.emit('chat:message', {
+                    roomId,
+                    senderId: userId,
+                    receiverId,
+                    content: arrayBufferToBase64(encrypted),
+                    conversationId,
+                });
+            } else {
+                // Send unencrypted
+                socket.emit('chat:message', {
+                    roomId,
+                    senderId: userId,
+                    receiverId,
+                    content: msg,
+                    conversationId: null,
+                });
+            }
 
-            socket.emit('chat:message', {
-                roomId,
-                senderId: userId,
-                receiverId,
-                content: arrayBufferToBase64(encrypted),
-                conversationId
-            });
             setMessages(prev => [...prev, { senderId: userId, content: msg, timestamp: new Date().toISOString() }]);
         } catch (err) {
             console.error(err);
@@ -61,44 +72,55 @@ export const useChat = ({ socket, userId }: UseChatProps) => {
         if (msg.senderId === userId) return;
         try {
             const privateKey = await KeyStorageService.getPrivateKeyFromLocalStorage();
-            if (!privateKey) return toast.error('Private key not found');
+            if (!privateKey) throw new Error("Private key missing");
+
             const decrypted = await decryptWithPrivateKey(strToArrayBuffer(msg.content), privateKey);
             const decodedMsg = new TextDecoder().decode(decrypted);
+
             setMessages(prev => [...prev, { senderId: msg.senderId, content: decodedMsg, timestamp: msg.timestamp || new Date().toISOString() }]);
         } catch (err) {
-            console.error('Decryption failed', err);
-            toast.error('Failed to decrypt message');
+            console.warn("Decryption failed, falling back to plain:", err);
+            setMessages(prev => [...prev, { senderId: msg.senderId, content: msg.content, timestamp: msg.timestamp || new Date().toISOString() }]);
         }
     }, [userId]);
 
 
-    const handlePartnerFound = useCallback(async (data: {
+        const handlePartnerFound = useCallback(async (data: {
         roomId: string;
-        conversationId: string;
+        conversationId: string | null;
         partnerId: string;
         partnerProfile: { username: string; profilePhoto: string };
-        publicKey: string;
+        publicKey: string | null;
     }) => {
         try {
             setRoomId(data.roomId);
             setConversationId(data.conversationId);
             setPartnerId(data.partnerId);
             setPartnerProfile(data.partnerProfile);
-            const importedKey = await window.crypto.subtle.importKey(
-                'spki',
-                strToArrayBuffer(data.publicKey),
-                { name: 'RSA-OAEP', hash: 'SHA-256' },
-                true,
-                ['encrypt']
-            );
-            setPartnerPublicKey(importedKey);
-            KeyStorageService.setPartnerPublicKey(data.publicKey);
+
+            if (data.publicKey) {
+                const importedKey = await window.crypto.subtle.importKey(
+                    'spki',
+                    strToArrayBuffer(data.publicKey),
+                    { name: 'RSA-OAEP', hash: 'SHA-256' },
+                    true,
+                    ['encrypt']
+                );
+                setPartnerPublicKey(importedKey);
+                KeyStorageService.setPartnerPublicKey(data.publicKey);
+            } else {
+                // Partner is guest, no encryption possible
+                setPartnerPublicKey(null);
+                KeyStorageService.clearPartnerPublicKey();
+            }
+
             toast.success(`User ${data.partnerProfile.username} has connected!`);
         } catch (err) {
             console.error('Error setting up partner key:', err);
             toast.error('Failed to set up secure chat');
         }
     }, []);
+
 
 
     useEffect(() => {

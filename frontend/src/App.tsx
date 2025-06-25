@@ -4,10 +4,11 @@ import { SignInPage } from "./pages/SignInPage";
 import { SignUpPage } from "./pages/SignUpPage";
 import { ForgetPasswordPage } from "./pages/ForgetPasswordPage";
 import { VerificationPage } from "./pages/VerificationPage";
-import { PrivateRoute } from "./components/AuthComponents/PrivateRoute";
+// import { PrivateRoute } from "./components/AuthComponents/PrivateRoute";
 import { HomePage } from "./pages/HomePage";
 import { ProfilePage } from "./pages/ProfilePage";
 import { ResetPasswordPage } from "./pages/ResetPasswordPage";
+import { ChatAccessLoader } from "./components/ChatComponents/ChatAccessLoader";
 
 function App() {
   return (
@@ -18,10 +19,10 @@ function App() {
         <Route path='/forgotpassword' element={<ForgetPasswordPage />} />
         <Route path='/resetpassword/:email' element={ <ResetPasswordPage/> } />
         <Route path='/verification/:email' element={<VerificationPage />} />
-      </Route>
+      {/* </Route> */}
 
-      <Route element={<PrivateRoute />}>
-        <Route path="/" element={<HomePage />} />
+      {/* <Route element={<PrivateRoute />}> */}
+        <Route path="/" element={<ChatAccessLoader><HomePage /></ChatAccessLoader>} />
         <Route path="/profile" element={<ProfilePage />} />
       </Route>
     </Routes>

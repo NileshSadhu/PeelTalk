@@ -7,21 +7,18 @@ import { User } from "../models/user.model";
 
 
 
-export const handleFindPartner = async (io: Server, socket: Socket, userData: { userId: string }) => {
+export const handleFindPartner = async (io: Server, socket: Socket, userData: { userId: string, username: string }) => {
     await redis.set(`socket:${socket.id}:user`, userData.userId);
 
     let data: string | null;
 
-    while((data = await redis.rpop("waitingUsers")) !== null){
-        const { socketId: partnerSocketId, userId: partnerId } = JSON.parse(data);
-        console.log(data)
-        if(partnerId === userData.userId){
-            continue;
-        }
+    while ((data = await redis.rpop("waitingUsers")) !== null) {
+        const { socketId: partnerSocketId, userId: partnerId, username: partnerUsername } = JSON.parse(data);
+
+        if (partnerId === userData.userId) continue;
 
         const partnerSocket = io.sockets.sockets.get(partnerSocketId);
-
-        if(!partnerSocket){
+        if (!partnerSocket) {
             await redis.srem("waitingUsers:set", partnerId);
             continue;
         }
@@ -34,69 +31,83 @@ export const handleFindPartner = async (io: Server, socket: Socket, userData: { 
         await redis.set(`user:${partnerId}:socket`, partnerSocket.id);
         await redis.set(`partner:${socket.id}`, partnerSocket.id);
         await redis.set(`partner:${partnerSocket.id}`, socket.id);
-        
+
         await redis.srem("waitingUsers:set", userData.userId);
         await redis.srem("waitingUsers:set", partnerId);
 
+        const isGuest1 = userData.userId.startsWith("guest-");
+        const isGuest2 = partnerId.startsWith("guest-");
 
-        let convo = await Conversation.findOneAndUpdate(
-            {
-                $or: [
-                { user1Id: userData.userId, user2Id: partnerId },
-                { user1Id: partnerId, user2Id: userData.userId },
-                ],
-            },
-            {
-                $setOnInsert: {
-                user1Id: userData.userId,
-                user2Id: partnerId,
+        let convo = null;
+        if (!isGuest1 && !isGuest2) {
+            convo = await Conversation.findOneAndUpdate(
+                {
+                    $or: [
+                        { user1Id: userData.userId, user2Id: partnerId },
+                        { user1Id: partnerId, user2Id: userData.userId },
+                    ],
                 },
-            },
-            {
-                new: true,        
-                upsert: true,   
-            }
+                {
+                    $setOnInsert: {
+                        user1Id: userData.userId,
+                        user2Id: partnerId,
+                    },
+                },
+                {
+                    new: true,
+                    upsert: true,
+                }
             );
+        }
 
-        
-        const currentUser = await User.findById(userData.userId).select("username profilePhoto publicKey");
-        const partnerUser = await User.findById(partnerId).select("username profilePhoto publicKey");
-        
+        const currentUser = isGuest1
+            ? { username: userData.username, profilePhoto: null, publicKey: null }
+            : await User.findById(userData.userId).select("username profilePhoto publicKey");
+
+        const partnerUser = isGuest2
+            ? { username: partnerUsername, profilePhoto: null, publicKey: null }
+            : await User.findById(partnerId).select("username profilePhoto publicKey");
 
         socket.emit("partner:found", {
             roomId,
-            conversationId: convo._id,
+            conversationId: convo?._id ?? null,
             partnerId,
             partnerProfile: {
                 username: partnerUser?.username,
                 profilePhoto: partnerUser?.profilePhoto,
             },
-            publicKey: partnerUser?.publicKey
+            publicKey: partnerUser?.publicKey ?? null,
         });
-        
+
         partnerSocket.emit("partner:found", {
             roomId,
-            conversationId: convo._id,
+            conversationId: convo?._id ?? null,
             partnerId: userData.userId,
             partnerProfile: {
                 username: currentUser?.username,
-                profilePhoto: currentUser?.profilePhoto
-            }, 
-            publicKey: currentUser?.publicKey
+                profilePhoto: currentUser?.profilePhoto,
+            },
+            publicKey: currentUser?.publicKey ?? null,
         });
 
-        socket.emit("chat:history", { conversationId: convo._id });
-        partnerSocket.emit("chat:history", { conversationId: convo._id });
+        if (convo) {
+            socket.emit("chat:history", { conversationId: convo._id });
+            partnerSocket.emit("chat:history", { conversationId: convo._id });
+        }
 
         return;
     }
 
     const isAlreadyWaiting = await redis.sismember("waitingUsers:set", userData.userId);
-    if(!isAlreadyWaiting){
-        await redis.lpush("waitingUsers", JSON.stringify({ socketId: socket.id, userId: userData.userId }));
+    if (!isAlreadyWaiting) {
+        await redis.lpush("waitingUsers", JSON.stringify({
+            socketId: socket.id,
+            userId: userData.userId,
+            username: userData.username,
+        }));
         await redis.sadd("waitingUsers:set", userData.userId);
         await redis.set(`user:${userData.userId}:socket`, socket.id);
-    } else{
+    } else {
         const current = await redis.get(`user:${userData.userId}:socket`);
         if (current !== socket.id) {
             await redis.set(`user:${userData.userId}:socket`, socket.id);
@@ -106,33 +117,53 @@ export const handleFindPartner = async (io: Server, socket: Socket, userData: { 
 
 
 
-export const handleMessage = async(io: Server, 
-    {roomId,content,senderId,receiverId,conversationId}:
-    {roomId:string,content:string,senderId:string,receiverId:string,conversationId:string}
-    ) =>{
+export const handleMessage = async (
+    io: Server,
+    { roomId, content, senderId, receiverId, conversationId }:
+    { roomId: string, content: string, senderId: string, receiverId: string, conversationId: string | null }
+) => {
+    const isGuest = senderId.startsWith("guest-") || receiverId.startsWith("guest-");
 
-        const saved = await Message.create({
+    if (isGuest || !conversationId) {
+        io.to(roomId).emit("chat:message", {
             senderId,
-            receiverId,
             content,
-            conversationId,
+            timeStamp: new Date(),
         });
+        return;
+    }
 
-        io.to(roomId).emit("chat:message",{
-            senderId,
-            content,
-            timeStamp: saved.createdAt
-        })
+    const saved = await Message.create({
+        senderId,
+        receiverId,
+        content,
+        conversationId,
+    });
+
+    io.to(roomId).emit("chat:message", {
+        senderId,
+        content,
+        timeStamp: saved.createdAt,
+    });
 };
 
 
-export const getMessages = async (req:Request, res:Response): Promise<Response> => {
-    try{
+
+export const getMessages = async (req: Request, res: Response): Promise<Response> => {
+    try {
         const userId = req.userId;
+
+        if (!userId) {
+            return res.status(401).json({ message: "Unauthorized: Missing user ID." });
+        }
+
+        if (userId.startsWith("guest-")) {
+            return res.status(403).json({ message: "Guests cannot retrieve chat history." });
+        }
+
         const conversationId = req.params.conversationId;
         const decryptedConversationKey = req.body.decryptedKey;
 
-        
         if (!decryptedConversationKey) {
             return res.status(400).json({ message: "Decryption key missing." });
         }
@@ -144,23 +175,22 @@ export const getMessages = async (req:Request, res:Response): Promise<Response> 
 
         const messages = await Message.find({ conversationId }).sort({ createdAt: 1 });
 
-        const encryptedMessages = messages.map((msg) => ({
-            _id: msg._id,
-            senderId: msg.senderId,
-            receiverId: msg.receiverId,
-            content: msg.content,
-            createdAt: msg.createdAt,
-        }));
-
         return res.status(200).json({
             message: "Messages retrieved successfully.",
-            messages: encryptedMessages,
+            messages: messages.map((msg) => ({
+                _id: msg._id,
+                senderId: msg.senderId,
+                receiverId: msg.receiverId,
+                content: msg.content,
+                createdAt: msg.createdAt,
+            })),
         });
-    }catch(error){
+    } catch (error) {
         console.error("Error in getMessages:", error);
         return res.status(500).json({ message: "Internal server error." });
     }
-}
+};
+
 
 
 
@@ -201,17 +231,18 @@ export const handleDisconnect = async (io: Server, socket: Socket) => {
         await redis.del(`partner:${socket.id}`);
         await redis.del(`partner:${partnerSocketId}`);
 
-        if (userId && partnerUserId) {
-        const conversation = await Conversation.findOne({
-            $or: [
-            { user1Id: userId, user2Id: partnerUserId },
-            { user1Id: partnerUserId, user2Id: userId },
-            ],
-        });
+        if (userId && partnerUserId && !userId.startsWith("guest-") && !partnerUserId.startsWith("guest-")) {
+            const conversation = await Conversation.findOne({
+                $or: [
+                    { user1Id: userId, user2Id: partnerUserId },
+                    { user1Id: partnerUserId, user2Id: userId },
+                ],
+            });
 
-        if (conversation) {
-            await Message.deleteMany({ conversationId: conversation._id });
+            if (conversation) {
+                await Message.deleteMany({ conversationId: conversation._id });
+            }
         }
-        }
+
     }
 };

@@ -347,24 +347,39 @@ export const getUserDetails = async(req:Request,res:Response):Promise<Response> 
 }
 
 
-export const updateUserDetails = async(req:Request,res:Response):Promise<Response> => {
+export const updateUserDetails = async (req: Request, res: Response): Promise<Response> => {
     const result = updateUserSchema.safeParse(req.body);
 
-    if(!result.success){
+    if (!result.success) {
         return res.status(400).json({
-        message: "Validation failed",
-        errors: result.error.flatten(), 
-    });
+            message: "Validation failed",
+            errors: result.error.flatten(),
+        });
     }
-    
+
     const data = result.data;
 
-    try{
+    try {
         const userId = req.userId;
 
-        const user = await User.findByIdAndUpdate({_id: userId},{$set: data},{new: true});
+        if (data.username) {
+            const existingUser = await User.findOne({
+                username: data.username,
+                _id: { $ne: userId }, 
+            });
 
-        if(!user){
+            if (existingUser) {
+                return res.status(409).json({ message: "Username is already taken" });
+            }
+        }
+
+        const user = await User.findByIdAndUpdate(
+            { _id: userId },
+            { $set: data },
+            { new: true }
+        );
+
+        if (!user) {
             return res.status(404).json({ message: "User not found!" });
         }
 
@@ -372,11 +387,13 @@ export const updateUserDetails = async(req:Request,res:Response):Promise<Respons
             message: "User updated successfully",
             user,
         });
-    }catch(error){
+
+    } catch (error) {
         console.error("Update Error:", error);
         return res.status(500).json({ message: "Internal server error" });
     }
-}
+};
+
 
 
 export const userLogout = async(req:Request,res:Response):Promise<Response> => {

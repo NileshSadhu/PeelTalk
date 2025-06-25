@@ -1,14 +1,17 @@
 import { useNavigate } from "react-router-dom";
 import { FaSignOutAlt } from 'react-icons/fa';
 import { logoutUser } from "../../api/auth";
+import { useUserStore } from "../../store/useUserStore";
 
 export const LogoutButton = () => {
     const navigate = useNavigate();
+    const { fetchUser } = useUserStore.getState();
 
     const handleLogout = async () => {
         const result = await logoutUser();
 
         if(result?.success){
+            await fetchUser();
             navigate(result.next!);
         }
     }

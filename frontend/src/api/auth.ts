@@ -5,6 +5,7 @@ import { exportPublicKey, generateKeyPair } from "../utils/keyUtils";
 import { decryptPrivateKeyWithPassword, encryptPrivateKeyWithPassword } from "../utils/aesUtils.ts";
 import { KeyStorageService } from "../utils/keyStorage.ts";
 import { clearUserKeysFromIndexedDB, storeUserKeysInIndexedDB } from "../utils/indexedDbUtils.ts";
+import { useUserStore } from "../store/useUserStore.ts";
 
 const backend_api = import.meta.env.VITE_BACKEND_URL;
 
@@ -202,14 +203,14 @@ export const logoutUser = async () => {
             });
 
             if (response.status === 200) {
-                localStorage.removeItem("aesKey");
-                localStorage.removeItem("aesKeyExpiry");
                 sessionStorage.clear();
                 KeyStorageService.clearAll();
                 await clearUserKeysFromIndexedDB();
 
+                useUserStore.getState().clearUser();
+
                 toast.success("Logged out successfully.");
-                return { success: true, next: `/signIn`}
+                return { success: true, next: `/`}
             } else {
                 toast.error("Logout failed. Please try again.");
             }

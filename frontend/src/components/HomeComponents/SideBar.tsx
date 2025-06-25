@@ -6,10 +6,11 @@ import { ProfileBtn } from './ProfileBtn';
 interface SideBarProps {
     isMenuOpen: boolean;
     toggleMenu: () => void;
-    partnerId : string;
+    partnerId: string;
+    isGuest: boolean;
 }
 
-export const SideBar = ({ isMenuOpen, toggleMenu, partnerId }: SideBarProps) => {
+export const SideBar = ({ isMenuOpen, toggleMenu, partnerId, isGuest }: SideBarProps) => {
 
     return (
         <>
@@ -50,11 +51,21 @@ export const SideBar = ({ isMenuOpen, toggleMenu, partnerId }: SideBarProps) => 
                 </div>
 
                 {/* Buttons Section */}
+                {/* Buttons Section */}
                 <div className="flex flex-col gap-4 p-6 items-center">
-                    {/* Profile Button */}
-                    <ProfileBtn />
-                    {/* Logout Button */}
-                    <LogOutBtn />
+                    {isGuest ? (
+                        <a
+                            href="/signUp"
+                            className="px-4 py-2 bg-yellow-400 text-brown-900 rounded-md hover:bg-yellow-500 transition-colors"
+                        >
+                            Sign Up
+                        </a>
+                    ) : (
+                        <>
+                            <ProfileBtn />
+                            <LogOutBtn />
+                        </>
+                    )}
                 </div>
             </div>
         </>

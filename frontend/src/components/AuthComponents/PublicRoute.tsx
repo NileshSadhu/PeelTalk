@@ -4,37 +4,34 @@ import { useState, useEffect } from "react";
 import { Loading } from "../Common/Loading";
 
 export const PublicRoute = () => {
-    const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
-    const backend_url: string = import.meta.env.VITE_BACKEND_URL;
+    const [isChecked, setIsChecked] = useState(false);
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const backend_url = import.meta.env.VITE_BACKEND_URL;
 
     useEffect(() => {
-        console.log("PublicRoute: Checking authentication...");
         const verify = async () => {
             try {
-                const response = await axios.get<any>(`${backend_url}/user/verify`, {
+                const response = await axios.get(`${backend_url}/user/verify`, {
                     withCredentials: true,
                 });
 
-                if (response.status === 200) {
-                    setIsAuthenticated(true);
-                } else {
-                    setIsAuthenticated(false);
-                }
+                setIsAuthenticated(response.status === 200);
             } catch (error) {
-                console.error("Authentication verification failed:", error);
                 setIsAuthenticated(false);
+            } finally {
+                setIsChecked(true);
             }
         };
 
         verify();
     }, [backend_url]);
 
-    if (isAuthenticated === null) {
+    if (!isChecked) {
         return <Loading />;
     }
 
     if (isAuthenticated) {
-        return <Navigate to={"/"} replace />;
+        return <Navigate to="/" replace />;
     }
 
     return <Outlet />;
