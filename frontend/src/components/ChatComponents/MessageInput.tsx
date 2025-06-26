@@ -31,6 +31,7 @@ export const MessageInput = ({
     ) => {
         e.preventDefault();
 
+        
         if (!message.trim()) {
             toast.error('Message cannot be empty');
             return;

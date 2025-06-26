@@ -8,9 +8,11 @@ interface MessageBubbleProps {
     avatar: string;
     username: string;
     content: string;
+    messageId: string; 
+    reaction?: string;
     timestamp: string;
     onAvatarClick?: () => void;
-    onReact?: (reaction: string) => void;
+    onReact?: (reaction: string, messageId: string) => void;
 }
 
 export const MessageBubble = ({
@@ -18,12 +20,13 @@ export const MessageBubble = ({
     avatar,
     username,
     content,
+    messageId,
+    reaction,
     timestamp,
     onAvatarClick,
     onReact,
 }: MessageBubbleProps) => {
     const [showReactions, setShowReactions] = useState(false);
-    const [reaction, setReaction] = useState<string | null>(null);
     const reactionRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -101,9 +104,8 @@ export const MessageBubble = ({
                                         className="cursor-pointer hover:scale-110 transition-transform text-lg p-1"
                                         onClick={(e) => {
                                             e.stopPropagation();
-                                            setReaction(emoji);
                                             setShowReactions(false);
-                                            onReact?.(emoji);
+                                            onReact?.(emoji, messageId); 
                                         }}
                                     >
                                         {emoji}

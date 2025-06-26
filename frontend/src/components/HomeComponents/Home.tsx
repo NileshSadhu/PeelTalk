@@ -10,6 +10,7 @@ import { useBeforeUnloadWarning } from '../../hooks/useBeforeUnloadWarning';
 import { Disconnect } from '../ChatComponents/Disconnect';
 import { SignUpPopup } from '../Common/SignUpPopup';
 import { resolveProfilePhoto } from '../../utils/resolveProfilePhoto';
+import { v4 as uuidv4 } from 'uuid';
 
 
 const Home = () => {
@@ -41,6 +42,7 @@ const Home = () => {
         sendMessage,
         disconnect,
         partnerId,
+        sendReaction,
         roomId,
         partnerProfile,
         partnerTyping
@@ -55,6 +57,10 @@ const Home = () => {
         if (!user || !user._id) return;
         if (!socket.connected) socket.connect();
         socket.emit('find:partner', { userId: user._id, username: user.username });
+    };
+
+    const handleSendReaction = (messageId: string, emoji: string) => {
+        sendReaction(messageId, emoji);
     };
 
 
@@ -88,6 +94,7 @@ const Home = () => {
                         partnerId={partnerId ?? undefined}
                         onDisconnect={disconnect}
                         isPartnerTyping={partnerTyping}
+                        handleSendReaction={handleSendReaction}
                     />
                 </div>
 
@@ -102,7 +109,10 @@ const Home = () => {
                 <MessageInput
                     disabled={!roomId}
                     receiverId={partnerId ?? ""}
-                    onSend={sendMessage}
+                    onSend={(message: string, receiverId: string) => {
+                        const messageId = uuidv4();
+                        sendMessage(message, receiverId, messageId);
+                    }}
                     roomId={roomId!}
                 />
                 </div>

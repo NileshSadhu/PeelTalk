@@ -119,8 +119,8 @@ export const handleFindPartner = async (io: Server, socket: Socket, userData: { 
 
 export const handleMessage = async (
     io: Server,
-    { roomId, content, senderId, receiverId, conversationId }:
-    { roomId: string, content: string, senderId: string, receiverId: string, conversationId: string | null }
+    { roomId, content, senderId, receiverId, conversationId, messageId }:
+    { roomId: string, content: string, senderId: string, receiverId: string, conversationId: string | null, messageId: string }
 ) => {
     const isGuest = senderId.startsWith("guest-") || receiverId.startsWith("guest-");
 
@@ -129,21 +129,23 @@ export const handleMessage = async (
             senderId,
             content,
             timeStamp: new Date(),
+            messageId,
         });
         return;
     }
 
-    const saved = await Message.create({
-        senderId,
-        receiverId,
-        content,
-        conversationId,
-    });
+    // const saved = await Message.create({
+    //     senderId,
+    //     receiverId,
+    //     content,
+    //     conversationId,
+    // });
 
     io.to(roomId).emit("chat:message", {
         senderId,
         content,
-        timeStamp: saved.createdAt,
+        timeStamp : new Date(),
+        messageId,
     });
 };
 
@@ -245,4 +247,19 @@ export const handleDisconnect = async (io: Server, socket: Socket) => {
         }
 
     }
+};
+
+
+export const handleMessageReaction = (io: Server, socket: Socket) => {
+    socket.on('message:reaction', async ({ roomId, messageId, senderId, reaction }) => {
+        if (!senderId.startsWith("guest-") && messageId) {
+            await Message.findByIdAndUpdate(messageId, { reaction });
+        }
+
+        io.to(roomId).emit('message:reaction:update', {
+            messageId,
+            reaction,
+            senderId,
+        });
+    });
 };

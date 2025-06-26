@@ -7,9 +7,11 @@ import { socket } from "../../utils/socket";
 import { PartnerProfileOverlay } from "../ProfileComponents/PartnerProfileOverlay";
 
 interface Message {
+    messageId: string;
     senderId: string;
     content: string;
     timestamp: string;
+    reaction?: string;
 }
 
 interface ChatWindowProps {
@@ -23,6 +25,7 @@ interface ChatWindowProps {
     isPartnerTyping?: boolean;
     onFindPartner?: () => void;
     onDisconnect?: () => void;
+    handleSendReaction: (messageId: string, emoji: string) => void;
 }
 
 export const ChatWindow = ({
@@ -35,15 +38,16 @@ export const ChatWindow = ({
     partnerId,
     isPartnerTyping,
     onFindPartner,
+    handleSendReaction  
 }: ChatWindowProps) => {
     const [isSearching, setIsSearching] = useState(false);
     const isUserAtBottomRef = useRef(true);
-
     const scrollContainerRef = useRef<HTMLDivElement | null>(null);
     const messagesEndRef = useRef<HTMLDivElement | null>(null);
     const lastMessageSenderIdRef = useRef<string | null>(null);
 
     const [showPartnerProfile, setShowPartnerProfile] = useState(false);
+
 
     const handleScroll = () => {
         const el = scrollContainerRef.current;
@@ -70,6 +74,7 @@ export const ChatWindow = ({
     useEffect(() => {
         if (partnerId) setIsSearching(false);
     }, [partnerId]);
+
 
     const handleJuiceMatch = () => {
         setIsSearching(true);
@@ -124,13 +129,11 @@ export const ChatWindow = ({
                                 username={msg.senderId === currentUserId ? currentUsername : partnerUsername}
                                 content={msg.content}
                                 timestamp={msg.timestamp}
-                                onAvatarClick={
-                                    msg.senderId === currentUserId
-                                        ? undefined
-                                        : () => setShowPartnerProfile(true)
-                                }
-                                onReact={(reaction) => console.log("User reacted with", reaction)}
-                            />
+                                reaction={msg.reaction}
+                                onAvatarClick={msg.senderId === currentUserId
+                                    ? undefined
+                                    : () => setShowPartnerProfile(true)}
+                                onReact={(emoji, messageId) => handleSendReaction(messageId, emoji)} messageId={msg.messageId}    />
                         ))}
                         {isPartnerTyping && (
                             <TypingIndicator

@@ -52,7 +52,7 @@ fetchUser: async (): Promise<{ redirectToSignIn: boolean }> => {
                 console.warn("Missing keys for authenticated user. Logging out...");
                 await axios.post(`${backend_api}/user/logout`, {}, { withCredentials: true });
                 set({ user: null, loading: false });
-                return { redirectToSignIn: true }; // ✅ just return a flag
+                return { redirectToSignIn: true }; 
             }
 
         }

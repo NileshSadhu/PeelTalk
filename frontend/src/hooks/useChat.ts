@@ -6,10 +6,13 @@ import { arrayBufferToBase64, strToArrayBuffer } from '../utils/aesUtils.ts.ts';
 import { encryptWithPublicKey, decryptWithPrivateKey } from '../utils/rsaEncryptUtils.ts';
 
 interface Message {
+    messageId: string;
     senderId: string;
     content: string;
     timestamp: string;
+    reaction?: string;
 }
+
 
 interface UseChatProps {
     socket: Socket;
@@ -32,9 +35,9 @@ export const useChat = ({ socket, userId }: UseChatProps) => {
         partnerProfileRef.current = partnerProfile;
     }, [partnerProfile]);
 
-    const sendMessage = useCallback(async (msg: string, receiverId: string) => {
+    const sendMessage = useCallback(async (msg: string, receiverId: string, messageId: string) => {
         if (!msg.trim()) return toast.error('Message cannot be empty');
-        if (!socket || !roomId) return toast.error('Missing socket, roomId, or partner public key');
+        if (!socket || !roomId) return toast.error('Missing socket or roomId');
 
         try {
             if (partnerPublicKey) {
@@ -45,28 +48,67 @@ export const useChat = ({ socket, userId }: UseChatProps) => {
                     receiverId,
                     content: arrayBufferToBase64(encrypted),
                     conversationId,
+                    messageId, 
                 });
             } else {
-                // Send unencrypted
                 socket.emit('chat:message', {
                     roomId,
                     senderId: userId,
                     receiverId,
                     content: msg,
                     conversationId: null,
+                    messageId,
                 });
             }
 
-            setMessages(prev => [...prev, { senderId: userId, content: msg, timestamp: new Date().toISOString() }]);
+            setMessages(prev => [
+                ...prev,
+                {   
+                    senderId: userId,
+                    content: msg,
+                    timestamp: new Date().toISOString(),
+                    messageId,
+                }
+            ]);
         } catch (err) {
             console.error(err);
             toast.error('Failed to send message');
         }
     }, [socket, roomId, userId, partnerPublicKey]);
 
+
+    const sendReaction = useCallback((messageId: string, reaction: string) => {
+        if (!socket || !roomId || !partnerId) return;
+
+        socket.emit("chat:reaction", {
+            roomId,
+            messageId,
+            senderId: userId,
+            receiverId: partnerId,
+            reaction,
+        });
+    }, [socket, roomId, partnerId, userId]);
+
+
+    useEffect(() => {
+        socket.on("chat:reaction", ({ messageId, reaction }) => {
+            setMessages((prevMessages) =>
+                prevMessages.map((msg) =>
+                    msg.messageId === messageId ? { ...msg, reaction } : msg
+                )
+            );
+        });
+
+        return () => {
+            socket.off("chat:reaction");
+        };
+    }, []);
+
+
     const handleIncomingMessage = useCallback(async (msg: {
         senderId: string;
         content: string;
+        messageId: string;
         timestamp?: string;
     }) => {
         if (msg.senderId === userId) return;
@@ -77,10 +119,26 @@ export const useChat = ({ socket, userId }: UseChatProps) => {
             const decrypted = await decryptWithPrivateKey(strToArrayBuffer(msg.content), privateKey);
             const decodedMsg = new TextDecoder().decode(decrypted);
 
-            setMessages(prev => [...prev, { senderId: msg.senderId, content: decodedMsg, timestamp: msg.timestamp || new Date().toISOString() }]);
+            setMessages(prev => [
+                ...prev,
+                {
+                    messageId: msg.messageId,
+                    senderId: msg.senderId,
+                    content: decodedMsg,
+                    timestamp: msg.timestamp || new Date().toISOString()
+                }
+            ]);
         } catch (err) {
             console.warn("Decryption failed, falling back to plain:", err);
-            setMessages(prev => [...prev, { senderId: msg.senderId, content: msg.content, timestamp: msg.timestamp || new Date().toISOString() }]);
+            setMessages(prev => [
+                ...prev,
+                {
+                    messageId: msg.messageId,
+                    senderId: msg.senderId,
+                    content: msg.content,
+                    timestamp: msg.timestamp || new Date().toISOString()
+                }
+            ]);
         }
     }, [userId]);
 
@@ -214,6 +272,7 @@ export const useChat = ({ socket, userId }: UseChatProps) => {
         sendMessage,
         partnerId,
         roomId,
+        sendReaction,
         conversationId,
         disconnect,
         partnerProfile,

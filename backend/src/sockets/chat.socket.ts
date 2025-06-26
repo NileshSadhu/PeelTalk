@@ -34,6 +34,15 @@ export default function registerChatHandlers(io: Server, socket: Socket) {
     });
 
 
+    socket.on("chat:reaction", ({ roomId, messageId, senderId, reaction }) => {
+        io.to(roomId).emit("chat:reaction", {
+            messageId,
+            senderId,
+            reaction,
+        });
+    });
+
+
     socket.on("partner:typing", async () => {
     const partnerSocketId = await redis.get(`partner:${socket.id}`);
     if (partnerSocketId) {
