@@ -14,7 +14,6 @@ export const SideBar = ({ isMenuOpen, toggleMenu, partnerId, isGuest }: SideBarP
 
     return (
         <>
-            {/* Hamburger Menu Button for Mobile */}
             {partnerId ? <div></div>
                 :<button
                 onClick={toggleMenu}
@@ -24,7 +23,6 @@ export const SideBar = ({ isMenuOpen, toggleMenu, partnerId, isGuest }: SideBarP
             </button>
             }
 
-            {/* Overlay for Mobile Menu */}
             {isMenuOpen && (
                 <div
                     className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
@@ -32,13 +30,12 @@ export const SideBar = ({ isMenuOpen, toggleMenu, partnerId, isGuest }: SideBarP
                 />
             )}
 
-            {/* Sidebar Content */}
             <div className={`
                 fixed lg:static w-64 lg:w-80 h-full bg-gradient-to-b from-yellow-200 to-yellow-100 shadow-lg
                 flex flex-col justify-between z-50 transform transition-transform duration-300 ease-in-out
                 ${isMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
             `}>
-                {/* Logo and Title Section */}
+
                 <div className="flex flex-col items-center p-6">
                     <div className="flex flex-col items-center gap-2">
                         <img
@@ -50,8 +47,6 @@ export const SideBar = ({ isMenuOpen, toggleMenu, partnerId, isGuest }: SideBarP
                     </div>
                 </div>
 
-                {/* Buttons Section */}
-                {/* Buttons Section */}
                 <div className="flex flex-col gap-4 p-6 items-center">
                     {isGuest ? (
                         <a

@@ -1,3 +1,6 @@
+import { getAvatarFromUsername } from '../../utils/getAvatar';
+
+
 interface MessageBubbleProps {
     isCurrentUser: boolean;
     avatar: string;
@@ -20,7 +23,7 @@ export const MessageBubble = ({
             className={`flex ${isCurrentUser ? "flex-row-reverse" : "flex-row"} gap-2 items-start max-w-[90%] sm:max-w-[75%]`}
         >
             <img
-                src={avatar}
+                src={avatar || getAvatarFromUsername(username)}
                 alt={`${username}'s avatar`}
                 className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full border border-gray-300 ${onAvatarClick ? 'cursor-pointer hover:scale-105 transition-transform duration-200 ease-in-out' : ''
                     }`}

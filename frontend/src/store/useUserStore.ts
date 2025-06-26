@@ -22,8 +22,9 @@ interface UserStore {
     loading: boolean;
     setUser: (user: User) => void;
     clearUser: () => void;
-    fetchUser: () => Promise<void>;
+    fetchUser: () => Promise<{ redirectToSignIn: boolean }>; // ✅ Fix here
 }
+
 
 export const useUserStore = create<UserStore>((set) => ({
     user: null,
@@ -33,43 +34,41 @@ export const useUserStore = create<UserStore>((set) => ({
     clearUser: () => set({ user: null, loading: false }),
 
 
-    fetchUser: async () => {
-        try {
-            const res = await axios.get<{ user: User }>(
-                `${backend_api}/user/userDetails`,
-                { withCredentials: true }
-            );
-            const user = res.data.user;
-            const isGuest = user._id.startsWith("guest-");
+fetchUser: async (): Promise<{ redirectToSignIn: boolean }> => {
+    try {
+        const res = await axios.get<{ user: User }>(
+            `${backend_api}/user/userDetails`,
+            { withCredentials: true }
+        );
 
-            if (!isGuest) {
-                const decryptedPrivateKey = localStorage.getItem("decryptedPrivateKey");
-                const indexedDbKeys = await getUserKeysFromIndexedDB();
+        const user = res.data.user;
+        const isGuest = user._id.startsWith("guest-");
 
-                if (!decryptedPrivateKey || !indexedDbKeys?.publicKey) {
-                    console.warn("Missing keys. Logging out.");
-                    await axios.post(`${backend_api}/user/logout`, {}, { withCredentials: true });
-                    set({ user: null, loading: false });
-                    window.location.href = "/signIn";
-                    return;
-                }
+        if (!isGuest) {
+            const decryptedPrivateKey = localStorage.getItem("decryptedPrivateKey");
+            const indexedDbKeys = await getUserKeysFromIndexedDB();
+
+            if (!decryptedPrivateKey || !indexedDbKeys?.publicKey) {
+                console.warn("Missing keys for authenticated user. Logging out...");
+                await axios.post(`${backend_api}/user/logout`, {}, { withCredentials: true });
+                set({ user: null, loading: false });
+                return { redirectToSignIn: true }; // ✅ just return a flag
             }
 
-            set({ user, loading: false });
-        } catch (err) {
-            console.warn('User not authenticated, falling back to guest.');
+        }
 
-            let guestUsername = localStorage.getItem("guestUsername");
-            if (!guestUsername) {
-                guestUsername = generateGuestUsername();
-                localStorage.setItem("guestUsername", guestUsername);
-            }
+        set({ user, loading: false });
+        return { redirectToSignIn: false };
 
-            let guestId = localStorage.getItem("guestId");
-            if (!guestId) {
-                guestId = generateGuestId();
-                localStorage.setItem("guestId", guestId);
-            }
+    } catch (err: any) {
+        const isUnauthorized = err?.response?.status === 401;
+
+        if (isUnauthorized) {
+            let guestUsername = localStorage.getItem("guestUsername") || generateGuestUsername();
+            localStorage.setItem("guestUsername", guestUsername);
+
+            let guestId = localStorage.getItem("guestId") || generateGuestId();
+            localStorage.setItem("guestId", guestId);
 
             const guestUser: User = {
                 _id: guestId,
@@ -83,6 +82,14 @@ export const useUserStore = create<UserStore>((set) => ({
             };
 
             set({ user: guestUser, loading: false });
+            return { redirectToSignIn: false };
+        } else {
+            console.error("Unexpected error fetching user:", err);
+            set({ user: null, loading: false });
+            return { redirectToSignIn: true };
         }
-    },
+    }
+}
+
+
 }));

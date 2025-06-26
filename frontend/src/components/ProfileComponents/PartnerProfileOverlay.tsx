@@ -1,3 +1,5 @@
+import { getAvatarFromUsername } from "../../utils/getAvatar";
+
 interface PartnerProfileOverlayProps {
     partnerImage: string;
     partnerUsername: string;
@@ -17,7 +19,7 @@ export const PartnerProfileOverlay = ({
             />
             <div className="absolute top-1/2 left-1/2 z-50 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-2xl shadow-xl p-6 w-[90vw] max-w-sm text-center">
                 <img
-                    src={partnerImage}
+                    src={partnerImage || getAvatarFromUsername(partnerUsername)}
                     alt={`${partnerUsername}'s profile`}
                     className="w-20 h-20 rounded-full mx-auto border border-gray-300"
                 />

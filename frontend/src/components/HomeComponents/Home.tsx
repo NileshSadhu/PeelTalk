@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import profile from '../../assets/default_profile.png';
 import { useUserStore } from '../../store/useUserStore';
 import { socket } from '../../utils/socket';
 import { Loading } from '../Common/Loading';
@@ -9,14 +8,33 @@ import { MessageInput } from '../ChatComponents/MessageInput';
 import { useChat } from '../../hooks/useChat';
 import { useBeforeUnloadWarning } from '../../hooks/useBeforeUnloadWarning';
 import { Disconnect } from '../ChatComponents/Disconnect';
+import { SignUpPopup } from '../Common/SignUpPopup';
+import { resolveProfilePhoto } from '../../utils/resolveProfilePhoto';
 
 
 const Home = () => {
     const { user, loading } = useUserStore();
-    const [partnerProfileImageUrl, setPartnerProfileImageUrl] = useState(profile);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const toggleMenu = () => setIsMenuOpen((prev) => !prev);
+    const [showPopup, setShowPopup] = useState(false);
 
+    useEffect(() => {
+        if (!user?._id?.startsWith("guest-")) return;
+
+        const lastShown = localStorage.getItem("lastSignupPopupShown");
+
+        if (!lastShown) {
+            localStorage.setItem("lastSignupPopupShown", Date.now().toString());
+            return;
+        }
+
+        const hoursSince = (Date.now() - parseInt(lastShown)) / (1000 * 60 * 60);
+
+        if (hoursSince >= 3) {
+            setShowPopup(true);
+            localStorage.setItem("lastSignupPopupShown", Date.now().toString());
+        }
+    }, [user]);
 
     const {
         messages,
@@ -39,9 +57,6 @@ const Home = () => {
         socket.emit('find:partner', { userId: user._id, username: user.username });
     };
 
-    useEffect(() => {
-        setPartnerProfileImageUrl(partnerProfile?.profilePhoto || profile);
-    }, [partnerProfile]);
 
     if (loading) return <Loading />;
 
@@ -53,6 +68,8 @@ const Home = () => {
 
 
     return (
+        <>
+            {isGuest && showPopup && <SignUpPopup onClose={() => setShowPopup(false)} />}
         <div className="flex flex-col sm:flex-row h-screen w-full bg-white overflow-hidden">
             <SideBar isMenuOpen={isMenuOpen} toggleMenu={toggleMenu} partnerId={partnerId!} isGuest={isGuest}/>
 
@@ -63,8 +80,8 @@ const Home = () => {
                     <ChatWindow
                         messages={messages}
                         currentUserId={user._id}
-                        currentUserImage={user.profilePhoto || profile}
-                        partnerImage={partnerProfileImageUrl}
+                        currentUserImage={resolveProfilePhoto(user.username, user.profilePhoto)}
+                        partnerImage={resolveProfilePhoto(partnerProfile?.username || '', partnerProfile?.profilePhoto || null)}
                         onFindPartner={handleFindPartner}
                         currentUsername={user.username}
                         partnerUsername={partnerProfile?.username || 'Stranger'}
@@ -91,6 +108,7 @@ const Home = () => {
                 </div>
             </div>
         </div>
+        </>
     );
 };
 
