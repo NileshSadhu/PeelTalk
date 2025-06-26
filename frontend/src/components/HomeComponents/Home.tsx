@@ -16,7 +16,7 @@ const Home = () => {
     const { user, loading } = useUserStore();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const toggleMenu = () => setIsMenuOpen((prev) => !prev);
-    const [showPopup, setShowPopup] = useState(false);
+    const [showPopup, setShowPopup] = useState(true);
 
     useEffect(() => {
         if (!user?._id?.startsWith("guest-")) return;

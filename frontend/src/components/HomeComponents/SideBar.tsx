@@ -2,6 +2,7 @@ import { FaBars } from 'react-icons/fa';
 import logo from '../../assets/logo.png';
 import LogOutBtn from './LogOutBtn';
 import { ProfileBtn } from './ProfileBtn';
+import ProfileSignUpBtn from '../ProfileComponents/ProfileSignUpBtn';
 
 interface SideBarProps {
     isMenuOpen: boolean;
@@ -15,12 +16,12 @@ export const SideBar = ({ isMenuOpen, toggleMenu, partnerId, isGuest }: SideBarP
     return (
         <>
             {partnerId ? <div></div>
-                :<button
-                onClick={toggleMenu}
-                className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-lg bg-yellow-400 hover:bg-yellow-500 transition-colors"
+                : <button
+                    onClick={toggleMenu}
+                    className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-lg bg-yellow-400 hover:bg-yellow-500 transition-colors"
                 >
-                <FaBars className="text-[#4B2E1E] text-xl" />
-            </button>
+                    <FaBars className="text-[#4B2E1E] text-xl" />
+                </button>
             }
 
             {isMenuOpen && (
@@ -49,12 +50,13 @@ export const SideBar = ({ isMenuOpen, toggleMenu, partnerId, isGuest }: SideBarP
 
                 <div className="flex flex-col gap-4 p-6 items-center">
                     {isGuest ? (
-                        <a
-                            href="/signUp"
-                            className="px-4 py-2 bg-yellow-400 text-brown-900 rounded-md hover:bg-yellow-500 transition-colors"
-                        >
-                            Sign Up
-                        </a>
+                        // <a
+                        //     href="/signUp"
+                        //     className="px-4 py-2 bg-yellow-400 text-brown-900 rounded-md hover:bg-yellow-500 transition-colors"
+                        // >
+                        //     Sign Up
+                        // </a>
+                        <ProfileSignUpBtn />
                     ) : (
                         <>
                             <ProfileBtn />

@@ -89,7 +89,7 @@ export const ChatWindow = ({
                             <div className="text-base sm:text-lg md:text-xl font-semibold text-center max-w-[90vw] break-words">
                                 <span className="font-medium ">{partnerUsername}</span> has connected. Start chatting!
                             </div>
-                            )}
+                        )}
                         {!isSearching && !partnerId && <Taglines />}
                         {!isSearching && !partnerId && (
                             <button
@@ -129,6 +129,7 @@ export const ChatWindow = ({
                                         ? undefined
                                         : () => setShowPartnerProfile(true)
                                 }
+                                onReact={(reaction) => console.log("User reacted with", reaction)}
                             />
                         ))}
                         {isPartnerTyping && (
