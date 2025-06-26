@@ -16,7 +16,7 @@ const Home = () => {
     const { user, loading } = useUserStore();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const toggleMenu = () => setIsMenuOpen((prev) => !prev);
-    const [showPopup, setShowPopup] = useState(true);
+    const [showPopup, setShowPopup] = useState(false);
 
     useEffect(() => {
         if (!user?._id?.startsWith("guest-")) return;
@@ -30,7 +30,7 @@ const Home = () => {
 
         const hoursSince = (Date.now() - parseInt(lastShown)) / (1000 * 60 * 60);
 
-        if (hoursSince >= 3) {
+        if (hoursSince >= 1) {
             setShowPopup(true);
             localStorage.setItem("lastSignupPopupShown", Date.now().toString());
         }
