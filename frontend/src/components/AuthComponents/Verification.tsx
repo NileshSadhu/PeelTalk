@@ -10,6 +10,7 @@ export const Verification = () => {
     const navigate = useNavigate();
     const [otp, setOtp] = useState<string>("");
     const [error, setError] = useState<string>("");
+    const [loading, setLoading] = useState(false);
 
     const { email } = useParams<{ email?: string }>();
 
@@ -35,12 +36,16 @@ export const Verification = () => {
         const cachedPassword = sessionStorage.getItem("cachedPassword");
 
         if (!cachedPassword) {
-        setError("Verification expired or invalid. Please sign up again.");
-        return;
+            setError("Verification expired or invalid. Please sign up again.");
+            return;
         }
+
+        setLoading(true); // start loading
 
         try {
             const result = await verifySignup(otp, email, cachedPassword);
+            setLoading(false); // stop loading
+
             if (result?.success && result.next) {
                 sessionStorage.removeItem("cachedPassword");
                 navigate(result.next);
@@ -48,10 +53,11 @@ export const Verification = () => {
                 setError(result.error);
             }
         } catch (err: any) {
+            setLoading(false);
             console.error("Verification failed:", err);
             setError(err.message || "Failed to verify OTP. Please try again.");
         }
-    }
+    };
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-yellow-200 to-yellow-100 flex items-center justify-center p-4">
@@ -83,6 +89,7 @@ export const Verification = () => {
                             type="button"
                             text="Submit"
                             onClick={handleSubmit}
+                            disabled={loading}
                         />
 
                         {error && (

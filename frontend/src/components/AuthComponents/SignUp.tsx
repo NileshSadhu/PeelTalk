@@ -16,9 +16,12 @@ export const SignUp = () => {
     const [password, setPassword] = useState<string>("");
     const [emailError, setEmailError] = useState<string>("");
     const [passwordError, setPasswordError] = useState<string>("");
+    const [loading, setLoading] = useState(false);
 
     const handleSubmit = async () => {
+        setLoading(true);
         const result = await handleSignup(user, email, password);
+        setLoading(false);
 
         if (result?.success) {
             sessionStorage.setItem("cachedPassword", password);
@@ -86,6 +89,7 @@ export const SignUp = () => {
                             type="submit"
                             text="Submit"
                             onClick={handleSubmit}
+                            disabled={loading}
                         />
 
                         {/* Link to Sign In */}

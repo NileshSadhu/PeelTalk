@@ -22,19 +22,25 @@ export const ForgetPassword = () => {
     const [showEmailSuccess, setShowEmailSuccess] = useState<boolean>(false);
     const [emailFeedback, setEmailFeedback] = useState<string>("");
 
-    const handleSubmit = async() => {
-            if (emailError || passwordError || !email || !password) {
-                setError("Please correct the form errors and fill all fields.");
-                return;
-                }
+    const [loading, setLoading] = useState(false);
 
-            const result = await forgotPassword(email, password);
-
-            if(result?.success){
-                sessionStorage.setItem("newCachedPassword", password);
-                navigate(result.next)
-            }
+    const handleSubmit = async () => {
+        if (emailError || passwordError || !email || !password) {
+            setError("Please correct the form errors and fill all fields.");
+            return;
         }
+
+        setLoading(true); // start loading
+
+        const result = await forgotPassword(email, password);
+
+        setLoading(false); // stop loading
+
+        if (result?.success) {
+            sessionStorage.setItem("newCachedPassword", password);
+            navigate(result.next);
+        }
+    };
 
 
     return (
@@ -94,6 +100,7 @@ export const ForgetPassword = () => {
                             type="button"
                             text="Submit"
                             onClick={handleSubmit}
+                            disabled={loading}
                         />
 
                         {error && (

@@ -15,9 +15,12 @@ export const SignIn = () => {
     const [password, setPassword] = useState("");
     const [emailError, setEmailError] = useState("");
     const [passwordError, setPasswordError] = useState("");
+    const [loading, setLoading] = useState(false);
 
     const handleSubmit = async () => {
+        setLoading(true);
         const result = await handleSignIn(email, password);
+        setLoading(false);
 
         if (result?.success) {
             navigate(result.next!);
@@ -76,6 +79,7 @@ export const SignIn = () => {
                             type="submit"
                             text="Submit"
                             onClick={handleSubmit}
+                            disabled={loading}
                         />
 
                         {/* Link to Register */}

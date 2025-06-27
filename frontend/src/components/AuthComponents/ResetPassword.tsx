@@ -14,17 +14,18 @@ export const ResetPassword = ()=>{
         const [error, setError] = useState("");
         const [pin, setPin] = useState("");
         const [pinError, setPinError] = useState("");
-    
+        const [loading, setLoading] = useState(false);
+
         const navigate = useNavigate();
     
-        async function handleSubmit(pin: string ) {
+        async function handleSubmit(pin: string) {
             const pinValidationMessage = validPin(pin);
-    
+
             if (pinValidationMessage) {
                 setPinError(pinValidationMessage);
                 return;
             }
-            
+
             if (!email) {
                 setError("Email is missing from the URL. Please go back and try again.");
                 return;
@@ -37,10 +38,12 @@ export const ResetPassword = ()=>{
                 return;
             }
 
-            const result = await resetPassword(pin, email, newCachedPassword)
+            setLoading(true); // start loading
+            const result = await resetPassword(pin, email, newCachedPassword);
+            setLoading(false); // stop loading
 
-            if(result?.success){
-                navigate(result.next)
+            if (result?.success) {
+                navigate(result.next);
             }
         }
     
@@ -81,6 +84,7 @@ export const ResetPassword = ()=>{
                                 type="button"
                                 text="Submit"
                                 onClick={() => handleSubmit(pin)}
+                                disabled={loading}
                             />
     
                             {error && (
