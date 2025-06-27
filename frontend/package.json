@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "generate-sitemap": "ts-node scripts/generate-sitemap.ts",
-    "build": "tsc -b && vite build",
+    "build": "npm install --legacy-peer-deps && tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
