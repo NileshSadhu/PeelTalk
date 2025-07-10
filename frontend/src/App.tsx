@@ -10,6 +10,7 @@ import { ResetPasswordPage } from "./pages/ResetPasswordPage";
 import { ChatAccessLoader } from "./components/ChatComponents/ChatAccessLoader";
 import { useEffect } from "react";
 import { useUserStore } from "./store/useUserStore";
+import { PrivateRoute } from "./components/AuthComponents/PrivateRoute";
 
 
 function App() {
@@ -38,7 +39,9 @@ function App() {
       </Route>
 
         <Route path="/" element={<ChatAccessLoader><HomePage /></ChatAccessLoader>} />
-        <Route path="/profile" element={<ProfilePage />} />
+        <Route element={<PrivateRoute />}>
+          <Route path="/profile" element={<ProfilePage />} />
+        </Route>
     </Routes>
   );
 }

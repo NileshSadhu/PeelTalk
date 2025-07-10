@@ -34,7 +34,7 @@ export const PrivateRoute = () => {
     }
 
     if (!isAuthenticated) {
-        return <Navigate to={"/signIn"} replace />;
+        return <Navigate to={"/"} replace />;
     }
 
     return <Outlet />;

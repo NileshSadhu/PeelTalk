@@ -111,7 +111,7 @@ export const ChatWindow = ({
                                     className="mt-4 bg-yellow-200 text-gray-800 px-4 py-2 rounded-lg shadow hover:bg-yellow-100 transition text-sm sm:text-base w-[90vw] max-w-xs"
                                     onClick={() => {
                                         setIsSearching(false);
-                                        socket.emit("partner:cancel");
+                                        socket.emit("search:cancel");
                                     }}
                                 >
                                     Cancel Search

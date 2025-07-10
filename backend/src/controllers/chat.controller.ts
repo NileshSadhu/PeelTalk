@@ -194,8 +194,6 @@ export const getMessages = async (req: Request, res: Response): Promise<Response
 };
 
 
-
-
 export const handleDisconnect = async (io: Server, socket: Socket) => {
     const userId = await redis.get(`socket:${socket.id}:user`);
 
@@ -248,6 +246,32 @@ export const handleDisconnect = async (io: Server, socket: Socket) => {
 
     }
 };
+
+
+export const handleCancelSearch = async (socket: Socket) => {
+    const userId = await redis.get(`socket:${socket.id}:user`);
+    if (!userId) return;
+
+    await redis.srem("waitingUsers:set", userId);
+
+    const waitingList = await redis.lrange("waitingUsers", 0, -1);
+    const updatedList = waitingList.filter(item => {
+        try {
+            const parsed = JSON.parse(item);
+            return parsed.userId !== userId;
+        } catch {
+            return true;
+        }
+    });
+
+    await redis.del("waitingUsers");
+    if (updatedList.length > 0) {
+        await redis.rpush("waitingUsers", ...updatedList);
+    }
+
+    socket.emit("search:cancelled");
+};
+
 
 
 export const handleMessageReaction = (io: Server, socket: Socket) => {
