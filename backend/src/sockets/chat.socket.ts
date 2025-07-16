@@ -7,11 +7,13 @@ import { sendDiscordMessage } from "../utils/webhookNotify";
 export default function registerChatHandlers(io: Server, socket: Socket) {
     console.log("📥 Chat socket ready for:",socket.id);
 
-    socket.on("find:partner", async(data) => {
-        await sendDiscordMessage(`🔍 A user is looking for a chat partner (socket ID: ${data.userId})`);
+    socket.on("find:partner", async (data) => {
+    sendDiscordMessage(`🔍 A user is looking for a chat partner (socket ID: ${data.userId})`)
+        .catch(err => console.error("Failed to send Discord message:", err.message));
 
-        handleFindPartner(io, socket, data);
+    handleFindPartner(io, socket, data);
     });
+
 
     socket.on("chat:message",async(data) =>{
         try{
