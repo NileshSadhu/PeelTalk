@@ -1,15 +1,15 @@
 import { Server, Socket } from "socket.io";
 import { handleCancelSearch, handleDisconnect, handleFindPartner, handleMessage } from "../controllers/chat.controller";
 import redis from "../redis";
-import { sendDiscordMessage } from "../utils/webhookNotify";
+// import { sendDiscordMessage } from "../utils/webhookNotify";
 
 
 export default function registerChatHandlers(io: Server, socket: Socket) {
     console.log("📥 Chat socket ready for:",socket.id);
 
     socket.on("find:partner", async (data) => {
-    sendDiscordMessage(`🔍 A user is looking for a chat partner (socket ID: ${data.userId})`)
-        .catch(err => console.error("Failed to send Discord message:", err.message));
+    // sendDiscordMessage(`🔍 A user is looking for a chat partner (socket ID: ${data.userId})`)
+    //     .catch(err => console.error("Failed to send Discord message:", err.message));
 
     handleFindPartner(io, socket, data);
     });
