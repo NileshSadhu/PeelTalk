@@ -1,0 +1,27 @@
+# Node modules - never copy into image
+node_modules
+
+# Output directory - will be generated inside the container
+dist
+
+# Environment files - prevent secrets from going into image
+.env
+
+# OS / Editor files
+.DS_Store
+Thumbs.db
+
+# VS Code settings
+.vscode/
+
+# Logs
+logs/
+*.log
+npm-debug.log
+yarn-error.log
+
+# TypeScript build artifacts
+tsconfig.tsbuildinfo
+
+# Docker override (local only)
+docker-compose.override.yml
