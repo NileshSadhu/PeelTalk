@@ -7,7 +7,7 @@ import dotenv from "dotenv";
 import redis from "../redis";
 import { sendOtpEmail } from "../utils/mailer";
 import { uploadToCloudinary } from "../services/uploadServices";
-// import { sendDiscordMessage } from "../utils/webhookNotify";
+import { sendTelegramMessage } from "../utils/webhookNotify";
 
 
 dotenv.config();
@@ -125,7 +125,8 @@ export const verifySignup = async(req:Request,res:Response):Promise<Response> =>
             maxAge: 7 * 24 * 60 * 60 * 1000,
         })
 
-        // await sendDiscordMessage(`🎉 New user signup: *${email}*`);
+        sendTelegramMessage(`🎉 New user signup: *${email}*`)
+            .catch(err => console.error("Failed to send Telegram message:", err.message));
 
         return res.status(201).json({
             message: 'Signup verified successfully!',
