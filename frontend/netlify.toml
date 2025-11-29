@@ -1,6 +1,6 @@
 [build]
 publish = "dist"
-command = "npm install --force && tsc -b && vite build"
+command = "npm run build"
 
 [[redirects]]
 from = "/*"
