@@ -1,0 +1,4 @@
+[build]
+base = "frontend"
+command = "npm install --legacy-peer-deps && tsc -b && vite build"
+publish = "frontend/dist"
