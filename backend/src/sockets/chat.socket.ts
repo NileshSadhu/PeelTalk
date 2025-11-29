@@ -9,7 +9,7 @@ export default function registerChatHandlers(io: Server, socket: Socket) {
 
     socket.on("find:partner", async (data) => {
     // sendTelegramMessage(`🔍 A user is looking for a chat partner (socket ID: ${data.userId})`)
-        .catch(err => console.error("Failed to send Telegram message:", err.message));
+        // .catch(err => console.error("Failed to send Telegram message:", err.message));
 
     handleFindPartner(io, socket, data);
     });
