@@ -1,0 +1,4 @@
+[build]
+base = "frontend"
+publish = "dist"
+command = "npm install --force && tsc -b && vite build"
