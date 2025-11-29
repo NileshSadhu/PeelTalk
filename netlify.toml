@@ -1,9 +1,8 @@
 [build]
-base = "frontend"
-publish = "dist"
-command = "npm install --force && tsc -b && vite build"
+publish = "frontend/dist"
+command = "cd frontend && npm install --force && tsc -b && vite build"
 
 [[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
+from = "/*"
+to = "/index.html"
+status = 200
