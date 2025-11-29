@@ -1,14 +1,14 @@
 import { Server, Socket } from "socket.io";
 import { handleCancelSearch, handleDisconnect, handleFindPartner, handleMessage } from "../controllers/chat.controller";
 import redis from "../redis";
-import { sendTelegramMessage } from "../utils/webhookNotify";
+// import { sendTelegramMessage } from "../utils/webhookNotify";
 
 
 export default function registerChatHandlers(io: Server, socket: Socket) {
     console.log("📥 Chat socket ready for:",socket.id);
 
     socket.on("find:partner", async (data) => {
-    sendTelegramMessage(`🔍 A user is looking for a chat partner (socket ID: ${data.userId})`)
+    // sendTelegramMessage(`🔍 A user is looking for a chat partner (socket ID: ${data.userId})`)
         .catch(err => console.error("Failed to send Telegram message:", err.message));
 
     handleFindPartner(io, socket, data);
