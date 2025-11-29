@@ -1,0 +1,8 @@
+[build]
+publish = "dist"
+command = "npm install --force && tsc -b && vite build"
+
+[[redirects]]
+from = "/*"
+to = "/index.html"
+status = 200
