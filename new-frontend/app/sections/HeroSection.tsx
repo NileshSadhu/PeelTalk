@@ -5,18 +5,6 @@ export default function HeroSection() {
     <div className="relative flex flex-col min-h-screen items-center p-5 bg-linear-to-b from-yellow-300 to-white">
       <NavBar />
 
-      {/* Banana decorations */}
-      <img
-        src="left.png"
-        className="absolute top-80 right-75 w-12 h-12 animate-bounce"
-        alt="banana"
-      />
-      <img
-        src="right.png"
-        className="absolute top-80 left-75 w-12 h-12 animate-bounce"
-        alt="banana"
-      />
-
       {/* Hero content */}
       <div className="flex flex-1 flex-col justify-center items-center text-center z-10">
         <h1 className="text-5xl font-bold text-amber-900">
