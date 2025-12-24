@@ -1,5 +1,5 @@
-import Footer from "./sections/Footer";
-import HeroSection from "./sections/HeroSection";
+import Footer from "../components/Footer";
+import HeroSection from "../components/HeroSection";
 
 export default function Home() {
   return (

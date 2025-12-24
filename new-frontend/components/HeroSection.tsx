@@ -1,9 +1,9 @@
-import NavBar from "../components/NavBar";
+// import NavBar from "../components/NavBar";
 
 export default function HeroSection() {
   return (
     <div className="relative flex flex-col min-h-screen items-center p-5 bg-linear-to-b from-yellow-300 to-white">
-      <NavBar />
+      {/* <NavBar /> */}
 
       {/* Hero content */}
       <div className="flex flex-1 flex-col justify-center items-center text-center z-10">
