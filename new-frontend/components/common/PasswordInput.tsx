@@ -38,20 +38,20 @@ export const PasswordInput = ({
                     type={showPassword ? "text" : "password"}
                     autoComplete="off"
                     className={`
-            h-12
-            rounded-md
-            p-3
-            w-full
-            text-sm
-            placeholder:text-sm
-            sm:placeholder:text-base
-            bg-white
-            shadow-[0_4px_10px_rgba(253,215,85,0.6)]
-            focus:outline-none
-            focus:shadow-[0_6px_12px_rgba(253,215,85,0.8)]
-            transition-shadow duration-300
-            ${error ? "border-2 border-red-500" : "border-none"}
-          `}
+                        h-12
+                        rounded-md
+                        p-3
+                        w-full
+                        text-sm
+                        placeholder:text-sm
+                        sm:placeholder:text-base
+                        bg-white
+                        shadow-[0_4px_10px_rgba(253,215,85,0.6)]
+                        focus:outline-none
+                        focus:shadow-[0_6px_12px_rgba(253,215,85,0.8)]
+                        transition-shadow duration-300
+                        ${error ? "border-2 border-red-500" : "border-none"}
+                    `}
                     placeholder={placeholder}
                     name={name}
                     value={value}

@@ -3,7 +3,7 @@ import { AuthContainer } from "../Common/AuthConatiner"
 import { CustomInput } from "../Common/CustomInput"
 import { Head } from "../Common/Head"
 import { isEmailValid, isPasswordValid } from "../../utils/validation";
-import PasswordInput from "../Common/PasswordInput";
+import {PasswordInput} from "../Common/PasswordInput";
 import { SubmitBtn } from "../Common/SubmitBtn";
 import { handleSignIn } from "../../api/auth";
 import { NavigateLinks } from "../Common/NavigateLinks";
