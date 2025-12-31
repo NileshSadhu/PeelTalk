@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Balsamiq_Sans } from "next/font/google";
 import { GoogleOAuthProvider } from '@react-oauth/google';
+import { Toaster } from "react-hot-toast"
 import "./globals.css";
 
 const balsamiq = Balsamiq_Sans({
@@ -25,6 +26,7 @@ export default function RootLayout({
       <body className={balsamiq.className}>
         <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!}>
           {children}
+          <Toaster position="top-center" />
         </GoogleOAuthProvider>
       </body>
     </html>

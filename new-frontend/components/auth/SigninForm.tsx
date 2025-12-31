@@ -1,41 +1,88 @@
-'use client'
+"use client"
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { CustomInput } from '@components/common/inputbox'
-import { SubmitBtn } from '@components/common/SubmitBtn'
-import { NavigateLinks } from '@components/common/NavigateLinks'
-import { isEmailValid, isPasswordValid } from '@lib/validators'
-import { SubtitleContainer } from '../common/SubtitleContainer'
-import { PasswordInput } from '@components/common/PasswordInput'
-import { GoogleLogin } from '@react-oauth/google';
-import axios from "axios";
+import { useEffect, useRef, useState } from "react"
+import axios from "axios"
+import { SubtitleContainer } from "@components/common/SubtitleContainer"
+import { NavigateLinks } from "@components/common/NavigateLinks"
+import toast from "react-hot-toast"
+
+declare global {
+    interface Window {
+        google: any
+    }
+}
 
 export const SignInForm = () => {
-    const router = useRouter()
-
-    const [email, setEmail] = useState('')
-    const [password, setPassword] = useState('')
-
-    const [emailError, setEmailError] = useState('')
-    const [passwordError, setPasswordError] = useState('')
     const [loading, setLoading] = useState(false)
+    const googleBtnRef = useRef<HTMLDivElement>(null)
 
-    const handleSubmit = async () => {
-        const emailValidation = isEmailValid(email)
-        const passwordValidation = isPasswordValid(password)
+    useEffect(() => {
+        const script = document.createElement("script")
+        script.src = "https://accounts.google.com/gsi/client"
+        script.async = true
+        script.defer = true
+        document.body.appendChild(script)
 
-        setEmailError(emailValidation || '')
-        setPasswordError(passwordValidation || '')
+        script.onload = () => {
+        window.google.accounts.id.initialize({
+            client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!,
+            callback: handleGoogleResponse,
+            use_fedcm_for_prompt: false,
+        })
 
-        if (emailValidation || passwordValidation) return
+        window.google.accounts.id.renderButton(googleBtnRef.current, {
+            theme: "outline",
+            size: "large",
+            width: 260,
+            text: "signin_with",
+        })
+        }
+    }, [])
 
+    const handleGoogleResponse = async (response: any) => {
         try {
         setLoading(true)
-        // 🔐 Call login API here
-        console.log({ email, password })
-        } catch (error) {
-        console.error(error)
+
+        const idToken = response.credential
+        if (!idToken) throw new Error("No Google ID token")
+
+        const res = await axios.post(
+            "http://localhost:3000/auth/google",
+            {
+            id_token: idToken,
+            mode: "signin",
+            },
+            { withCredentials: true }
+        )
+
+        const { publicKey, privateKey } = res.data
+
+        // Store keys for session usage
+        sessionStorage.setItem("publicKey", publicKey)
+        sessionStorage.setItem("privateKey", privateKey)
+
+        toast.success("Signed in successfully!")
+        } catch (err: any) {
+        if (axios.isAxiosError(err)) {
+            const { code, message } = err.response?.data || {}
+
+            switch (code) {
+            case "GOOGLE_ACCOUNT_NOT_FOUND":
+                toast.error("No account exists with this Google email. Please sign up.")
+                return
+
+            case "GOOGLE_ACCOUNT_MISMATCH":
+                toast.error("Google account mismatch. Try again.")
+                return
+
+            default:
+                toast.error(message || "Google sign-in failed.")
+                return
+            }
+        }
+
+        console.error("Unexpected error:", err)
+        toast.error("Something went wrong. Please try again.")
         } finally {
         setLoading(false)
         }
@@ -43,67 +90,21 @@ export const SignInForm = () => {
 
     return (
         <div className="flex justify-center items-center w-full">
-        <div className="bg-white rounded-lg w-full">
-
+        <div className="bg-white rounded-lg w-full max-w-md p-6 sm:p-10 text-center">
             <SubtitleContainer
-                title="Welcome Back!"
-                tagline="Back for more Bananas? We got you"
+            title="Welcome Back"
+            tagline="Sign in securely with Google"
             />
 
-            <CustomInput
-            id="email"
-            label="Email:"
-            type="email"
-            name="email"
-            placeholder="xyz@example.com"
-            value={email}
-            onChange={(value) => {
-                setEmail(value)
-                setEmailError(isEmailValid(value) || '')
-            }}
-            error={emailError}
-            />
+            <div ref={googleBtnRef} className="mt-6 flex justify-center" />
 
-            <PasswordInput
-            id="password"
-            label="Password"
-            name="password"
-            placeholder="At least 8 characters long"
-            value={password}
-            onChange={(value: string) => {
-                setPassword(value)
-                setPasswordError(isPasswordValid(value) || '')
-            }}
-            error={passwordError}
-            />
-
-            <button
-            onClick={() => router.push('/forgotpassword')}
-            className="balsamiq-sans-regular text-xs text-amber-900 mb-2 float-right"
-            >
-            Forget Password
-            </button>
-
-            <SubmitBtn
-            type="submit"
-            text="Submit"
-            onClick={handleSubmit}
-            disabled={loading}
-            />
-
-            <GoogleLogin
-                onSuccess={async (response) => {
-                    const token = response.credential;
-
-                    await axios.post('http://localhost:3000/auth/google', {
-                    token,
-                    });
-                }}
-                onError={() => console.log('Google Login Failed')}
-                />
+            {loading && (
+            <p className="mt-4 text-sm text-gray-500">
+                Signing you in…
+            </p>
+            )}
 
             <NavigateLinks type="SignUp" />
-
         </div>
         </div>
     )

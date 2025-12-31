@@ -27,6 +27,7 @@
       "@layout/*": ["components/layout/*"],
       "@common/*": ["components/common/*"],
       "@lib/*": ["lib/*"],
+      "@utils/*": ["utils/*"]
     }
   },
   "include": [

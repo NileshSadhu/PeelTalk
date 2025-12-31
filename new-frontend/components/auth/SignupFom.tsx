@@ -1,103 +1,108 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { SubtitleContainer } from "@components/common/SubtitleContainer"
-import { CustomInput } from "@components/common/inputbox"
-import { PasswordInput } from "@components/common/PasswordInput"
-import { SubmitBtn } from "@components/common/SubmitBtn"
 import { NavigateLinks } from "@components/common/NavigateLinks"
-import { isEmailValid, isPasswordValid } from "@/lib/validators"
-import { GoogleLogin } from '@react-oauth/google';
+// import { encryptPrivateKeyDeviceBased } from "@/utils/crypto/deviceEncryption"
+// import { generateKeyPair, exportPublicKey } from "@/utils/crypto/keyUtils"
 import axios from "axios"
+import toast from "react-hot-toast"
 
 
-    export default function SignupForm() {
-    const [user, setUser] = useState("")
-    const [email, setEmail] = useState("")
-    const [password, setPassword] = useState("")
-
-    const [emailError, setEmailError] = useState("")
-    const [passwordError, setPasswordError] = useState("")
-    const [loading, setLoading] = useState(false)
-
-    const handleSubmit = async () => {
-        const emailValidation = isEmailValid(email)
-        const passwordValidation = isPasswordValid(password)
-
-        setEmailError(emailValidation || "")
-        setPasswordError(passwordValidation || "")
-
-        if (emailValidation || passwordValidation) return
-
-        setLoading(true)
-        try {
-        // await onSubmit({ username: user, email, password })
-        } finally {
-        setLoading(false)
-        }
+declare global {
+    interface Window {
+        google: any
     }
+}
+
+export default function SignupForm() {
+    const [loading, setLoading] = useState(false)
+    const googleBtnRef = useRef<HTMLDivElement>(null)
+
+    useEffect(() => {
+        const script = document.createElement("script")
+        script.src = "https://accounts.google.com/gsi/client"
+        script.async = true
+        script.defer = true
+        document.body.appendChild(script)
+
+        script.onload = () => {
+        window.google.accounts.id.initialize({
+            client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!,
+            callback: handleGoogleResponse,
+            use_fedcm_for_prompt: false, 
+        })
+
+        // THIS is the correct way
+        window.google.accounts.id.renderButton(googleBtnRef.current, {
+            theme: "outline",
+            size: "large",
+            width: 260,
+            text: "signup_with",
+        })
+        }
+    }, [])
+
+    const handleGoogleResponse = async (response: any) => {
+        try {
+            setLoading(true)
+
+            const idToken = response.credential
+            if (!idToken) throw new Error("No Google ID token")
+
+            const res = await axios.post(
+            "http://localhost:3000/auth/google",
+            {
+                id_token: idToken,
+                mode: "signup",
+            },
+            { withCredentials: true }
+            )
+
+            const { publicKey, privateKey } = res.data
+
+            // Store keys for session usage
+            sessionStorage.setItem("publicKey", publicKey)
+            sessionStorage.setItem("privateKey", privateKey)
+
+            toast.success("Signed up successfully!")
+        } catch (err: any) {
+            if (!axios.isAxiosError(err)) {
+            toast.error("Unexpected error occurred.")
+            return
+            }
+
+            const { code, message } = err.response?.data || {}
+
+            if (code === "GOOGLE_ACCOUNT_EXISTS") {
+            toast.error("Account already exists. Please sign in.")
+            return
+            }
+
+            toast.error(message || "Google signup failed.")
+        } finally {
+            setLoading(false)
+        }
+        }
+
 
     return (
         <div className="flex justify-center items-center w-full">
-        <div className="bg-white rounded-lg w-full max-w-md">
+        <div className="bg-white rounded-lg w-full max-w-md p-6 sm:p-10 text-center">
+
             <SubtitleContainer
-                title="Let's get you started"
-                tagline="Don't worry, we don't bite. We just chat."
+            title="Create your account"
+            tagline="Fast, secure, no passwords to remember"
             />
 
-            <CustomInput
-            id="username"
-            label="Username"
-            name="username"
-            placeholder="peo"
-            value={user}
-            onChange={setUser}
-            />
+            {/* Google controls this button — no surprise popups */}
+            <div ref={googleBtnRef} className="mt-6 flex justify-center" />
 
-            <CustomInput
-            id="email"
-            label="Email"
-            type="email"
-            name="email"
-            placeholder="xyz@example.com"
-            value={email}
-            onChange={(value: string) => {
-                setEmail(value)
-                setEmailError(isEmailValid(value) || "")
-            }}
-            error={emailError}
-            />
-
-            <PasswordInput
-            id="password"
-            name="password"
-            label="Password"
-            placeholder="At least 8 characters long"
-            value={password}
-            onChange={(value: string) => {
-                setPassword(value)
-                setPasswordError(isPasswordValid(value) || "")
-            }}
-            error={passwordError}
-            />
-
-            <SubmitBtn
-            type="submit"
-            text="Submit"
-            onClick={handleSubmit}
-            disabled={loading}
-            />
-
-            <GoogleLogin
-                onSuccess={async (response) => {
-                    const token = response.credential;
-
-                    await axios.post('http://localhost:3000/auth/google', {
-                    token,
-                    });
-                }}
-                onError={() => console.log('Google Login Failed')}
-            />
+            {loading && (
+            <p className="mt-4 text-sm text-gray-500">
+                Signing you up…
+            </p>
+            )}
 
             <NavigateLinks type="SignIn" />
         </div>

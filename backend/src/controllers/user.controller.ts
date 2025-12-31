@@ -1,13 +1,14 @@
 import { Request, Response } from "express";
-import { loginSchema, passwordResetSchema, signupSchema, updateUserSchema } from "../validations/user.schema";
+// import { loginSchema, passwordResetSchema, signupSchema, updateUserSchema } from "../validations/user.schema";
+import { updateUserSchema } from "../validations/user.schema";
 import { User } from "../models/user.model";
-import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
+// import bcrypt from "bcrypt";
+// import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
-import redis from "../redis";
-import { sendOtpEmail } from "../utils/mailer";
+// import redis from "../redis";
+// import { sendOtpEmail } from "../utils/mailer";
 import { uploadToCloudinary } from "../services/uploadServices";
-import { sendTelegramMessage } from "../utils/webhookNotify";
+// import { sendTelegramMessage } from "../utils/webhookNotify";
 
 
 dotenv.config();
@@ -19,284 +20,284 @@ if (!jwt_secret) {
     throw new Error("JWT_SECRET is not defined in environment variables");
 }
 
-function generateOtp(): string {
-    return Math.floor(1000 + Math.random() * 9000).toString();
-}
+// function generateOtp(): string {
+//     return Math.floor(1000 + Math.random() * 9000).toString();
+// }
 
-export const signup = async(req:Request,res:Response):Promise<Response> => {
-    const result = signupSchema.safeParse(req.body);
+// export const signup = async(req:Request,res:Response):Promise<Response> => {
+//     const result = signupSchema.safeParse(req.body);
 
-    if(!result.success){
-        return res.status(400).json({
-        message: "Validation failed",
-        errors: result.error.flatten(), 
-    });
-    }
+//     if(!result.success){
+//         return res.status(400).json({
+//         message: "Validation failed",
+//         errors: result.error.flatten(), 
+//     });
+//     }
     
-    const data = result.data;
+//     const data = result.data;
 
-    try{
-        const existingUser = await User.findOne({
-            $or: [{email: data.email}, {username: data.username}]
-        })
+//     try{
+//         const existingUser = await User.findOne({
+//             $or: [{email: data.email}, {username: data.username}]
+//         })
 
-        if(existingUser){
-            if (existingUser.email === data.email) {
-                return res.status(400).json({ message: "Email already registered" });
-            }
+//         if(existingUser){
+//             if (existingUser.email === data.email) {
+//                 return res.status(400).json({ message: "Email already registered" });
+//             }
 
-            if (existingUser.username === data.username) {
-                return res.status(400).json({ message: "Username already taken" });
-            }
-        }
+//             if (existingUser.username === data.username) {
+//                 return res.status(400).json({ message: "Username already taken" });
+//             }
+//         }
 
-        const hashedPassword = await bcrypt.hash(data.password,10);
+//         const hashedPassword = await bcrypt.hash(data.password,10);
 
-        const otp = generateOtp();
+//         const otp = generateOtp();
 
-        const tempUserData = {
-            email: data.email,
-            username: data.username,
-            password: hashedPassword,
-            publicKey: data.publicKey,
-            encryptedPrivateKey: {
-                cipher: data.encryptedPrivateKey.cipher,
-                iv: data.encryptedPrivateKey.iv,
-                salt: data.encryptedPrivateKey.salt
-            }
-        }
-
-
-
-        await redis.set(`otp:${data.email}`,JSON.stringify({
-            otp: otp,
-            user: tempUserData
-        }),'EX',300)
-
-        await sendOtpEmail(data.email,otp)
-
-        return res.status(200).json({
-            message: "OTP sent to your email. Please verify to complete signup."
-        })
-
-    }catch(error){
-        console.error("Server Error:",error)
-        return res.status(500).json({message:"Internal server error"})
-    }
-}
+//         const tempUserData = {
+//             email: data.email,
+//             username: data.username,
+//             password: hashedPassword,
+//             publicKey: data.publicKey,
+//             encryptedPrivateKey: {
+//                 cipher: data.encryptedPrivateKey.cipher,
+//                 iv: data.encryptedPrivateKey.iv,
+//                 salt: data.encryptedPrivateKey.salt
+//             }
+//         }
 
 
-export const verifySignup = async(req:Request,res:Response):Promise<Response> => {
-    try{
-        const {email,otp} = req.body;
 
-        const data = await redis.get(`otp:${email}`);
+//         await redis.set(`otp:${data.email}`,JSON.stringify({
+//             otp: otp,
+//             user: tempUserData
+//         }),'EX',300)
 
-        if(!data){
-            return res.status(400).json({ message: 'OTP expired or not found.' });
-        }
+//         await sendOtpEmail(data.email,otp)
 
-        const parsedData = JSON.parse(data);
+//         return res.status(200).json({
+//             message: "OTP sent to your email. Please verify to complete signup."
+//         })
 
-        if(parsedData.otp !== otp){
-            return res.status(400).json({ message: 'Invalid OTP.' });
-        }
+//     }catch(error){
+//         console.error("Server Error:",error)
+//         return res.status(500).json({message:"Internal server error"})
+//     }
+// }
 
-        const user = await User.create({
-            email: parsedData.user.email,
-            username: parsedData.user.username,
-            password: parsedData.user.password,
-            publicKey: parsedData.user.publicKey,
-            encryptedPrivateKey: {
-                cipher: parsedData.user.encryptedPrivateKey.cipher,
-                iv: parsedData.user.encryptedPrivateKey.iv,
-                salt: parsedData.user.encryptedPrivateKey.salt
-            }
-        });
 
-        await redis.del(`otp:${email}`);
+// export const verifySignup = async(req:Request,res:Response):Promise<Response> => {
+//     try{
+//         const {email,otp} = req.body;
 
-        const token = jwt.sign({ id: user._id, email: user.email }, jwt_secret);
+//         const data = await redis.get(`otp:${email}`);
 
-        res.cookie("token",token, {
-            httpOnly: true,
-            secure: true,
-            sameSite: "none",
-            maxAge: 7 * 24 * 60 * 60 * 1000,
-        })
+//         if(!data){
+//             return res.status(400).json({ message: 'OTP expired or not found.' });
+//         }
 
-        sendTelegramMessage(`🎉 New user signup: *${email}*`)
-            .catch(err => console.error("Failed to send Telegram message:", err.message));
+//         const parsedData = JSON.parse(data);
 
-        return res.status(201).json({
-            message: 'Signup verified successfully!',
-            userId: user._id,
-            publicKey: user.publicKey,
-            encryptedPrivateKey: user.encryptedPrivateKey
-        });
+//         if(parsedData.otp !== otp){
+//             return res.status(400).json({ message: 'Invalid OTP.' });
+//         }
+
+//         const user = await User.create({
+//             email: parsedData.user.email,
+//             username: parsedData.user.username,
+//             password: parsedData.user.password,
+//             publicKey: parsedData.user.publicKey,
+//             encryptedPrivateKey: {
+//                 cipher: parsedData.user.encryptedPrivateKey.cipher,
+//                 iv: parsedData.user.encryptedPrivateKey.iv,
+//                 salt: parsedData.user.encryptedPrivateKey.salt
+//             }
+//         });
+
+//         await redis.del(`otp:${email}`);
+
+//         const token = jwt.sign({ id: user._id, email: user.email }, jwt_secret);
+
+//         res.cookie("token",token, {
+//             httpOnly: true,
+//             secure: true,
+//             sameSite: "none",
+//             maxAge: 7 * 24 * 60 * 60 * 1000,
+//         })
+
+//         sendTelegramMessage(`🎉 New user signup: *${email}*`)
+//             .catch(err => console.error("Failed to send Telegram message:", err.message));
+
+//         return res.status(201).json({
+//             message: 'Signup verified successfully!',
+//             userId: user._id,
+//             publicKey: user.publicKey,
+//             encryptedPrivateKey: user.encryptedPrivateKey
+//         });
         
-    }catch(error){
-        console.error("Server Error:", error);
-        return res.status(500).json({ message: "Internal server error" });
-    }
-}
+//     }catch(error){
+//         console.error("Server Error:", error);
+//         return res.status(500).json({ message: "Internal server error" });
+//     }
+// }
 
 
-export const login = async(req:Request,res:Response):Promise<Response> => {
-    const result = loginSchema.safeParse(req.body);
+// export const login = async(req:Request,res:Response):Promise<Response> => {
+//     const result = loginSchema.safeParse(req.body);
 
-    if(!result.success){
-        return res.status(400).json({
-        message: "Validation failed",
-        errors: result.error.flatten(), 
-    });
-    }
+//     if(!result.success){
+//         return res.status(400).json({
+//         message: "Validation failed",
+//         errors: result.error.flatten(), 
+//     });
+//     }
     
-    const data = result.data;
+//     const data = result.data;
 
-    try{
-        const user = await User.findOne({email: data.email})
+//     try{
+//         const user = await User.findOne({email: data.email})
 
-        if(!user){
-            return res.status(400).json({
-                message: "User does not exists!"
-            })
-        }
+//         if(!user){
+//             return res.status(400).json({
+//                 message: "User does not exists!"
+//             })
+//         }
 
-        const isPasswordValid = await bcrypt.compare(data.password,user.password);
-        if(!isPasswordValid){
-            return res.status(401).json({
-                message: "Invalid password"
-            });
-        }
+//         const isPasswordValid = await bcrypt.compare(data.password,user.password);
+//         if(!isPasswordValid){
+//             return res.status(401).json({
+//                 message: "Invalid password"
+//             });
+//         }
 
-        const token = jwt.sign({ id: user._id, email: user.email }, jwt_secret);
+//         const token = jwt.sign({ id: user._id, email: user.email }, jwt_secret);
 
-        res.cookie("token",token, {
-            httpOnly: true,
-            secure: true,
-            sameSite: "none",
-            maxAge: 7 * 24 * 60 * 60 * 1000,
-        })
+//         res.cookie("token",token, {
+//             httpOnly: true,
+//             secure: true,
+//             sameSite: "none",
+//             maxAge: 7 * 24 * 60 * 60 * 1000,
+//         })
 
-        return res.status(201).json({
-            message: "Login in successful!!!",
-            userId: user._id,
-            publicKey: user.publicKey,
-            encryptedPrivateKey: user.encryptedPrivateKey
-        });
+//         return res.status(201).json({
+//             message: "Login in successful!!!",
+//             userId: user._id,
+//             publicKey: user.publicKey,
+//             encryptedPrivateKey: user.encryptedPrivateKey
+//         });
         
-    }catch(error){
-        console.error("Server Error:",error)
-        return res.status(500).json({message:"Internal server error"})
-    }
-}
+//     }catch(error){
+//         console.error("Server Error:",error)
+//         return res.status(500).json({message:"Internal server error"})
+//     }
+// }
 
 
-export const forgotPassword = async(req:Request,res:Response):Promise<Response> =>{
-    const result = passwordResetSchema.safeParse(req.body);
+// export const forgotPassword = async(req:Request,res:Response):Promise<Response> =>{
+//     const result = passwordResetSchema.safeParse(req.body);
 
-    if(!result.success){
-        return res.status(400).json({
-        message: "Validation failed",
-        errors: result.error.flatten(), 
-    });
-    }
+//     if(!result.success){
+//         return res.status(400).json({
+//         message: "Validation failed",
+//         errors: result.error.flatten(), 
+//     });
+//     }
     
-    const data = result.data;
+//     const data = result.data;
 
-    try{
-        const user = await User.findOne({
-            email: data.email
-        })
+//     try{
+//         const user = await User.findOne({
+//             email: data.email
+//         })
 
-        if(!user){
-            return res.status(400).json({
-                message: "User does not exists!"
-            })
-        }
+//         if(!user){
+//             return res.status(400).json({
+//                 message: "User does not exists!"
+//             })
+//         }
 
-        const otp = generateOtp();
+//         const otp = generateOtp();
 
-        const hashedPassword = await bcrypt.hash(data.Newpassword,10)
+//         const hashedPassword = await bcrypt.hash(data.Newpassword,10)
 
-        await sendOtpEmail(data.email,otp);
+//         await sendOtpEmail(data.email,otp);
 
-        await redis.set(
-            `reset-otp:${data.email}`,
-            JSON.stringify({
-                otp,
-                password: hashedPassword,
-                publicKey: data.publicKey,
-                encryptedPrivateKey: {
-                    cipher: data.encryptedPrivateKey.cipher,
-                    iv: data.encryptedPrivateKey.iv,
-                    salt: data.encryptedPrivateKey.salt
-            }
-            }),
-            'EX',
-            300
-        );
+//         await redis.set(
+//             `reset-otp:${data.email}`,
+//             JSON.stringify({
+//                 otp,
+//                 password: hashedPassword,
+//                 publicKey: data.publicKey,
+//                 encryptedPrivateKey: {
+//                     cipher: data.encryptedPrivateKey.cipher,
+//                     iv: data.encryptedPrivateKey.iv,
+//                     salt: data.encryptedPrivateKey.salt
+//             }
+//             }),
+//             'EX',
+//             300
+//         );
 
-        return res.status(200).json({
-            message: "If this email is registered, an OTP has been sent."
-        });
+//         return res.status(200).json({
+//             message: "If this email is registered, an OTP has been sent."
+//         });
 
-    }catch(error){
-        console.error("Server Error:",error)
-        return res.status(500).json({message:"Internal server error"})
-    }
-}
+//     }catch(error){
+//         console.error("Server Error:",error)
+//         return res.status(500).json({message:"Internal server error"})
+//     }
+// }
 
 
-export const resetPassword = async(req:Request,res:Response):Promise<Response> => {
-    try{
-        const { otp,email } = req.body;
+// export const resetPassword = async(req:Request,res:Response):Promise<Response> => {
+//     try{
+//         const { otp,email } = req.body;
 
-        const data = await redis.get(`reset-otp:${email}`);
+//         const data = await redis.get(`reset-otp:${email}`);
 
-        if(!data){
-            return res.status(400).json({ message: 'OTP expired or not found.' });
-        }
+//         if(!data){
+//             return res.status(400).json({ message: 'OTP expired or not found.' });
+//         }
 
-        const parsedData = JSON.parse(data);
+//         const parsedData = JSON.parse(data);
 
-        if(parsedData.otp !== otp){
-            return res.status(400).json({ message: 'Invalid OTP.' });
-        }
+//         if(parsedData.otp !== otp){
+//             return res.status(400).json({ message: 'Invalid OTP.' });
+//         }
         
-        const user = await User.findOneAndUpdate({email},{
-            password: parsedData.password,
-            publicKey: parsedData.publicKey,
-            encryptedPrivateKey: {
-                cipher: parsedData.encryptedPrivateKey.cipher,
-                iv: parsedData.encryptedPrivateKey.iv,
-                salt: parsedData.encryptedPrivateKey.salt
-            }
-        },{
-            new: true
-        });
+//         const user = await User.findOneAndUpdate({email},{
+//             password: parsedData.password,
+//             publicKey: parsedData.publicKey,
+//             encryptedPrivateKey: {
+//                 cipher: parsedData.encryptedPrivateKey.cipher,
+//                 iv: parsedData.encryptedPrivateKey.iv,
+//                 salt: parsedData.encryptedPrivateKey.salt
+//             }
+//         },{
+//             new: true
+//         });
 
-        if(!user){
-            return res.status(400).json({
-                message: "Error updating user password!!!"
-            })
-        }
+//         if(!user){
+//             return res.status(400).json({
+//                 message: "Error updating user password!!!"
+//             })
+//         }
 
-        await redis.del(`reset-otp:${email}`);
+//         await redis.del(`reset-otp:${email}`);
 
-        return res.status(200).json({
-            message: "Password reset successfully.",
-            userId: user._id,
-            publicKey: user.publicKey,
-            encryptedPrivateKey: user.encryptedPrivateKey
-        })
+//         return res.status(200).json({
+//             message: "Password reset successfully.",
+//             userId: user._id,
+//             publicKey: user.publicKey,
+//             encryptedPrivateKey: user.encryptedPrivateKey
+//         })
 
-    }catch(error){
-        console.error("Server Error:",error)
-        return res.status(500).json({message:"Internal server error"})
-    }
-}
+//     }catch(error){
+//         console.error("Server Error:",error)
+//         return res.status(500).json({message:"Internal server error"})
+//     }
+// }
 
 
 export const verifyUser = async(req:Request,res:Response):Promise<Response> => {
