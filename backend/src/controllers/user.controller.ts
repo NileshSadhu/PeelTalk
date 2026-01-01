@@ -300,21 +300,31 @@ if (!jwt_secret) {
 // }
 
 
-export const verifyUser = async(req:Request,res:Response):Promise<Response> => {
-    try{
-        const userId = req.userId;
-        const email = req.username;
+export const verifyUser = async (req: Request, res: Response): Promise<Response> => {
+    try {
+        const user = req.user
+
+        if (!user) {
+        return res.status(401).json({ message: "Unauthorized" })
+        }
 
         return res.status(200).json({
-            message: "User verified successfully!!!",
-            userId: userId,
-            email: email
+        message: "User verified successfully",
+        user: {
+            id: user._id,
+            username: user.username,
+            email: user.email,
+            avatar: user.profilePhoto ?? null,
+            authProvider: user.authProvider,
+        },
         })
-    }catch(error){
-        console.error("Server Error:",error)
-        return res.status(500).json({message:"Internal server error"})
+    } catch (error) {
+        console.error("Server Error:", error)
+        return res.status(500).json({ message: "Internal server error" })
     }
 }
+
+
 
 
 export const getUserDetails = async(req:Request,res:Response):Promise<Response> => {

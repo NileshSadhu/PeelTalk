@@ -58,8 +58,8 @@ export const googleAuth: RequestHandler = async (req, res) => {
         if (mode === "signup") {
         if (user) {
             res.status(409).json({
-            message: "Account already exists. Please sign in.",
-            code: "GOOGLE_ACCOUNT_EXISTS",
+                message: "Account already exists. Please sign in.",
+                code: "GOOGLE_ACCOUNT_EXISTS",
             })
             return
         }
@@ -72,7 +72,7 @@ export const googleAuth: RequestHandler = async (req, res) => {
 
         const username = await getUniqueGuestUsername()
 
-        // ⬇️ Create user → now user is NON-NULL
+        
         user = await User.create({
             email: payload.email,
             username: username,
@@ -83,7 +83,7 @@ export const googleAuth: RequestHandler = async (req, res) => {
         })
         }
 
-        // HARD GUARANTEE for TypeScript
+        
         if (!user) {
             res.status(400).json({
                 message: "Invalid auth flow",
@@ -93,7 +93,7 @@ export const googleAuth: RequestHandler = async (req, res) => {
 
         const decryptedPrivateKey = decryptWithServerKey(user.encryptedPrivateKey)
 
-        // ⬇️ At this point, user is ALWAYS defined
+        
         const token = jwt.sign(
             { id: user._id, email: user.email },
             jwt_secret,
@@ -110,10 +110,15 @@ export const googleAuth: RequestHandler = async (req, res) => {
 
         res.status(200).json({
             message: "Authenticated successfully",
-            userId: user._id,
-            publicKey: user.publicKey,
-            privateKey: decryptedPrivateKey.toString("utf8"),
+            user: {
+                id: user._id,
+                username: user.username,
+                email: user.email,
+                avatar: user.profilePhoto ?? null,
+                authProvider: user.authProvider,
+            },
         })
+
     } catch (err) {
         console.error("Google Auth Error:", err)
         res.status(500).json({ message: "Authentication failed" })

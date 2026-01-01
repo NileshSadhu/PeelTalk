@@ -1,8 +1,9 @@
-import mongoose, {Schema, Document} from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
 
-export interface IUser extends Document {
+export interface IUser {
     // User Details
+    _id: string
     firstname?: string;
     lastname?: string;
     email: string;
@@ -28,6 +29,11 @@ export interface IUser extends Document {
     isPremium: boolean;
     profilePhoto: string;
 }
+
+
+export type UserDocument = mongoose.HydratedDocument<IUser>
+
+
 
 const userSchema = new Schema<IUser>({
     firstname:    { type: String, default: null },
