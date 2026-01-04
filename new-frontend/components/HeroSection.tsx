@@ -1,6 +1,10 @@
-// import NavBar from "../components/NavBar";
+"use client"
+import { useRouter } from "next/navigation"
 
 export default function HeroSection() {
+
+  const router = useRouter()
+
   return (
     <div className="relative flex flex-col min-h-screen items-center p-5 bg-linear-to-b from-yellow-300 to-white">
       {/* <NavBar /> */}
@@ -14,7 +18,7 @@ export default function HeroSection() {
           Talk to weirdos, oversharers, and emotional time bombs all hiding
           behind fruity usernames. It’s random. It’s raw. It’s PeelTalk.
         </p>
-        <button className="bg-white px-5 py-2 mt-3 rounded-2xl shadow-md hover:bg-yellow-100">
+        <button onClick={() => router.push('/chat')} className="bg-white px-5 py-2 mt-3 rounded-2xl shadow-md hover:bg-yellow-100">
           Chat Now
         </button>
       </div>

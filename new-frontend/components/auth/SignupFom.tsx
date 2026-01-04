@@ -3,10 +3,10 @@
 import { useEffect, useRef, useState } from "react"
 import { SubtitleContainer } from "@components/common/SubtitleContainer"
 import { NavigateLinks } from "@components/common/NavigateLinks"
-// import { encryptPrivateKeyDeviceBased } from "@/utils/crypto/deviceEncryption"
-// import { generateKeyPair, exportPublicKey } from "@/utils/crypto/keyUtils"
 import axios from "axios"
 import toast from "react-hot-toast"
+import { useAuthStore } from "@/store/auth.store"
+import { useRouter } from "next/navigation"
 
 
 declare global {
@@ -18,6 +18,10 @@ declare global {
 export default function SignupForm() {
     const [loading, setLoading] = useState(false)
     const googleBtnRef = useRef<HTMLDivElement>(null)
+
+    const router = useRouter()
+
+    const setAuth = useAuthStore((s) => s.setAuth)
 
     useEffect(() => {
         const script = document.createElement("script")
@@ -51,7 +55,7 @@ export default function SignupForm() {
             if (!idToken) throw new Error("No Google ID token")
 
             const res = await axios.post(
-            "http://localhost:3000/auth/google",
+            `${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/google`,
             {
                 id_token: idToken,
                 mode: "signup",
@@ -59,13 +63,10 @@ export default function SignupForm() {
             { withCredentials: true }
             )
 
-            const { publicKey, privateKey } = res.data
 
-            // Store keys for session usage
-            sessionStorage.setItem("publicKey", publicKey)
-            sessionStorage.setItem("privateKey", privateKey)
-
+            setAuth(res.data.user)
             toast.success("Signed up successfully!")
+            router.replace("/chat")
         } catch (err: any) {
             if (!axios.isAxiosError(err)) {
             toast.error("Unexpected error occurred.")

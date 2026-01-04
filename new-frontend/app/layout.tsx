@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { Balsamiq_Sans } from "next/font/google";
-import { GoogleOAuthProvider } from '@react-oauth/google';
-import { Toaster } from "react-hot-toast"
+// import { GoogleOAuthProvider } from '@react-oauth/google';
+import { Toaster } from "react-hot-toast";
+import { AuthInit } from "@components/auth/AuthInit";
 import "./globals.css";
 
 const balsamiq = Balsamiq_Sans({
@@ -24,10 +25,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={balsamiq.className}>
-        <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!}>
+        {/* <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!}> */}
+          <AuthInit />
           {children}
           <Toaster position="top-center" />
-        </GoogleOAuthProvider>
+        {/* </GoogleOAuthProvider> */}
       </body>
     </html>
   );

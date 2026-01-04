@@ -5,6 +5,9 @@ import axios from "axios"
 import { SubtitleContainer } from "@components/common/SubtitleContainer"
 import { NavigateLinks } from "@components/common/NavigateLinks"
 import toast from "react-hot-toast"
+import { useRouter } from "next/navigation"
+import { useAuthStore } from "@/store/auth.store"
+
 
 declare global {
     interface Window {
@@ -15,6 +18,9 @@ declare global {
 export const SignInForm = () => {
     const [loading, setLoading] = useState(false)
     const googleBtnRef = useRef<HTMLDivElement>(null)
+    const setAuth = useAuthStore((s) => s.setAuth)
+    const router = useRouter()
+    
 
     useEffect(() => {
         const script = document.createElement("script")
@@ -47,21 +53,17 @@ export const SignInForm = () => {
         if (!idToken) throw new Error("No Google ID token")
 
         const res = await axios.post(
-            "http://localhost:3000/auth/google",
+            `${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/google`,
             {
             id_token: idToken,
             mode: "signin",
             },
             { withCredentials: true }
         )
-
-        const { publicKey, privateKey } = res.data
-
-        // Store keys for session usage
-        sessionStorage.setItem("publicKey", publicKey)
-        sessionStorage.setItem("privateKey", privateKey)
-
+        
+        setAuth(res.data.user)
         toast.success("Signed in successfully!")
+        router.replace("/chat")
         } catch (err: any) {
         if (axios.isAxiosError(err)) {
             const { code, message } = err.response?.data || {}
