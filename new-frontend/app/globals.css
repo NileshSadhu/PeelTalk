@@ -1,1 +1,101 @@
 @import "tailwindcss";
+
+.custom-shape-divider-top-1769697554 {
+  position: absolute;
+  /* top: 0; */
+  left: 0;
+  width: 100%;
+  overflow: hidden;
+  line-height: 0;
+}
+
+.custom-shape-divider-top-1769697554 svg {
+  position: relative;
+  display: block;
+  width: calc(100% + 1.3px);
+  height: 251px;
+}
+
+.custom-shape-divider-top-1769697554 .shape-fill {
+  fill: #fff872;
+}
+
+.text-outline {
+  text-shadow:
+    -1px -1px 0 #653516,
+    1px -1px 0 #653516,
+    -1px 1px 0 #653516,
+    1px 1px 0 #653516;
+}
+
+/* Scroll reveal base state */
+.reveal {
+  opacity: 0;
+  transform: translateY(40px);
+  transition:
+    opacity 0.6s ease,
+    transform 0.6s ease;
+}
+
+/* When visible */
+.reveal.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Difference */
+.custom-shape-divider-bottom-1769705831 {
+  position: relative;
+  margin-bottom: -1;
+  left: 0;
+  width: 100%;
+  overflow: hidden;
+  line-height: 0;
+  transform: rotate(180deg);
+}
+
+.custom-shape-divider-bottom-1769705831 svg {
+  position: relative;
+  display: block;
+  width: calc(100% + 1.3px);
+  height: 254px;
+}
+
+.custom-shape-divider-bottom-1769705831 .shape-fill {
+  fill: #fff872;
+}
+
+.custom-shape-divider-top-1769706322 {
+  position: relative;
+  top: 0;
+  left: 0;
+  width: 100%;
+  overflow: hidden;
+  line-height: 0;
+}
+
+.custom-shape-divider-top-1769706322 svg {
+  position: relative;
+  display: block;
+  width: calc(100% + 1.3px);
+  height: 254px;
+}
+
+.custom-shape-divider-top-1769706322 .shape-fill {
+  fill: #fff872;
+}
+
+.marginSection {
+  margin-top: 300px;
+  margin-bottom: 100px;
+}
+
+/* hero Margin */
+.heroPadding {
+  padding-top: 150px;
+  padding-bottom: 100px;
+}
+
+.faq-card {
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+}
