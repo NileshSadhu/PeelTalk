@@ -1,11 +1,9 @@
-import Footer from "../components/Footer";
-import HeroSection from "../components/HeroSection";
+import PeelWeb from "@/components/pages/PeelWeb";
 
 export default function Home() {
   return (
     <>
-      <HeroSection />
-      <Footer />
+      <PeelWeb />
     </>
   );
 }

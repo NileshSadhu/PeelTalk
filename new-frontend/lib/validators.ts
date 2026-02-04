@@ -1,34 +1,32 @@
 export function isPasswordValid(password: string) {
-    const minLength = 8;
-    const specialCharRegex = /[!@#$%^&*(),.?":{}|<>]/;
+  const minLength = 8;
+  const specialCharRegex = /[!@#$%^&*(),.?":{}|<>]/;
 
-    if (password.length < minLength) {
-        return "Password must be at least 8 characters long.";
-    }
+  if (password.length < minLength) {
+    return "Password must be at least 8 characters long.";
+  }
 
-    if (!specialCharRegex.test(password)) {
-        return "Password must include at least one special character.";
-    }
+  if (!specialCharRegex.test(password)) {
+    return "Password must include at least one special character.";
+  }
 
-    return null;
+  return null;
 }
 
 export function isEmailValid(email: string) {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!email.trim()) {
-        return "Email is required.";
-    }
-    if (!emailRegex.test(email)) {
-        return "Please enter a valid email address.";
-    }
-    return null;
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!email.trim()) {
+    return "Email is required.";
+  }
+  if (!emailRegex.test(email)) {
+    return "Please enter a valid email address.";
+  }
+  return null;
 }
 
 export function validPin(pin: string) {
-    
-
-    if (pin.length !== 4 || !/^\d{4}$/.test(pin)) {
-        return "Pin must be exactly 4 digits.";
-    }
-    return null;
+  if (pin.length !== 4 || !/^\d{4}$/.test(pin)) {
+    return "Pin must be exactly 4 digits.";
+  }
+  return null;
 }

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Balsamiq_Sans } from "next/font/google";
-import { GoogleOAuthProvider } from '@react-oauth/google';
+import { GoogleOAuthProvider } from "@react-oauth/google";
 import "./globals.css";
 
 const balsamiq = Balsamiq_Sans({
@@ -12,7 +12,8 @@ const balsamiq = Balsamiq_Sans({
 
 export const metadata: Metadata = {
   title: "PeelTalk – Anonymous Chat with Strangers Worldwide",
-  description: "PeelTalk is a secure random chat app where you can sign up and connect anonymously with real people worldwide. One-on-one, private conversations with strangers made simple.",
+  description:
+    "PeelTalk is a secure random chat app where you can sign up and connect anonymously with real people worldwide. One-on-one, private conversations with strangers made simple.",
 };
 
 export default function RootLayout({
@@ -23,7 +24,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={balsamiq.className}>
-        <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!}>
+        <GoogleOAuthProvider
+          clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!}
+        >
           {children}
         </GoogleOAuthProvider>
       </body>
