@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { Disconnect } from "./Disconnect";
 import { UserInput } from "./UserInput";
 import { EmojiBtn } from "./EmojiBtn";
