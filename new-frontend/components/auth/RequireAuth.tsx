@@ -10,7 +10,7 @@ export const RequireAuth = ({ children }: { children: React.ReactNode }) => {
 
     useEffect(() => {
         if (!user) {
-        router.replace("/signin")
+        router.replace("/auth")
         }
     }, [user, router])
 

@@ -42,7 +42,7 @@ export default function SignupForm() {
             theme: "outline",
             size: "large",
             width: 260,
-            text: "signup_with",
+            text: "continue_with",
         })
         }
     }, [])
@@ -57,8 +57,7 @@ export default function SignupForm() {
             const res = await axios.post(
             `${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/google`,
             {
-                id_token: idToken,
-                mode: "signup",
+                id_token: idToken
             },
             { withCredentials: true }
             )

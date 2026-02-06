@@ -21,7 +21,7 @@ export const LogoutButton = () => {
         } finally {
         clearAuth()
 
-        router.replace("/signin")
+        router.replace("/auth")
         }
     }
 

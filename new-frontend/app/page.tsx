@@ -1,11 +1,10 @@
-import Footer from "../components/Footer";
-import HeroSection from "../components/HeroSection";
+import PeelWeb from "@/components/ui/home/PeelWeb";
+
 
 export default function Home() {
   return (
     <>
-      <HeroSection />
-      <Footer />
+      <PeelWeb />
     </>
   );
 }
